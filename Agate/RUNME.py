@@ -18,27 +18,38 @@ def gem(module_name):
 
 @gem('Gem.Boot')
 def gem():
+    #
+    #
+    #   This really belongs in Gem.Core, but is here since we need it during Boot
+    #
     Python_System   = __import__('sys')
     is_python_2     = Python_System.version_info.major is 2
     Python_Builtins = __import__('__builtin__'  if is_python_2 else   'builtins')
 
 
-    #
-    #   Python functions
-    #
     globals = Python_Builtins.globals
     iterate = Python_Builtins.iter
     length  = Python_Builtins.len
 
 
     #
-    #   Python Types
+    #   attribute_next
+    #       Access the .next method of an iterator
     #
-    String = Python_Builtins.str
+    #       (Deals with Annoyance of .next method named .next in python 2.0, but .__next__ in python 3.0)
+    #
+    if is_python_2:
+        def attribute_next(iterator):
+            return iterator.next
+    else:
+        def attribute_next(iterator):
+            return iterator.__next__
 
 
     #
-    #   Create export function
+    #   export:
+    #       Exports a function to Gem (Global Execution Module).
+    #       Can also be used with multiple arguments to export a list of values.
     #
     provide_gem = globals().setdefault
 
@@ -48,17 +59,12 @@ def gem():
             return provide_gem(f.__name__, f)
 
         argument_iterator = iterate(arguments)
-        next_argument     = argument_iterator.next
-
-        assert f.__class__ is String
+        next_argument     = attribute_next(argument_iterator)
 
         provide_gem(f, next_argument())
 
         for v in argument_iterator:
-            if v.__class__ is String:
-                provide_gem(v, next_argument())
-            else:
-                provide_gem(v.__name__, f)
+            provide_gem(v, next_argument())
 
 
     #
@@ -69,8 +75,10 @@ def gem():
 
     #
     #   Export everything else we used in creating export function
+    #       Consider this part of Gem.Core -- and exporting it here just avoids repeating the code there
     #
     export(
+        'attribute_next',   attribute_next,
         'globals',          globals,
         'is_python_2',      is_python_2,
         'Python_Builtins',  Python_Builtins,
@@ -81,10 +89,18 @@ def gem():
 @gem('Gem.Core')
 def gem():
     #
-    #   Keywords
-    #       implemented as keywords in Python 3.0 --so can't use something like Python_Builtins.None.
+    #   none
     #
     none = None
+
+
+    #
+    #   arrange
+    #
+    @export
+    def arrange(format, *arguments):
+        return format % arguments
+
 
     #
     #   line
@@ -108,6 +124,7 @@ def gem():
     export(
         #
         #   Keywords
+        #       implemented as keywords in Python 3.0 --so can't use something like Python_Builtins.None.
         #
         'false',    False,
         'none',     None,
@@ -118,68 +135,39 @@ def gem():
         #
         'introspection',    Python_Builtins.dir,
         'intern_string',    (Python_Builtins   if is_python_2 else   Python_System).intern,
+        'property',         Python_Builtins.property,
         'type',             Python_Builtins.type,
+
+        #
+        #   Types
+        #
+        'FrozenSet',        Python_Builtins.frozenset,
+        'Object',           Python_Builtins.object,
     )
 
 
-@gem('Main')
+@gem('Gem.Exception')
 def gem():
-    import os, re, sys
+    Python_Exceptions = (__import__('exceptions')   if is_python_2 else  Python_Builtins)
 
+    export(
+        'FileNotFoundError',  (Python_Builtins.OSError   if is_python_2 else    Python_Builtins.FileNotFoundError),
+        'ImportError',        Python_Exceptions.ImportError,
+    )
+    
 
-    if is_python_2:
-        #
-        #   Insanely enough, the python 2.0 'input' function actually evaluated the input!
-        #   We use the python 3.0 meaning of 'input' -- don't evaluate the input
-        #
-        input             = Python_Builtins.raw_input
-        FileNotFoundError = Python_Builtins.OSError
-    else:
-        input             = Python_Builtins.input
-        FileNotFoundError = Python_Builtins.FileNotFoundError
-
-
-    compile_regular_expression = re.compile
-    flush_standard_output      = sys.stdout.flush
-    FrozenSet                  = Python_Builtins.frozenset
-    ImportError                = Python_Builtins.ImportError
-    Object                     = Python_Builtins.object
-    open_file                  = Python_Builtins.open
-    path_join                  = os.path.join
-    path_remove                = os.remove
-    path_rename                = os.rename
-    property                   = Python_Builtins.property
-    file_status                = os.stat
-
-
-    her_or_his    = 'her|his'
-    is_her_or_his = FrozenSet(['her', 'his']).__contains__
-
-
-    def arrange(format, *arguments):
-        return format % arguments
-
-
-    def line(format, *arguments):
-        print (format % arguments   if arguments else   format)
-        flush_standard_output()
-
-
-    def make_match_function(pattern):
-        return compile_regular_expression(pattern).match
-
-
-    github_username__match = make_match_function(r'[0-9A-Za-z]+(?:-[0-9A-Za-z]+)*\Z')
-
-
-    class Ignore_FileNotFoundError(Object):
+@gem('Gem.CatchException')
+def gem():
+    class CatchException(Object):
         __slots__ = ((
+            'exception_type',           #   Type
             'caught',                   #   None | FileNotFoundError
         ))
 
 
-        def __init__(t):
-            t.caught = none
+        def __init__(t, exception_type):
+            t.exception_type = exception_type
+            t.caught         = none
 
 
         def __enter__(t):
@@ -187,10 +175,99 @@ def gem():
 
 
         def __exit__(t, e_type, value, traceback):
-            t.caught = value
-
-            if e_type is FileNotFoundError:
+            if e_type is t.exception_type:
+                t.caught = value
                 return true
+
+
+    @export
+    def catch_ImportError():
+        return CatchException(ImportError)
+
+
+    @export
+    def catch_FileNotFoundError():
+        return CatchException(FileNotFoundError)
+
+
+@gem('Gem.Import')
+def gem():
+    Python_Import = __import__('imp')
+
+
+    find_module = Python_Import.find_module
+    load_module = Python_Import.load_module
+
+
+    @export
+    def find_and_import_module__or__none(name, path = none):
+        with catch_ImportError() as e:
+            [f, pathname, description] = find_module(name, path)
+
+        if e.caught is not none:
+            return none
+
+        if f is none:
+            return load_module(name, f, pathname, description)
+
+        with f:
+            return load_module(name, f, pathname, description)
+
+
+@gem('Gem.File')
+def gem():
+    Python_OperatingSystem = __import__('os')
+
+    export(
+        'open_file',    Python_Builtins.open,
+        'file_status',  Python_OperatingSystem.stat
+    )
+
+
+@gem('Gem.IO')
+def gem():
+    export(
+        #
+        #   Insanely enough, the python 2.0 'input' function actually evaluated the input!
+        #   We use the python 3.0 meaning of 'input' -- don't evaluate the input
+        #
+        'input',        (Python_Builtins.raw_input   if is_python_2 else   Python_Builtins.input),
+    )
+
+
+@gem('Gem.Path')
+def gem():
+    Python_OperatingSystem = __import__('os')
+    Python_Path            = __import__('os.path').path
+
+
+    export(
+        'path_join',    Python_Path.join,
+        'path_remove',  Python_OperatingSystem.remove,
+        'path_rename',  Python_OperatingSystem.rename,
+    )
+
+
+@gem('Gem.RegularExpression')
+def gem():
+    Python_RegularExpression = __import__('re')
+
+
+    compile_regular_expression = Python_RegularExpression.compile
+
+
+    @export
+    def make_match_function(pattern):
+        return compile_regular_expression(pattern).match
+
+
+@gem('Main')
+def gem():
+    her_or_his    = 'her|his'
+    is_her_or_his = FrozenSet(['her', 'his']).__contains__
+
+
+    github_username__match = make_match_function(r'[0-9A-Za-z]+(?:-[0-9A-Za-z]+)*\Z')
 
 
     class FileOutput(Object):
@@ -227,10 +304,10 @@ def gem():
             f.close()
 
             if e_type is none:
-                with Ignore_FileNotFoundError():
+                with catch_FileNotFoundError():
                     path_remove(path_old)
 
-                with Ignore_FileNotFoundError():
+                with catch_FileNotFoundError():
                     path_rename(path, path_old)
 
                 path_rename(path_new, path)
@@ -398,7 +475,7 @@ def gem():
         path = path_join('Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
-            with Ignore_FileNotFoundError() as e:
+            with catch_FileNotFoundError() as e:
                 file_status(path)
 
             if e.caught is not none:
@@ -466,14 +543,19 @@ def gem():
         line('')
         line('Please EDIT the GPG key to the key you will sign with')
 
+
     @export
     def main():
-        try:
-            from Answers import github_username, name, pronoun
-        except ImportError:
+        Answers = find_and_import_module__or__none('Answers', ['.'])
+
+        if Answers is none:
             github_username = ''
             name            = ''
             pronoun         = her_or_his
+        else:
+            github_username = Answers.github_username
+            name            = Answers.name
+            pronoun         = Answers.pronoun
 
         [github_username, name, pronoun] = ask_three_questions(github_username, name, pronoun)
 
