@@ -5,46 +5,150 @@
 #
 #   Thanks!
 #
-def produce():
+
+
+def gem(module_name):
+    def execute(f):
+        f()
+
+        return gem
+
+    return execute
+
+
+@gem('Gem.Boot')
+def gem():
+    Python_System   = __import__('sys')
+    is_python_2     = Python_System.version_info.major is 2
+    Python_Builtins = __import__('__builtin__'  if is_python_2 else   'builtins')
+
+
+    #
+    #   Python functions
+    #
+    globals = Python_Builtins.globals
+    iterate = Python_Builtins.iter
+    length  = Python_Builtins.len
+
+
+    #
+    #   Python Types
+    #
+    String = Python_Builtins.str
+
+
+    #
+    #   Create export function
+    #
+    provide_gem = globals().setdefault
+
+
+    def export(f, *arguments):
+        if length(arguments) is 0:
+            return provide_gem(f.__name__, f)
+
+        argument_iterator = iterate(arguments)
+        next_argument     = argument_iterator.next
+
+        assert f.__class__ is String
+
+        provide_gem(f, next_argument())
+
+        for v in argument_iterator:
+            if v.__class__ is String:
+                provide_gem(v, next_argument())
+            else:
+                provide_gem(v.__name__, f)
+
+
+    #
+    #   Export ourselves :)
+    #
+    export(export)
+
+
+    #
+    #   Export everything else we used in creating export function
+    #
+    export(
+        'globals',          globals,
+        'is_python_2',      is_python_2,
+        'Python_Builtins',  Python_Builtins,
+        'Python_System',    Python_System,
+    )
+
+
+@gem('Gem.Core')
+def gem():
+    #
+    #   Keywords
+    #       implemented as keywords in Python 3.0 --so can't use something like Python_Builtins.None.
+    #
+    none = None
+
+    #
+    #   line
+    #
+    flush_standard_output = Python_System.stdout.flush
+    write_standard_output = Python_System.stdout.write
+
+
+    @export
+    def line(format = none, *arguments):
+        if format is none:
+            assert length(arguments) is 0
+
+            write_standard_output('\n')
+        else:
+            write_standard_output((format % arguments   if arguments else   format) + '\n')
+
+        flush_standard_output()
+
+
+    export(
+        #
+        #   Keywords
+        #
+        'false',    False,
+        'none',     None,
+        'true',     True,
+
+        #
+        #   Functions
+        #
+        'introspection',    Python_Builtins.dir,
+        'intern_string',    (Python_Builtins   if is_python_2 else   Python_System).intern,
+        'type',             Python_Builtins.type,
+    )
+
+
+@gem('Main')
+def gem():
     import os, re, sys
 
 
-    is_python_2 = sys.version_info.major is 2
-
-
-    if is_python_2:
-        import __builtin__ as builtins
-    else:
-        import builtins
-
-
-    false = False           #   Builtin (in python 3.0, cannot use __builin__.False)
-    true  = True            #   Builtin
-    none  = None            #   Builtin
-
-    
     if is_python_2:
         #
         #   Insanely enough, the python 2.0 'input' function actually evaluated the input!
         #   We use the python 3.0 meaning of 'input' -- don't evaluate the input
         #
-        input             = builtins.raw_input
-        FileNotFoundError = builtins.OSError
+        input             = Python_Builtins.raw_input
+        FileNotFoundError = Python_Builtins.OSError
     else:
-        input             = builtins.input
-        FileNotFoundError = builtins.FileNotFoundError
+        input             = Python_Builtins.input
+        FileNotFoundError = Python_Builtins.FileNotFoundError
 
 
     compile_regular_expression = re.compile
     flush_standard_output      = sys.stdout.flush
-    FrozenSet                  = builtins.frozenset
-    ImportError                = builtins.ImportError
-    Object                     = builtins.object
-    open_file                  = builtins.open
+    FrozenSet                  = Python_Builtins.frozenset
+    ImportError                = Python_Builtins.ImportError
+    Object                     = Python_Builtins.object
+    open_file                  = Python_Builtins.open
     path_join                  = os.path.join
     path_remove                = os.remove
     path_rename                = os.rename
-    property                   = builtins.property
+    property                   = Python_Builtins.property
     file_status                = os.stat
 
 
@@ -377,24 +481,6 @@ def produce():
 
 
 if __name__ == '__main__':
-    import __main__
-
-
-    provide_global = __import__('__main__').__dict__.setdefault
-        
-
-    def export(f):
-        previous = provide_global(f.__name__, f)
-
-        assert previous is f
-
-        return f
-        
-
-    produce()
-    del export, produce
-
-
     main()
 
 
