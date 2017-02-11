@@ -22,14 +22,14 @@ def gem():
     #
     #   This really belongs in Gem.Core, but is here since we need it during Boot
     #
-    Python_System   = __import__('sys')
-    is_python_2     = Python_System.version_info.major is 2
-    Python_Builtins = __import__('__builtin__'  if is_python_2 else   'builtins')
+    PythonSystem = __import__('sys')
+    is_python_2   = PythonSystem.version_info.major is 2
+    PythonCore    = __import__('__builtin__'  if is_python_2 else   'builtins')
 
 
-    globals = Python_Builtins.globals
-    iterate = Python_Builtins.iter
-    length  = Python_Builtins.len
+    globals = PythonCore.globals
+    iterate = PythonCore.iter
+    length  = PythonCore.len
 
 
     #
@@ -81,8 +81,8 @@ def gem():
         'attribute_next',   attribute_next,
         'globals',          globals,
         'is_python_2',      is_python_2,
-        'Python_Builtins',  Python_Builtins,
-        'Python_System',    Python_System,
+        'PythonCore',       PythonCore,
+        'PythonSystem',     PythonSystem,
     )
 
 
@@ -105,8 +105,8 @@ def gem():
     #
     #   line
     #
-    flush_standard_output = Python_System.stdout.flush
-    write_standard_output = Python_System.stdout.write
+    flush_standard_output = PythonSystem.stdout.flush
+    write_standard_output = PythonSystem.stdout.write
 
 
     @export
@@ -124,7 +124,7 @@ def gem():
     export(
         #
         #   Keywords
-        #       implemented as keywords in Python 3.0 --so can't use something like Python_Builtins.None.
+        #       implemented as keywords in Python 3.0 --so can't use something like PythonCore.None.
         #
         'false',    False,
         'none',     None,
@@ -133,28 +133,38 @@ def gem():
         #
         #   Functions
         #
-        'introspection',    Python_Builtins.dir,
-        'intern_string',    (Python_Builtins   if is_python_2 else   Python_System).intern,
-        'property',         Python_Builtins.property,
-        'type',             Python_Builtins.type,
+        'introspection',    PythonCore.dir,
+        'intern_string',    (PythonCore   if is_python_2 else   PythonSystem).intern,
+        'property',         PythonCore.property,
+        'type',             PythonCore.type,
 
         #
         #   Types
         #
-        'FrozenSet',        Python_Builtins.frozenset,
-        'Object',           Python_Builtins.object,
+        'FrozenSet',        PythonCore.frozenset,
+        'Object',           PythonCore.object,
+        'String',           PythonCore.str,
     )
 
 
 @gem('Gem.Exception')
 def gem():
-    Python_Exceptions = (__import__('exceptions')   if is_python_2 else  Python_Builtins)
+    PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+    RuntimeError    = PythonException.RuntimeError
+
+
+    @export
+    def raise_runtime_error(format, *arguments):
+        error_message = (format   % arguments   if arguments else   format)
+
+        raise RuntimeError(error_message)
+
 
     export(
-        'FileNotFoundError',  (Python_Builtins.OSError   if is_python_2 else    Python_Builtins.FileNotFoundError),
-        'ImportError',        Python_Exceptions.ImportError,
+        'FileNotFoundError',  (PythonCore.OSError   if is_python_2 else    PythonCore.FileNotFoundError),
+        'ImportError',        PythonException.ImportError,
     )
-    
+
 
 @gem('Gem.CatchException')
 def gem():
@@ -192,11 +202,9 @@ def gem():
 
 @gem('Gem.Import')
 def gem():
-    Python_Import = __import__('imp')
-
-
-    find_module = Python_Import.find_module
-    load_module = Python_Import.load_module
+    PythonImport = __import__('imp')
+    find_module  = PythonImport.find_module
+    load_module  = PythonImport.load_module
 
 
     @export
@@ -216,12 +224,133 @@ def gem():
 
 @gem('Gem.File')
 def gem():
-    Python_OperatingSystem = __import__('os')
-
     export(
-        'open_file',    Python_Builtins.open,
-        'file_status',  Python_OperatingSystem.stat
+        'open_file',    PythonCore.open,
     )
+
+
+@gem('Gem.FileStatus')
+def gem():
+    PythonOperatingSystem         = __import__('os')
+    PythonFileStatus              = __import__('stat')
+    PythonFileStatus__inode_flags = PythonFileStatus.S_IMODE
+    PythonFileStatus__file_type   = PythonFileStatus.S_IFMT
+    python_file_status            = PythonOperatingSystem.stat
+
+
+    class FileType(Object):
+        __slots__ = ((
+            'name',                     #   String+
+            'is_block_device',          #   Boolean
+            'is_character_device',      #   Boolean
+            'is_directory',             #   Boolean
+            'is_fifo',                  #   Boolean
+            'is_regular_file',          #   Boolean
+            'is_socket',                #   Boolean
+            'is_symbolic_link',         #   Boolean
+            'nonexistent',              #   Boolean
+        ))
+
+
+        def __init__(
+                t, name,
+
+                is_block_device     = false,
+                is_character_device = false,
+                is_directory        = false,
+                is_fifo             = false,
+                is_regular_file     = false,
+                is_socket           = false,
+                is_symbolic_link    = false,
+                nonexistent         = false,
+        ):
+            assert name.__class__ is String
+
+            assert (
+                     (
+                           is_block_device + is_character_device + is_directory + is_fifo + is_regular_file
+                         + is_socket + is_symbolic_link + nonexistent
+                     )
+                  == 1
+            )
+
+            t.name                = name
+            t.is_block_device     = is_block_device
+            t.is_character_device = is_character_device
+            t.is_directory        = is_directory
+            t.is_fifo             = is_fifo
+            t.is_regular_file     = is_regular_file
+            t.is_socket           = is_socket
+            t.is_symbolic_link    = is_symbolic_link
+            t.nonexistent         = nonexistent
+
+
+    file_type__block_device     = FileType('block_device',     is_block_device     = true)
+    file_type__character_device = FileType('character_device', is_character_device = true)
+    file_type__directory        = FileType('directory',        is_directory        = true)
+    file_type__fifo             = FileType('fifo',             is_fifo             = true)
+    file_type__regular_file     = FileType('regular_file',     is_regular_file     = true)
+    file_type__socket           = FileType('socket',           is_socket           = true)
+    file_type__symbolic_link    = FileType('symbolic_link',    is_symbolic_link    = true)
+
+    file_type__nonexistent = FileType('nonexistent', nonexistent = true)
+
+
+    del FileType.__init__
+
+
+    find__file_type = {
+        PythonFileStatus.S_IFBLK  : file_type__block_device,
+        PythonFileStatus.S_IFCHR  : file_type__block_device,
+        PythonFileStatus.S_IFDIR  : file_type__regular_file,
+        PythonFileStatus.S_IFIFO  : file_type__symbolic_link,       #   Misspelled by Python as 'IFIFO'
+        PythonFileStatus.S_IFREG  : file_type__regular_file,
+        PythonFileStatus.S_IFSOCK : file_type__socket,
+        PythonFileStatus.S_IFLNK  : file_type__symbolic_link,
+    }.__getitem__
+
+
+    class FileStatus(Object):
+        __slots__ = ((
+            'path',                     #   String+
+            'mode',                     #   FileType
+        ))
+
+
+        def __init__(t, path, mode):
+            t.path = path
+            t.mode = mode
+
+
+        @property
+        def is_regular_file(t):
+            return t.mode.is_regular_file
+
+
+        @property
+        def nonexistent(t):
+            return t.mode.nonexistent
+
+
+    def file_status__or__nonexistent(path):
+        with catch_FileNotFoundError() as e:
+            status = python_file_status(path)
+
+        if e.caught is not none:
+            return FileStatus(path, file_type__nonexistent)
+
+        mode        = status.st_mode
+        file_type   = PythonFileStatus__file_type  (mode)
+        inode_flags = PythonFileStatus__inode_flags(mode)
+
+        assert mode == file_type | inode_flags
+
+        return FileStatus(path, find__file_type(file_type))
+
+
+    @export
+    def exists__regular_file(path):
+        return file_status__or__nonexistent(path).is_regular_file
 
 
 @gem('Gem.IO')
@@ -231,29 +360,28 @@ def gem():
         #   Insanely enough, the python 2.0 'input' function actually evaluated the input!
         #   We use the python 3.0 meaning of 'input' -- don't evaluate the input
         #
-        'input',        (Python_Builtins.raw_input   if is_python_2 else   Python_Builtins.input),
+        'input',        (PythonCore.raw_input   if is_python_2 else   PythonCore.input),
     )
 
 
 @gem('Gem.Path')
 def gem():
-    Python_OperatingSystem = __import__('os')
-    Python_Path            = __import__('os.path').path
+    PythonOperatingSystem = __import__('os')
+    PythonPath            = __import__('os.path').path
 
 
     export(
-        'path_join',    Python_Path.join,
-        'path_remove',  Python_OperatingSystem.remove,
-        'path_rename',  Python_OperatingSystem.rename,
+        'path_basename',    PythonPath.basename,
+        'path_join',        PythonPath.join,
+        'path_remove',      PythonOperatingSystem.remove,
+        'path_rename',      PythonOperatingSystem.rename,
     )
 
 
 @gem('Gem.RegularExpression')
 def gem():
-    Python_RegularExpression = __import__('re')
-
-
-    compile_regular_expression = Python_RegularExpression.compile
+    PythonRegularExpression    = __import__('re')
+    compile_regular_expression = PythonRegularExpression.compile
 
 
     @export
@@ -405,11 +533,11 @@ def gem():
 
             if is_her_or_his(pronoun):
                 return pronoun
-                
+
             line('')
             line("***  Pronoun is expected to be %r or %r ***", 'her', 'his')
             line('')
-            
+
             if pronoun == her_or_his:
                 #
                 #   Don't bother asking if 'her|his' was the correct answer, user probably just hit return
@@ -475,10 +603,7 @@ def gem():
         path = path_join('Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
-            with catch_FileNotFoundError() as e:
-                file_status(path)
-
-            if e.caught is not none:
+            if exists__regular_file(path):
                 break
 
             line('')
@@ -534,7 +659,12 @@ def gem():
             f.line('')
             f.line('Copyright (c) 2017 %s', name)
 
-            with open_file('LICENSE') as license:
+            license_path = 'LICENSE'
+
+            if exists__regular_file(license_path) is false:
+                license_path = path_join('..', license_path)
+
+            with open_file(license_path) as license:
                 for s in license.read().splitlines()[3:]:
                     f.line('%s', s)
 
