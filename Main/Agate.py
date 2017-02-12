@@ -251,7 +251,7 @@ def gem():
 
     @export
     def main():
-        Answers = find_and_import_module__or__none('Answers', ['.'])
+        Answers = find_and_execute_module__or__none('Answers')
 
         if Answers is none:
             github_username = ''

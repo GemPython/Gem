@@ -36,6 +36,7 @@ def gem():
     #
     #   Python types
     #
+    Module    = PythonCore.__class__
     LiquidSet = PythonCore.set
     String    = PythonCore.str
 
@@ -174,16 +175,13 @@ def gem():
 
     if is_python_2:
         #
-        #   Python 2.0 method of loding a module with 'gem' pre-initialized
+        #   Python 2.0 method of loading a module with 'gem' pre-initialized
         #
         #       This is messy -- see below for the Python 3.0 method which is much cleaner.
         #
-        PythonImport2 = __import__('imp')
-
-        find_module = PythonImport2.find_module
-        load_module = PythonImport2.load_module
-
-        Module = PythonImport2.__class__
+        PythonOldImport = __import__('imp')
+        find_module     = PythonOldImport.find_module
+        load_module     = PythonOldImport.load_module
 
 
         @export

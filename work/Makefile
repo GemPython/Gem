@@ -1,15 +1,36 @@
-all: clean links
+AGATE_FILES = ../Main/Agate.py ../Agate/RUNME.py
+
+GEM_FILES = \
+	../Gem/__init__.py \
+	../Gem/Boot.py \
+	../Gem/Core.py ../Gem/CatchException.py \
+	../Gem/Exception.py \
+	../Gem/File.py ../Gem/FileOutput.py ../Gem/FileStatus.py \
+	../Gem/Import.py ../Gem/IO.py \
+	../Gem/Path.py \
+	../Gem/RegularExpression.py
+
+WORK_FILES = Makefile
+
+FILES = $(AGATE_FILES) $(GEM_FILES) $(WORK_FILES)
+
+all: clean files links
 
 clean:
+	rm -f *.old *.new
 	rm -f a.py
 	rm -f b.py
 	rm -f c.py ce.py
 	rm -f e.py
-	rm -f fi.py fo.py fs.py
+	rm -f files fi.py fo.py fs.py
 	rm -f in.py im.py io.py
 	rm -f m
 	rm -f p.py
 	rm -f r.py re.py
+
+files:
+	echo $(FILES) >files.new
+	mv files.new files
 
 links:
 	ln -s ../Main/Agate.py              a.py
