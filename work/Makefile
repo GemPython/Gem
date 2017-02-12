@@ -4,7 +4,7 @@ GEM_FILES = \
 	../Gem/__init__.py \
 	../Gem/Boot.py \
 	../Gem/Core.py ../Gem/CatchException.py \
-	../Gem/Exception.py \
+	../Gem/Exception.py ../Gem/ExecuteFile.py \
 	../Gem/File.py ../Gem/FileOutput.py ../Gem/FileStatus.py \
 	../Gem/Import.py ../Gem/IO.py \
 	../Gem/Path.py \
@@ -17,11 +17,13 @@ FILES = $(AGATE_FILES) $(GEM_FILES) $(WORK_FILES)
 all: clean files links
 
 clean:
-	rm -f *.old *.new
+	rm -rf __pycache__
+	rm -f *.old *.new *.pyc
+
 	rm -f a.py
 	rm -f b.py
 	rm -f c.py ce.py
-	rm -f e.py
+	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
 	rm -f in.py im.py io.py
 	rm -f m
@@ -37,7 +39,8 @@ links:
 	ln -s ../Gem/Boot.py                b.py
 	ln -s ../Gem/Core.py                c.py
 	ln -s ../Gem/CatchException.py      ce.py
-	ln -s ../Gem/Exception.py           e.py
+	ln -s ../Gem/ExecuteFile.py         ef.py
+	ln -s ../Gem/Exception.py           ex.py
 	ln -s ../Gem/File.py                fi.py
 	ln -s ../Gem/FileOutput.py          fo.py
 	ln -s ../Gem/FileStatus.py          fs.py
@@ -48,3 +51,9 @@ links:
 	ln -s ../Gem/Path.py                p.py
 	ln -s ../Agate/RUNME.py             r.py
 	ln -s ../Gem/RegularExpression.py   re.py
+
+wc:
+	wc -l \
+        ../Main/Agate.py \
+        $(GEM_FILES) \
+        $(WORK_FILES)

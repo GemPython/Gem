@@ -15,9 +15,9 @@ from Gem import gem
 
 @gem('Main')
 def gem():
+    require_gem('Gem.ExecuteFile')
     require_gem('Gem.FileOutput')
     require_gem('Gem.FileStatus')
-    require_gem('Gem.Import')
     require_gem('Gem.IO')
     require_gem('Gem.Path')
     require_gem('Gem.RegularExpression')
@@ -251,16 +251,16 @@ def gem():
 
     @export
     def main():
-        Answers = find_and_execute_module__or__none('Answers')
+        if exists__regular_file('Answers.py'):
+            Answers = execute_python_from_file('Answers.py')
 
-        if Answers is none:
-            github_username = ''
-            name            = ''
-            pronoun         = her_or_his
-        else:
             github_username = Answers.github_username
             name            = Answers.name
             pronoun         = Answers.pronoun
+        else:
+            github_username = ''
+            name            = ''
+            pronoun         = her_or_his
 
         [github_username, name, pronoun] = ask_three_questions(github_username, name, pronoun)
 

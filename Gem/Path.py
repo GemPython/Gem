@@ -8,8 +8,9 @@ def gem():
 
 
     export(
-        'path_basename',    PythonPath.basename,
-        'path_join',        PythonPath.join,
-        'path_remove',      PythonOperatingSystem.remove,
-        'path_rename',      PythonOperatingSystem.rename,
+        'path_basename',            PythonPath.basename,
+        'path_join',                PythonPath.join,
+        'path_remove',              PythonOperatingSystem.remove,
+        'path_rename',              PythonOperatingSystem.rename,
+        'path_split_extension',     PythonPath.splitext,
     )
