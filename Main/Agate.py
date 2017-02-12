@@ -1,71 +1,18 @@
-PythonPath  = __import__('os.path').path
-module_path = __import__('sys').path
+#
+#   Copyright (c) 2017 Amit Green.  All rights reserved.
+#
 
 
-module_path.insert(1, PythonPath.abspath(PythonPath.join(module_path[0], '..')))
+from sys     import path    as module_path
+from os.path import abspath as path_absolute, join as path_join
+
+module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
 
 
-import Gem
+del module_path, path_absolute, path_join
 
 
-@gem('Gem.Core')
-def gem():
-    #
-    #   none
-    #
-    none = None
-
-
-    #
-    #   arrange
-    #
-    @export
-    def arrange(format, *arguments):
-        return format % arguments
-
-
-    #
-    #   line
-    #
-    flush_standard_output = PythonSystem.stdout.flush
-    write_standard_output = PythonSystem.stdout.write
-
-
-    @export
-    def line(format = none, *arguments):
-        if format is none:
-            assert length(arguments) is 0
-
-            write_standard_output('\n')
-        else:
-            write_standard_output((format % arguments   if arguments else   format) + '\n')
-
-        flush_standard_output()
-
-
-    export(
-        #
-        #   Keywords
-        #       implemented as keywords in Python 3.0 --so can't use something like PythonCore.None.
-        #
-        'false',    False,
-        'none',     None,
-        'true',     True,
-
-        #
-        #   Functions
-        #
-        'introspection',    PythonCore.dir,
-        'property',         PythonCore.property,
-        'type',             PythonCore.type,
-
-        #
-        #   Types
-        #
-        'FrozenSet',        PythonCore.frozenset,
-        'Object',           PythonCore.object,
-        'String',           PythonCore.str,
-    )
+from Gem import gem
 
 
 @gem('Gem.Exception')
@@ -614,4 +561,4 @@ def gem():
 
 
 if __name__ == '__main__':
-    Gem.main()
+    __import__('Gem').main()
