@@ -92,18 +92,21 @@ def gem():
 
     def export(f, *arguments):
         if length(arguments) is 0:
-            name = function_name(f)
+            if type(f) is Function:
+                name = function_name(f)
 
-            return provide_gem(
-                       name,
-                       Function(
-                           function_code(f),
-                           gem_scope,               #   Replace global scope with Gem's scope
+                return provide_gem(
                            name,
-                           function_defaults(f),
-                           function_closure(f),
-                       ),
-                   )
+                           Function(
+                               function_code(f),
+                               gem_scope,               #   Replace global scope with Gem's scope
+                               name,
+                               function_defaults(f),
+                               function_closure(f),
+                           ),
+                       )
+
+            return provide_gem(f.__name__, f)
 
         argument_iterator = iterate(arguments)
         next_argument     = next_method(argument_iterator)
