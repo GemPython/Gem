@@ -395,4 +395,40 @@ def gem():
     require_gem('Gem.Core')
 
 
-    Gem.boot = boot
+    #
+    #   main
+    #
+    Main = python_modules['__main__']
+
+
+    @localize
+    def main(module_name):
+        assert module_name == 'Main'
+
+
+        def export(f):
+            assert f.__name__ == 'main'
+
+            del Main.export
+
+            return forge_export(Main)(f)
+
+
+        def execute(f):
+            assert f.__name__ == 'main'
+
+            f()
+
+            Main.main()
+
+
+        del Main.main
+
+        Main.export      = export
+        Main.require_gem = require_gem
+
+        return execute
+
+
+    Gem .boot = boot
+    Main.main = main
