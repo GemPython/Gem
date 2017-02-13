@@ -1,0 +1,33 @@
+stty tostop
+
+set -o vi
+
+alias a=alias
+
+a g=git
+a mcl='mc && make links && fg'
+a mc='make clean'
+a m='make'
+a p=pushd
+a vm='v Makefile'
+a vrc='v ~/.bashrc2; source ~/.bashrc2'
+a v=vi
+a vx='v x'
+a yo='-O '
+a y=python
+a zo='z -O'
+a z=python3
+
+
+function vg()
+{
+    xargs grep -il "$*" <files >files.tmp
+
+    if [ -s files.tmp ]; then
+        vi "+/$*" `cat files.tmp`
+    else
+        echo "? pattern not found in files: $*" >&2
+    fi
+
+    rm files.tmp
+}

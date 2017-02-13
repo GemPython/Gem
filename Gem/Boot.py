@@ -91,35 +91,98 @@ def gem():
     function_name = Function.__dict__['__name__'].__get__
 
 
-    def export(f, *arguments):
-        if length(arguments) is 0:
-            if type(f) is Function:
-                name = function_name(f)
+    if __debug__:
+        PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+        NameError       = PythonException.NameError
 
-                return provide_gem(
-                           name,
-                           Function(
-                               function_code(f),
-                               gem_scope,               #   Replace global scope with Gem's scope
+
+        def arrange(format, *arguments):
+            return format % arguments
+
+
+        def already_exists(name, previous, exporting):
+            name_error = arrange("Gem.%s already exists (value: %r): can't export %r also",
+                                 name, previous, exporting)
+
+            raise NameError(name_error)
+
+
+        def export(f, *arguments):
+            if length(arguments) is 0:
+                if type(f) is Function:
+                    name = function_name(f)
+
+                    exporting = Function(
+                                    function_code(f),
+                                    gem_scope,              #   Replace global scope with Gem's scope
+                                    name,
+                                    function_defaults(f),
+                                    function_closure(f),
+                                )
+
+                    previous = provide_gem(name, exporting)
+
+                    if previous is not exporting:
+                        already_exists(name, previous, exporting)
+
+                    return exporting
+
+                previous = provide_gem(f.__name__, f)
+
+                if previous is not f:
+                    already_exists(f.__name__, previous, f)
+
+                return f
+
+            argument_iterator = iterate(arguments)
+            next_argument     = next_method(argument_iterator)
+
+            assert f.__class__ is String
+
+            exporting = next_argument()
+            previous  = provide_gem(f, exporting)
+
+            if previous is not exporting:
+                already_exists(f, previous, exporting)
+
+            for name in argument_iterator:
+                assert name.__class__ is String
+
+                exporting = next_argument()
+                previous  = provide_gem(name, exporting)
+
+                if previous is not exporting:
+                    already_exists(name, previous, exporting)
+    else:
+        def export(f, *arguments):
+            if length(arguments) is 0:
+                if type(f) is Function:
+                    name = function_name(f)
+
+                    return provide_gem(
                                name,
-                               function_defaults(f),
-                               function_closure(f),
-                           ),
-                       )
+                               Function(
+                                   function_code(f),
+                                   gem_scope,               #   Replace global scope with Gem's scope
+                                   name,
+                                   function_defaults(f),
+                                   function_closure(f),
+                               ),
+                           )
 
-            return provide_gem(f.__name__, f)
+                return provide_gem(f.__name__, f)
 
-        argument_iterator = iterate(arguments)
-        next_argument     = next_method(argument_iterator)
+            argument_iterator = iterate(arguments)
+            next_argument     = next_method(argument_iterator)
 
-        assert f.__class__ is String
+            assert f.__class__ is String
 
-        provide_gem(f, next_argument())
+            provide_gem(f, next_argument())
 
-        for v in argument_iterator:
-            assert v.__class__ is String
+            for name in argument_iterator:
+                assert name.__class__ is String
 
-            provide_gem(v, next_argument())
+                provide_gem(name, next_argument())
 
 
     export(export)                                  #   Export ourselves :)
@@ -139,6 +202,17 @@ def gem():
         @export
         def next_method(iterator):
             return iterator.__next__
+
+
+    #
+    #   NOTE:
+    #       The previous two calls to 'export' did *NOT* have 'next_argument' (used by export) defined ...
+    #
+    #       That is ok, as they only called 'export' with one argument ... thus not hitting the code path
+    #       that uses 'next_argument'
+    #
+    #       Now that 'next_method' is defined, 'export' can be called with multiple arguments ...
+    #
 
 
     #
