@@ -36,6 +36,7 @@ def gem():
     #
     #   Python types
     #
+    Module    = PythonCore.__class__
     LiquidSet = PythonCore.set
     String    = PythonCore.str
 
@@ -53,11 +54,9 @@ def gem():
     #
     Gem          = python_modules['Gem']
     Gem.__name__ = Gem_name              = intern_string(Gem.__name__)
+    gem_scope    = Gem.__dict__
 
     store_python_module(Gem_name, Gem)
-
-    gem_scope   = Gem.__dict__
-    provide_gem = gem_scope.setdefault
 
 
     #
@@ -90,38 +89,147 @@ def gem():
     function_name = Function.__dict__['__name__'].__get__
 
 
-    def export(f, *arguments):
-        if length(arguments) is 0:
-            if type(f) is Function:
-                name = function_name(f)
-
-                return provide_gem(
-                           name,
-                           Function(
-                               function_code(f),
-                               gem_scope,               #   Replace global scope with Gem's scope
-                               name,
-                               function_defaults(f),
-                               function_closure(f),
-                           ),
-                       )
-
-            return provide_gem(f.__name__, f)
-
-        argument_iterator = iterate(arguments)
-        next_argument     = next_method(argument_iterator)
-
-        assert f.__class__ is String
-
-        provide_gem(f, next_argument())
-
-        for v in argument_iterator:
-            assert v.__class__ is String
-
-            provide_gem(v, next_argument())
+    def localize(f):
+        return Function(
+                   function_code(f),
+                   gem_scope,                               #   Replace global scope with Gem's scope
+                   function_name(f),
+                   function_defaults(f),
+                   function_closure(f),
+               )
 
 
-    export(export)                                  #   Export ourselves :)
+    #
+    #   Strickly speaking:
+    #
+    #       We don't really need to localize ourselves ...
+    #       (since is never exported or referenced once this function finishes)
+    #
+    #   However ... might as well ...
+    #
+    localize = localize(localize)                           #   Localize ourselves :)
+
+
+    if __debug__:
+        PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+        NameError       = PythonException.NameError
+
+
+        @localize
+        def arrange(format, *arguments):
+            return format % arguments
+
+
+        @localize
+        def forge_export(module):
+            module_name    = module.__name__
+            module_scope   = module.__dict__
+            provide_export = module_scope.setdefault
+
+
+            def already_exists(name, previous, exporting):
+                name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
+                                     module_name, name, previous, exporting)
+
+                raise NameError(name_error)
+
+
+            def export(f, *arguments):
+                if length(arguments) is 0:
+                    if type(f) is Function:
+                        name = function_name(f)
+
+                        exporting = Function(
+                                        function_code(f),
+                                        module_scope,           #   Replace global scope with module's scope
+                                        name,
+                                        function_defaults(f),
+                                        function_closure(f),
+                                    )
+
+                        previous = provide_export(name, exporting)
+
+                        if previous is not exporting:
+                            already_exists(name, previous, exporting)
+
+                        return exporting
+
+                    previous = provide_export(f.__name__, f)
+
+                    if previous is not f:
+                        already_exists(f.__name__, previous, f)
+
+                    return f
+
+                argument_iterator = iterate(arguments)
+                next_argument     = next_method(argument_iterator)
+
+                assert f.__class__ is String
+
+                exporting = next_argument()
+                previous  = provide_export(f, exporting)
+
+                if previous is not exporting:
+                    already_exists(f, previous, exporting)
+
+                for name in argument_iterator:
+                    assert name.__class__ is String
+
+                    exporting = next_argument()
+                    previous  = provide_export(name, exporting)
+
+                    if previous is not exporting:
+                        already_exists(name, previous, exporting)
+
+
+            return export
+
+
+    else:
+        @localize
+        def forge_export(module):
+            module_name    = module.__name__
+            module_scope   = module.__dict__
+            provide_export = module_scope.setdefault
+
+
+            def export(f, *arguments):
+                if length(arguments) is 0:
+                    if type(f) is Function:
+                        name = function_name(f)
+
+                        return provide_export(
+                                   name,
+                                   Function(
+                                       function_code(f),
+                                       module_scope,           #   Replace global scope with module's scope
+                                       name,
+                                       function_defaults(f),
+                                       function_closure(f),
+                                   ),
+                               )
+
+                    return provide_export(f.__name__, f)
+
+                argument_iterator = iterate(arguments)
+                next_argument     = next_method(argument_iterator)
+
+                assert f.__class__ is String
+
+                provide_export(f, next_argument())
+
+                for name in argument_iterator:
+                    assert name.__class__ is String
+
+                    provide_export(name, next_argument())
+
+
+            return export
+
+
+    export       = forge_export(Gem)            #   Create export function for Gem
+    forge_export = export(forge_export)         #   export forge_export
+    export       = export(export)               #   export ourselves :)
 
 
     #
@@ -138,6 +246,17 @@ def gem():
         @export
         def next_method(iterator):
             return iterator.__next__
+
+
+    #
+    #   NOTE:
+    #       The previous two calls to 'export' did *NOT* have 'next_argument' (used by export) defined ...
+    #
+    #       That is ok, as they only called 'export' with one argument ... thus not hitting the code path
+    #       that uses 'next_argument'
+    #
+    #       Now that 'next_method' is defined, 'export' can be called with multiple arguments ...
+    #
 
 
     #
@@ -174,16 +293,13 @@ def gem():
 
     if is_python_2:
         #
-        #   Python 2.0 method of loding a module with 'gem' pre-initialized
+        #   Python 2.0 method of loading a module with 'gem' pre-initialized
         #
         #       This is messy -- see below for the Python 3.0 method which is much cleaner.
         #
-        PythonImport2 = __import__('imp')
-
-        find_module = PythonImport2.find_module
-        load_module = PythonImport2.load_module
-
-        Module = PythonImport2.__class__
+        PythonOldImport = __import__('imp')
+        find_module     = PythonOldImport.find_module
+        load_module     = PythonOldImport.load_module
 
 
         @export
@@ -279,4 +395,40 @@ def gem():
     require_gem('Gem.Core')
 
 
-    Gem.boot = boot
+    #
+    #   main
+    #
+    Main = python_modules['__main__']
+
+
+    @localize
+    def main(module_name):
+        assert module_name == 'Main'
+
+
+        def export(f):
+            assert f.__name__ == 'main'
+
+            del Main.export
+
+            return forge_export(Main)(f)
+
+
+        def execute(f):
+            assert f.__name__ == 'main'
+
+            f()
+
+            Main.main()
+
+
+        del Main.main
+
+        Main.export      = export
+        Main.require_gem = require_gem
+
+        return execute
+
+
+    Gem .boot = boot
+    Main.main = main

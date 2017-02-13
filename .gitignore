@@ -1,6 +1,9 @@
+*.new
+*.old
 *.pyc
 __pycache__/
 .*.sw[op]
+*.tmp
 tmp/
 x
 y

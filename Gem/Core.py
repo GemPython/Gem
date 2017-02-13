@@ -77,6 +77,7 @@ def gem():
         #   Types
         #
         'FrozenSet',        PythonCore.frozenset,
+        'Module',           PythonCore.__class__,
         'Object',           PythonCore.object,
         'String',           PythonCore.str,
 

@@ -10,17 +10,45 @@ module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
 del module_path, path_absolute, path_join
 
 
-from Gem import gem
+import Gem
 
 
-@gem('Main')
-def gem():
+#
+#   The three main functions:
+#
+#
+#   1.  main('Main')
+#           The wrapper that for all functions defined 'Main' Module.  Defined in Gem.Boot
+#
+#           In addition to doing the standard wrapping, also calls the 'Main.main' function after the
+#           'Main' module is instantiated.
+#
+#
+#   2.  @main('Main')
+#       def main():
+#           This function instantiates the Main module.
+#
+#           It is reponsible for exporting a 'main' function to the 'Main' module.
+#
+#
+#   3.  @export
+#       def main():
+#           The actual main function.  Exported to the 'Main' module.
+#
+#           This funtion is automatically executed after the 'Main' module is instantiated.
+#
+@main('Main')
+def main():
+    require_gem('Gem.ExecuteFile')
     require_gem('Gem.FileOutput')
     require_gem('Gem.FileStatus')
-    require_gem('Gem.Import')
     require_gem('Gem.IO')
     require_gem('Gem.Path')
     require_gem('Gem.RegularExpression')
+
+
+    from Gem import arrange, execute_python_from_file, exists__regular_file, false, FileOutput, FrozenSet
+    from Gem import input, line, make_match_function, open_file, path_join, true
 
 
     her_or_his    = 'her|his'
@@ -251,21 +279,17 @@ def gem():
 
     @export
     def main():
-        Answers = find_and_import_module__or__none('Answers', ['.'])
+        if exists__regular_file('Answers.py'):
+            Answers = execute_python_from_file('Answers.py')
 
-        if Answers is none:
-            github_username = ''
-            name            = ''
-            pronoun         = her_or_his
-        else:
             github_username = Answers.github_username
             name            = Answers.name
             pronoun         = Answers.pronoun
+        else:
+            github_username = ''
+            name            = ''
+            pronoun         = her_or_his
 
         [github_username, name, pronoun] = ask_three_questions(github_username, name, pronoun)
 
         write_contribution_agreement(github_username, name, pronoun)
-
-
-if __name__ == '__main__':
-    __import__('Gem').main()
