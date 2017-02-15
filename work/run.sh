@@ -26,7 +26,7 @@ do
 done
 
 amount=1
-command='python ../Main/Agate.py'
+command='python ../Beryl/Beryl.py'
 
 while :
 do

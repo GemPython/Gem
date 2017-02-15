@@ -1,16 +1,22 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-from sys     import path    as module_path
-from os.path import abspath as path_absolute, join as path_join
+def boot(module_name):
+    def execute(f):
+        return f()
 
-module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
-
-
-del module_path, path_absolute, path_join
+    return execute
 
 
-import Gem
+@boot('Boot')
+def boot():
+    from sys     import path    as module_path
+    from os.path import abspath as path_absolute, join as path_join
+
+    module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
+
+
+    import Gem
 
 
 #
@@ -180,7 +186,7 @@ def main():
 
     def ask_three_questions(github_username, name, pronoun):
         while 7 is 7:
-            line('Welcome to the RUNME, V0.0')
+            line('Welcome to the Beryl, V0.0')
             line('')
             line('This program will create a contribution agreement:')
             line('    A.  For you to add to your git repository; and')

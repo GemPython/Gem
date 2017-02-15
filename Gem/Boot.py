@@ -422,6 +422,7 @@ def gem():
             Main.main()
 
 
+        del Main.boot
         del Main.main
 
         Main.export      = export
