@@ -4,7 +4,7 @@ This means that everyone has the right to use the contributions for any reason
 whatsoever, including making a profit:
 
     o  Without giving anything to Mike Zhukovskiy in return;
-    o  And also, that once contributed, the contribution is permenant & cannot
+    o  And also, that once contributed, the contribution is permanent & cannot
        be undone.
 
 This agreement is dated 2017-02-09 and applies to all commits made via the
