@@ -1,4 +1,6 @@
-AGATE_FILES = ../Main/Agate.py ../Agate/RUNME.py
+AGATE_FILES = ../Agate/RUNME.py
+
+BERYL_FILES = ../Beryl/Beryl.py
 
 GEM_FILES = \
 	../Gem/__init__.py \
@@ -12,7 +14,7 @@ GEM_FILES = \
 
 WORK_FILES = Makefile
 
-FILES = $(AGATE_FILES) $(GEM_FILES) $(WORK_FILES)
+FILES = $(AGATE_FILES) $(BERYL_FILES) $(GEM_FILES) $(WORK_FILES)
 
 all: clean files links
 
@@ -20,8 +22,7 @@ clean:
 	rm -rf __pycache__
 	rm -f *.old *.new *.pyc
 
-	rm -f a.py
-	rm -f b.py
+	rm -f be.py bo.py
 	rm -f c.py ce.py
 	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
@@ -36,7 +37,8 @@ files:
 
 links:
 	ln -s ../Main/Agate.py              a.py
-	ln -s ../Gem/Boot.py                b.py
+	ln -s ../Beryl/Beryl.py             be.py
+	ln -s ../Gem/Boot.py                bo.py
 	ln -s ../Gem/Core.py                c.py
 	ln -s ../Gem/CatchException.py      ce.py
 	ln -s ../Gem/ExecuteFile.py         ef.py
@@ -53,7 +55,8 @@ links:
 	ln -s ../Gem/RegularExpression.py   re.py
 
 wc:
+	#  Excludes $(AGATE_FIELS)
 	wc -l \
-        ../Main/Agate.py \
+		$(BERYL_FILES) \
         $(GEM_FILES) \
         $(WORK_FILES)
