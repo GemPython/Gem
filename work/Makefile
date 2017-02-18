@@ -22,6 +22,7 @@ clean:
 	rm -rf __pycache__
 	rm -f *.old *.new *.pyc
 
+	rm -f a.py
 	rm -f be.py bo.py
 	rm -f c.py ce.py
 	rm -f ef.py ex.py
@@ -29,7 +30,7 @@ clean:
 	rm -f in.py im.py io.py
 	rm -f m
 	rm -f p.py
-	rm -f r.py re.py
+	rm -f r.py rx.py
 
 files:
 	echo $(FILES) >files.new
@@ -52,7 +53,7 @@ links:
 	ln -s Makefile                      m
 	ln -s ../Gem/Path.py                p.py
 	ln -s ../Agate/RUNME.py             r.py
-	ln -s ../Gem/RegularExpression.py   re.py
+	ln -s ../Gem/RegularExpression.py   rx.py
 
 wc:
 	#  Excludes $(AGATE_FIELS)

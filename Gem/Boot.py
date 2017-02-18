@@ -17,6 +17,7 @@ def gem():
     #
     PythonSystem = __import__('sys')
     is_python_2   = PythonSystem.version_info.major is 2
+    is_python_3   = PythonSystem.version_info.major is 3
     PythonCore    = __import__('__builtin__'  if is_python_2 else   'builtins')
 
 
@@ -68,12 +69,7 @@ def gem():
 
 
     #
-    #   export
-    #       Exports a function to Gem (Global Execution Module); also the actual function exported
-    #       is a copy of the original function -- but with its global scope replaced to be Gem's scope.
-    #
-    #       Can also be used with multiple arguments to export a list of values (no replacement of
-    #       global scope's is done in this case).
+    #   Function
     #
     Function = boot.__class__
 
@@ -89,6 +85,16 @@ def gem():
     function_name = Function.__dict__['__name__'].__get__
 
 
+    #
+    #   localize
+    #
+    #       Strickly speaking:
+    #
+    #           We don't really need to localize ourselves ...
+    #           (since is never exported or referenced once this function finishes)
+    #
+    #       However ... might as well ... hence: 'localize = localize(localize)'
+    #
     def localize(f):
         return Function(
                    function_code(f),
@@ -99,20 +105,36 @@ def gem():
                )
 
 
-    #
-    #   Strickly speaking:
-    #
-    #       We don't really need to localize ourselves ...
-    #       (since is never exported or referenced once this function finishes)
-    #
-    #   However ... might as well ...
-    #
     localize = localize(localize)                           #   Localize ourselves :)
 
 
+    #
+    #   next_method
+    #       Access the .next method of an iterator
+    #
+    #       (Deals with the annoyance of .next method named .next in python 2.0, but .__next__ in python 3.0)
+    #
+    if is_python_2:
+        @localize
+        def next_method(iterator):
+            return iterator.next
+    else:
+        @localize
+        def next_method(iterator):
+            return iterator.__next__
+
+
+    #
+    #   export
+    #       Exports a function to Gem (Global Execution Module); also the actual function exported
+    #       is a copy of the original function -- but with its global scope replaced to be Gem's scope.
+    #
+    #       Can also be used with multiple arguments to export a list of values (no replacement of
+    #       global scope's is done in this case).
+    #
     @localize
-    def produce_distribute(distribute_name, scope, insert):
-        def distribute(f, *arguments):
+    def produce_actual_export(scope, insert):
+        def export(f, *arguments):
             if length(arguments) is 0:
                 if f.__class__ is Function:
                     name = function_name(f)
@@ -143,12 +165,10 @@ def gem():
                 insert(name, next_argument())
 
 
-        distribute.__name__ = distribute_name
-
-        return distribute
+        return export
 
 
-    export_name = intern_string('export')
+    share_name = intern_string('share')
 
 
     if __debug__:
@@ -156,59 +176,163 @@ def gem():
         NameError       = PythonException.NameError
 
 
+        #
+        #   Code
+        #
+        Code = function_code(boot).__class__
+
+
+        code_argument_count    = Code.co_argcount   .__get__
+        code_cell_vars         = Code.co_cellvars   .__get__
+        code_constants         = Code.co_consts     .__get__
+        code_filename          = Code.co_filename   .__get__
+        code_first_line_number = Code.co_firstlineno.__get__
+        code_flags             = Code.co_flags      .__get__
+        code_free_variables    = Code.co_freevars   .__get__
+        code_global_names      = Code.co_names      .__get__
+        code_line_number_table = Code.co_lnotab     .__get__
+        code_name              = Code.co_name       .__get__
+        code_number_locals     = Code.co_nlocals    .__get__
+        code_stack_size        = Code.co_stacksize  .__get__
+        code_variable_names    = Code.co_varnames   .__get__
+        code_virtual_code      = Code.co_code       .__get__
+
+        if is_python_3:
+            code_keyword_only_argument_count = Code.co_kwonlyargcount.__get__
+
+
+        #
+        #   share_code
+        #
+        share_code = function_code(produce_actual_export(0, 0))
+
+        if is_python_2:
+            share_code = Code(
+                             code_argument_count   (share_code),
+                             code_number_locals    (share_code),
+                             code_stack_size       (share_code),
+                             code_flags            (share_code),
+                             code_virtual_code     (share_code),
+                             code_constants        (share_code),
+                             code_global_names     (share_code),
+                             code_variable_names   (share_code),
+                             code_filename         (share_code),
+                             share_name,                            #   Rename to 'share'
+                             code_first_line_number(share_code),
+                             code_line_number_table(share_code),
+                             code_free_variables   (share_code),
+                             code_cell_vars        (share_code),
+                        )
+        else:
+            share_code = Code(
+                             code_argument_count             (share_code),
+                             code_keyword_only_argument_count (share_code),
+                             code_number_locals              (share_code),
+                             code_stack_size                 (share_code),
+                             code_flags                      (share_code),
+                             code_virtual_code               (share_code),
+                             code_constants                  (share_code),
+                             code_global_names               (share_code),
+                             code_variable_names             (share_code),
+                             code_filename                   (share_code),
+                             share_name,                            #   Rename to 'share'
+                             code_first_line_number          (share_code),
+                             code_line_number_table          (share_code),
+                             code_free_variables             (share_code),
+                             code_cell_vars                  (share_code),
+                        )
+
+
+        #
+        #   arrange
+        #
         @localize
         def arrange(format, *arguments):
             return format % arguments
 
 
+        #
+        #   produce_export_and_share
+        #
         @localize
-        def produce_export(module):
+        def produce_export_and_share(module):
             module_name    = module.__name__
             module_scope   = module.__dict__
             provide_export = module_scope.setdefault
 
+            shared_scope   = {}
+            provide_shared = shared_scope.setdefault
 
-            def insert_export(name, exporting):
-                previous = provide_export(name, exporting)
+
+            def insert_share(name, exporting):
+                previous = provide_shared(name, exporting)
 
                 if previous is exporting:
                     return previous
+
+                name_error = arrange("%s.Shared.%s already exists (value: %r): can't export %r also",
+                                     module_name, name, previous, exporting)
+
+                raise NameError(name_error)
+
+
+            def insert_export(name, exporting):
+                #
+                #   Everything 'exported' is also 'shared', so call both 'provide_export' & 'insert_share'
+                #
+                previous = provide_export(name, insert_share(name, exporting))
+
+                if previous is exporting:
+                    return exporting
 
                 name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
                                      module_name, name, previous, exporting)
 
                 raise NameError(name_error)
 
+            export = produce_actual_export(module_scope, insert_export)
+            share  = produce_actual_export(module_scope, insert_share)
 
-            return produce_distribute(export_name, module_scope, insert_export)
+            share = Function(
+                        share_code,
+                        shared_scope,
+                        share_name,
+                        function_defaults(share),
+                        function_closure(share),
+                    )
+
+            share('Shared', shared_scope)
+
+            return ((export, share))
     else:
         @localize
-        def produce_export(module):
+        def produce_export_and_share(module):
             module_scope   = module.__dict__
             provide_export = module_scope.setdefault
 
-            return produce_distribute(export_name, module_scope, provide_export)
+            shared_scope   = {}
+            provide_shared = shared_scope.setdefault
 
 
-    export         = produce_export(Gem)            #   Create export function for Gem
-    produce_export = export(produce_export)         #   export produce_export
-    export         = export(export)                 #   export ourselves :)
+            def insert_export(name, exporting):
+                #
+                #   Everything 'exported' is also 'shared', so call both 'provide_export' & 'provide_shared'
+                #
+                return provide_export(name, provide_shared(name, exporting))
 
 
-    #
-    #   next_method
-    #       Access the .next method of an iterator
-    #
-    #       (Deals with the annoyance of .next method named .next in python 2.0, but .__next__ in python 3.0)
-    #
-    if is_python_2:
-        @export
-        def next_method(iterator):
-            return iterator.next
-    else:
-        @export
-        def next_method(iterator):
-            return iterator.__next__
+            export = produce_actual_export(module_scope, insert_export)
+            share  = produce_actual_export(module_scope, insert_share)
+
+            share('Shared', shared_scope)
+
+            return ((export, share))
+
+
+    [export, share] = produce_export_and_share(Gem)
+
+    export = export(export)
+    share  = export(share)
 
 
     #
@@ -374,7 +498,7 @@ def gem():
 
             del Main.export
 
-            return produce_export(Main)(f)
+            return produce_export_and_share(Main)[0](f)
 
 
         def execute(f):
