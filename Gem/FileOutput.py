@@ -8,6 +8,9 @@ def gem():
     require_gem('Gem.Path')
 
 
+    from Gem import open_file
+
+
     @export
     class FileOutput(Object):
         __slots__ = ((
@@ -22,6 +25,7 @@ def gem():
             t._write = t.f  = none
 
 
+        @privileged
         def __enter__(t):
             assert t.f is none
 

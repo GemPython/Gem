@@ -7,7 +7,7 @@ def gem():
     require_gem('Gem.Path')
 
 
-    from Gem import intern_string, path_basename, open_file, path_split_extension, Module
+    from Gem import path_basename, open_file, path_split_extension
 
 
     if is_python_2:

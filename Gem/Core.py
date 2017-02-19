@@ -16,15 +16,9 @@ def gem():
 
 
     #
-    #   Python Keywords
-    #
-    none = None
-
-
-    #
     #   arrange
     #
-    @export
+    @built_in
     def arrange(format, *arguments):
         return format % arguments
 
@@ -36,7 +30,7 @@ def gem():
     write_standard_output = PythonSystem.stdout.write
 
 
-    @export
+    @built_in
     def line(format = none, *arguments):
         if format is none:
             assert length(arguments) is 0
@@ -48,24 +42,17 @@ def gem():
         flush_standard_output()
 
 
-    export(
+    built_in(
         #
         #   Functions
         #
+        'globals',          PythonCore.globals,
         'intern_string',    intern_string,
         'introspection',    PythonCore.dir,
         'iterate',          PythonCore.iter,
         'length',           length,
         'property',         PythonCore.property,
         'type',             PythonCore.type,
-
-        #
-        #   Keywords
-        #       implemented as keywords in Python 3.0 --so can't use something like PythonCore.None.
-        #
-        'false',    False,
-        'none',     None,
-        'true',     True,
 
         #
         #   Modules

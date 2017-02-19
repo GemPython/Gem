@@ -53,17 +53,37 @@ def gem():
     #   Gem
     #       Replace the index in python_modules & also Gem.__name__ with an intern'ed copy of 'Gem'.
     #
-    Gem          = python_modules['Gem']
-    Gem.__name__ = Gem_name              = intern_string(Gem.__name__)
-    gem_scope    = Gem.__dict__
-
-    GemBuiltIn_scope = {}
-
-    special_builtins_name = intern_string('__builtins__')
-    GemShared_scope       = { special_builtins_name : PythonCore.__dict__ }
-    privileged_scope      = { special_builtins_name : PythonCore.__dict__ }
+    Gem       = python_modules['Gem']
+    Gem_name  = Gem.__name__ = intern_string(Gem.__name__)
+    gem_scope = Gem.__dict__
 
     store_python_module(Gem_name, Gem)
+
+
+    #
+    #   Gem.Builtin:
+    #       The same scope is used for both 'Gem.BuiltIn' & 'privileged_scope'.
+    #
+    #       'privileged_scope' requires '__builtins__' to be privileged.
+    #
+    #       On the other hand, '__builtins__' slightly *pollutes* Gem.Builtin.
+    #
+    #       For now the choice is to accept this, later on they can be spilt
+    #
+    special_builtins_name = intern_string('__builtins__')
+    special_name          = intern_string('__name__')
+    privileged_scope      = GemBuiltIn_scope = {
+                                                   special_builtins_name : PythonCore.__dict__,
+                                                   special_name          : intern_string('Gem.BuiltIn'),
+                                               }
+
+    #
+    #   Gem.Shared
+    #
+    GemShared_scope = {
+                          special_builtins_name : GemBuiltIn_scope,
+                          special_name          : intern_string('Gem.Shared'),
+                      }
 
 
     #
@@ -152,7 +172,7 @@ def gem():
         def export(f, *arguments):
             if length(arguments) is 0:
                 if (f.__class__ is Function) and (function_globals(f) is not privileged_scope):
-                    name = function_name(f)
+                    name = intern_string(function_name(f))
 
                     return insert(
                                name,
@@ -165,7 +185,7 @@ def gem():
                                ),
                            )
 
-                return insert(f.__name__, f)
+                return insert(intern_string(f.__name__), f)
 
             argument_iterator = iterate(arguments)
             next_argument     = next_method(argument_iterator)
@@ -177,14 +197,14 @@ def gem():
             for name in argument_iterator:
                 assert name.__class__ is String
 
-                insert(name, next_argument())
+                insert(intern_string(name), next_argument())
 
 
         return export
 
 
     #
-    #   built_in__code & share_code
+    #   share_code
     #
     if __debug__:
         #
@@ -215,53 +235,49 @@ def gem():
         #
         #   rename_export_code
         #
-        export__code = function_code(produce_actual_export(0, 0))
-
-
         if is_python_2:
-            def rename_export_code(name):
+            def rename_code(code, name):
                 return Code(
-                           code_argument_count   (export__code),
-                           code_number_locals    (export__code),
-                           code_stack_size       (export__code),
-                           code_flags            (export__code),
-                           code_virtual_code     (export__code),
-                           code_constants        (export__code),
-                           code_global_names     (export__code),
-                           code_variable_names   (export__code),
-                           code_filename         (export__code),
+                           code_argument_count   (code),
+                           code_number_locals    (code),
+                           code_stack_size       (code),
+                           code_flags            (code),
+                           code_virtual_code     (code),
+                           code_constants        (code),
+                           code_global_names     (code),
+                           code_variable_names   (code),
+                           code_filename         (code),
                            intern_string(name),                              #   Rename to 'name'
-                           code_first_line_number(export__code),
-                           code_line_number_table(export__code),
-                           code_free_variables   (export__code),
-                           code_cell_vars        (export__code),
+                           code_first_line_number(code),
+                           code_line_number_table(code),
+                           code_free_variables   (code),
+                           code_cell_vars        (code),
                       )
         else:
-            def rename_export_code(name):
+            def rename_code(code, name):
                 return Code(
-                           code_argument_count             (export__code),
-                           code_keyword_only_argument_count(export__code),
-                           code_number_locals              (export__code),
-                           code_stack_size                 (export__code),
-                           code_flags                      (export__code),
-                           code_virtual_code               (export__code),
-                           code_constants                  (export__code),
-                           code_global_names               (export__code),
-                           code_variable_names             (export__code),
-                           code_filename                   (export__code),
+                           code_argument_count             (code),
+                           code_keyword_only_argument_count(code),
+                           code_number_locals              (code),
+                           code_stack_size                 (code),
+                           code_flags                      (code),
+                           code_virtual_code               (code),
+                           code_constants                  (code),
+                           code_global_names               (code),
+                           code_variable_names             (code),
+                           code_filename                   (code),
                            intern_string(name),                              #   Rename to 'name'
-                           code_first_line_number          (export__code),
-                           code_line_number_table          (export__code),
-                           code_free_variables             (export__code),
-                           code_cell_vars                  (export__code),
+                           code_first_line_number          (code),
+                           code_line_number_table          (code),
+                           code_free_variables             (code),
+                           code_cell_vars                  (code),
                       )
 
 
         #
-        #   built_it__code & share_code
+        #   share_code
         #
-        built_in__code = rename_export_code('built_in')
-        share_code     = rename_export_code('share')
+        share_code = rename_code(function_code(produce_actual_export(0, 0)), 'share')
 
 
     #
@@ -309,24 +325,26 @@ def gem():
             raise__built_in__name_error(name, previous, exporting)
 
 
+        built_in = produce_actual_export(GemShared_scope, insert__built_in)
+
         built_in = Function(
-                       rename_export_code('built_in'),
-                       GemShared_scope,
+                       rename_code(share_code, 'built_in'),
+                       function_globals(built_in),
                        intern_string('built_in'),
-                       none,                                    #   No defaults
-                       function_closure(produce_actual_export(GemShared_scope, insert__built_in)),
+                       function_defaults(built_in),
+                       function_closure(built_in),
                    )
     else:
         built_in = produce_actual_export(GemShared_scope, provide__built_in)
 
 
+    #
+    #   produce_export_and_share
+    #
     if __debug__:
         share_name = intern_string('share')
 
 
-        #
-        #   produce_export_and_share
-        #
         @localize3_or_privileged2
         def produce_export_and_share(module, shared_scope = none):
             module_name    = module.__name__ = intern_string(module.__name__)
@@ -366,16 +384,17 @@ def gem():
 
 
             export = produce_actual_export(shared_scope, insert_export)
+            share  = produce_actual_export(shared_scope, insert_share)
 
             share = Function(
                         share_code,
-                        shared_scope,
+                        function_globals(share),
                         share_name,
-                        none,                       #   Defaults
-                        function_closure(produce_actual_export(shared_scope, insert_share)),
+                        function_defaults(share),
+                        function_closure(share),
                     )
 
-            share('Shared', shared_scope)
+            export('Shared', shared_scope)
 
             return ((export, share))
     else:
@@ -397,20 +416,42 @@ def gem():
                 return provide_export(name, provide_shared(name, exporting))
 
 
-            export = produce_actual_export(module_scope, insert_export)
-            share  = produce_actual_export(module_scope, insert_share)
+            export = produce_actual_export(shared_scope, insert_export)
+            share  = produce_actual_export(shared_scope, provide_shared)
 
-            share('Shared', shared_scope)
+            export('Shared', shared_scope)
 
             return ((export, share))
 
 
     [export, share] = produce_export_and_share(Gem, shared_scope = GemShared_scope)
 
-    share(
-        'export',       export,
+
+    built_in(
+        #
+        #   Keywords
+        #       implemented as keywords in Python 3.0 --so can't use an expression like 'PythonCore.None'.
+        #
+        'false',    False,
+        'none',     None,
+        'true',     True,
+
+
+        #
+        #   Functions
+        #
         '__import__',   PythonCore.__import__,
         'privileged',   privileged,
+    )
+
+
+    if is_python_3:
+        built_in(PythonCore.__build_class__.__name__, PythonCore.__build_class__)
+
+
+    share(
+        'built_in',     built_in,
+        'export',       export,
         'share',        share,
     )
 
@@ -550,6 +591,7 @@ def gem():
             blueprint.loader.exec_module(module)
 
 
+
     require_gem('Gem.Core')
 
 
@@ -589,5 +631,19 @@ def gem():
         return execute
 
 
-    Gem .boot = boot
-    Main.main = main
+    Gem.boot = boot
+
+
+    Main.__builtins__ = GemBuiltIn_scope
+    Main.main         = main
+
+    del Gem.__builtins__
+    del Gem.__package__
+
+
+import Gem
+
+Gem_keys = sorted(Gem.__dict__.keys())
+print('Gem: ', Gem_keys)
+print('Gem.Shared: ', sorted(k   for k in Gem.Shared.keys()   if k not in Gem_keys))
+print("Gem.Shared['__builtins__']: ", sorted(Gem.Shared['__builtins__'].keys()))

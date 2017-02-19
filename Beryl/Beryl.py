@@ -53,8 +53,8 @@ def main():
     require_gem('Gem.RegularExpression')
 
 
-    from Gem import arrange, execute_python_from_file, exists__regular_file, false, FileOutput, FrozenSet
-    from Gem import input, line, make_match_function, open_file, path_join, true
+    from Gem import execute_python_from_file, exists__regular_file, FileOutput
+    from Gem import input, make_match_function, open_file, path_join
 
 
     her_or_his    = 'her|his'
@@ -208,11 +208,12 @@ def main():
                 return ((github_username, name, pronoun))
 
 
+    @privileged
     def write_contribution_agreement(github_username, name, pronoun):
         path = path_join('Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
-            if exists__regular_file(path):
+            if not exists__regular_file(path):
                 break
 
             line('')
