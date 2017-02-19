@@ -7,6 +7,9 @@ def gem():
     require_gem('Gem.Path')
 
 
+    from Gem import intern_string, path_basename, open_file, path_split_extension, Module
+
+
     if is_python_2:
         execute_file = PythonCore.execfile
 
@@ -29,6 +32,7 @@ def gem():
 
 
         @export
+        @privileged
         def execute_python_from_file(path):
             path                  = intern_string(path)
             [basename, extension] = path_split_extension(path_basename(path))

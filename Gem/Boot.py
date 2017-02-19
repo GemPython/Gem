@@ -57,6 +57,12 @@ def gem():
     Gem.__name__ = Gem_name              = intern_string(Gem.__name__)
     gem_scope    = Gem.__dict__
 
+    GemBuiltIn_scope = {}
+
+    special_builtins_name = intern_string('__builtins__')
+    GemShared_scope       = { special_builtins_name : PythonCore.__dict__ }
+    privileged_scope      = { special_builtins_name : PythonCore.__dict__ }
+
     store_python_module(Gem_name, Gem)
 
 
@@ -77,16 +83,18 @@ def gem():
         function_closure  = Function.func_closure .__get__
         function_code     = Function.func_code    .__get__
         function_defaults = Function.func_defaults.__get__
+        function_globals  = Function.func_globals .__get__
     else:
         function_closure  = Function.__closure__ .__get__
         function_code     = Function.__code__    .__get__
         function_defaults = Function.__defaults__.__get__
+        function_globals  = Function.__globals__ .__get__
 
     function_name = Function.__dict__['__name__'].__get__
 
 
     #
-    #   localize
+    #   localize, privilege, & localize3_or_privileged2
     #
     #       Strickly speaking:
     #
@@ -95,17 +103,24 @@ def gem():
     #
     #       However ... might as well ... hence: 'localize = localize(localize)'
     #
-    def localize(f):
-        return Function(
-                   function_code(f),
-                   gem_scope,                               #   Replace global scope with Gem's scope
-                   function_name(f),
-                   function_defaults(f),
-                   function_closure(f),
-               )
+    def produce_change_scope(scope):
+        def change_scope(f):
+            return Function(
+                       function_code(f),
+                       scope,
+                       function_name(f),
+                       function_defaults(f),
+                       function_closure(f),
+                   )
+
+        return change_scope
 
 
-    localize = localize(localize)                           #   Localize ourselves :)
+    privileged = produce_change_scope(privileged_scope)
+    privileged = privileged(privileged)                     #   Make ourselves privileged ;)
+    localize   = privileged(produce_change_scope(GemShared_scope))
+
+    localize3_or_privileged2 = (privileged   if is_python_2 else   localize)
 
 
     #
@@ -132,11 +147,11 @@ def gem():
     #       Can also be used with multiple arguments to export a list of values (no replacement of
     #       global scope's is done in this case).
     #
-    @localize
+    @localize3_or_privileged2
     def produce_actual_export(scope, insert):
         def export(f, *arguments):
             if length(arguments) is 0:
-                if f.__class__ is Function:
+                if (f.__class__ is Function) and (function_globals(f) is not privileged_scope):
                     name = function_name(f)
 
                     return insert(
@@ -168,14 +183,10 @@ def gem():
         return export
 
 
-    share_name = intern_string('share')
-
-
+    #
+    #   built_in__code & share_code
+    #
     if __debug__:
-        PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
-        NameError       = PythonException.NameError
-
-
         #
         #   Code
         #
@@ -197,71 +208,140 @@ def gem():
         code_variable_names    = Code.co_varnames   .__get__
         code_virtual_code      = Code.co_code       .__get__
 
-        if is_python_3:
+        if not is_python_2:
             code_keyword_only_argument_count = Code.co_kwonlyargcount.__get__
 
 
         #
-        #   share_code
+        #   rename_export_code
         #
-        share_code = function_code(produce_actual_export(0, 0))
+        export__code = function_code(produce_actual_export(0, 0))
+
 
         if is_python_2:
-            share_code = Code(
-                             code_argument_count   (share_code),
-                             code_number_locals    (share_code),
-                             code_stack_size       (share_code),
-                             code_flags            (share_code),
-                             code_virtual_code     (share_code),
-                             code_constants        (share_code),
-                             code_global_names     (share_code),
-                             code_variable_names   (share_code),
-                             code_filename         (share_code),
-                             share_name,                            #   Rename to 'share'
-                             code_first_line_number(share_code),
-                             code_line_number_table(share_code),
-                             code_free_variables   (share_code),
-                             code_cell_vars        (share_code),
-                        )
+            def rename_export_code(name):
+                return Code(
+                           code_argument_count   (export__code),
+                           code_number_locals    (export__code),
+                           code_stack_size       (export__code),
+                           code_flags            (export__code),
+                           code_virtual_code     (export__code),
+                           code_constants        (export__code),
+                           code_global_names     (export__code),
+                           code_variable_names   (export__code),
+                           code_filename         (export__code),
+                           intern_string(name),                              #   Rename to 'name'
+                           code_first_line_number(export__code),
+                           code_line_number_table(export__code),
+                           code_free_variables   (export__code),
+                           code_cell_vars        (export__code),
+                      )
         else:
-            share_code = Code(
-                             code_argument_count             (share_code),
-                             code_keyword_only_argument_count (share_code),
-                             code_number_locals              (share_code),
-                             code_stack_size                 (share_code),
-                             code_flags                      (share_code),
-                             code_virtual_code               (share_code),
-                             code_constants                  (share_code),
-                             code_global_names               (share_code),
-                             code_variable_names             (share_code),
-                             code_filename                   (share_code),
-                             share_name,                            #   Rename to 'share'
-                             code_first_line_number          (share_code),
-                             code_line_number_table          (share_code),
-                             code_free_variables             (share_code),
-                             code_cell_vars                  (share_code),
-                        )
+            def rename_export_code(name):
+                return Code(
+                           code_argument_count             (export__code),
+                           code_keyword_only_argument_count(export__code),
+                           code_number_locals              (export__code),
+                           code_stack_size                 (export__code),
+                           code_flags                      (export__code),
+                           code_virtual_code               (export__code),
+                           code_constants                  (export__code),
+                           code_global_names               (export__code),
+                           code_variable_names             (export__code),
+                           code_filename                   (export__code),
+                           intern_string(name),                              #   Rename to 'name'
+                           code_first_line_number          (export__code),
+                           code_line_number_table          (export__code),
+                           code_free_variables             (export__code),
+                           code_cell_vars                  (export__code),
+                      )
 
 
         #
-        #   arrange
+        #   built_it__code & share_code
         #
+        built_in__code = rename_export_code('built_in')
+        share_code     = rename_export_code('share')
+
+
+    #
+    #   produce__raise_already_exists
+    #
+    if __debug__:
+        PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+        NameError       = PythonException.NameError
+
+
         @localize
         def arrange(format, *arguments):
             return format % arguments
 
 
+        @localize
+        def produce__raise_already_exists(interned_module_name):
+            def raise_already_exists(name, previous, exporting):
+                name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
+                                     interned_module_name, name, previous, exporting)
+
+                raise NameError(name_error)
+
+
+            return raise_already_exists
+
+
+    #
+    #   built_in
+    #
+    provide__built_in = GemBuiltIn_scope.setdefault
+
+
+    if __debug__:
+        raise__built_in__name_error = produce__raise_already_exists(intern_string('Gem.BuiltIn'))
+
+
+        @localize
+        def insert__built_in(name, exporting):
+            previous = provide__built_in(name, exporting)
+
+            if previous is exporting:
+                return previous
+
+            raise__built_in__name_error(name, previous, exporting)
+
+
+        built_in = Function(
+                       rename_export_code('built_in'),
+                       GemShared_scope,
+                       intern_string('built_in'),
+                       none,                                    #   No defaults
+                       function_closure(produce_actual_export(GemShared_scope, insert__built_in)),
+                   )
+    else:
+        built_in = produce_actual_export(GemShared_scope, provide__built_in)
+
+
+    if __debug__:
+        share_name = intern_string('share')
+
+
         #
         #   produce_export_and_share
         #
-        @localize
-        def produce_export_and_share(module):
-            module_name    = module.__name__
+        @localize3_or_privileged2
+        def produce_export_and_share(module, shared_scope = none):
+            module_name    = module.__name__ = intern_string(module.__name__)
             module_scope   = module.__dict__
             provide_export = module_scope.setdefault
 
-            shared_scope   = {}
+            if shared_scope is none:
+                shared_scope = {}
+
             provide_shared = shared_scope.setdefault
+
+            raise_already_exists       = produce__raise_already_exists(module_name)
+            raise_share_already_exists = produce__raise_already_exists(
+                                             intern_string(arrange('%s.Shared', module_name)),
+                                         )
 
 
             def insert_share(name, exporting):
@@ -270,10 +350,7 @@ def gem():
                 if previous is exporting:
                     return previous
 
-                name_error = arrange("%s.Shared.%s already exists (value: %r): can't export %r also",
-                                     module_name, name, previous, exporting)
-
-                raise NameError(name_error)
+                raise_share_already_exists(name, previous, exporting)
 
 
             def insert_export(name, exporting):
@@ -285,20 +362,17 @@ def gem():
                 if previous is exporting:
                     return exporting
 
-                name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
-                                     module_name, name, previous, exporting)
+                raise_already_exists(name, previous, exporting)
 
-                raise NameError(name_error)
 
-            export = produce_actual_export(module_scope, insert_export)
-            share  = produce_actual_export(module_scope, insert_share)
+            export = produce_actual_export(shared_scope, insert_export)
 
             share = Function(
                         share_code,
                         shared_scope,
                         share_name,
-                        function_defaults(share),
-                        function_closure(share),
+                        none,                       #   Defaults
+                        function_closure(produce_actual_export(shared_scope, insert_share)),
                     )
 
             share('Shared', shared_scope)
@@ -306,11 +380,13 @@ def gem():
             return ((export, share))
     else:
         @localize
-        def produce_export_and_share(module):
+        def produce_export_and_share(module, shared_scope = none):
             module_scope   = module.__dict__
             provide_export = module_scope.setdefault
 
-            shared_scope   = {}
+            if shared_scope is none:
+                shared_scope = {}
+
             provide_shared = shared_scope.setdefault
 
 
@@ -329,21 +405,14 @@ def gem():
             return ((export, share))
 
 
-    [export, share] = produce_export_and_share(Gem)
+    [export, share] = produce_export_and_share(Gem, shared_scope = GemShared_scope)
 
-    export = export(export)
-    share  = export(share)
-
-
-    #
-    #   NOTE:
-    #       The previous two calls to 'export' did *NOT* have 'next_argument' (used by export) defined ...
-    #
-    #       That is ok, as they only called 'export' with one argument ... thus not hitting the code path
-    #       that uses 'next_argument'
-    #
-    #       Now that 'next_method' is defined, 'export' can be called with multiple arguments ...
-    #
+    share(
+        'export',       export,
+        '__import__',   PythonCore.__import__,
+        'privileged',   privileged,
+        'share',        share,
+    )
 
 
     #
@@ -353,13 +422,14 @@ def gem():
 
 
     @export
+    @privileged
     def gem(module_gem):
         def execute(f):
             assert f.__name__ == gem_name
 
             Function(
                 function_code(f),
-                gem_scope,               #   Replace global scope with Gem's scope
+                GemShared_scope,         #   Replace global scope with Gem' shared scope
                 gem_name,
                 function_defaults(f),
                 function_closure(f),
@@ -390,6 +460,7 @@ def gem():
 
 
         @export
+        @privileged
         def require_gem(module_name):
             if has_gem_module(module_name):
                 return
