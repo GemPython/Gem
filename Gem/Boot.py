@@ -61,30 +61,19 @@ def gem():
 
 
     #
-    #   Gem.Builtin:
-    #       The same scope is used for both 'Gem.BuiltIn' & 'privileged_scope'.
-    #
-    #       'privileged_scope' requires '__builtins__' to be privileged.
-    #
-    #       On the other hand, '__builtins__' slightly *pollutes* Gem.Builtin.
-    #
-    #       For now the choice is to accept this, later on they can be spilt
+    #   Gem{Builtin,Privileged,Shared}_scope
     #
     special_builtins_name = intern_string('__builtins__')
     special_name          = intern_string('__name__')
-    privileged_scope      = GemBuiltIn_scope = {
-                                                   special_builtins_name : PythonCore.__dict__,
-                                                   special_name          : intern_string('Gem.BuiltIn'),
-                                               }
-
-    #
-    #   Gem.Shared
-    #
-    GemShared_scope = {
-                          special_builtins_name : GemBuiltIn_scope,
-                          special_name          : intern_string('Gem.Shared'),
-                      }
-
+    GemBuiltIn_scope      = { special_name : intern_string('Gem.BuiltIn') }
+    GemPrivileged_scope   = {
+                                special_builtins_name : PythonCore.__dict__,
+                                special_name          : intern_string('Gem.Privileged'),
+                            }
+    GemShared_scope       = {
+                              special_builtins_name : GemBuiltIn_scope,
+                              special_name          : intern_string('Gem.Shared'),
+                            }
 
     #
     #   boot
@@ -136,7 +125,7 @@ def gem():
         return change_scope
 
 
-    privileged = produce_change_scope(privileged_scope)
+    privileged = produce_change_scope(GemPrivileged_scope)
     privileged = privileged(privileged)                     #   Make ourselves privileged ;)
     localize   = privileged(produce_change_scope(GemShared_scope))
 
@@ -171,7 +160,7 @@ def gem():
     def produce_actual_export(scope, insert):
         def export(f, *arguments):
             if length(arguments) is 0:
-                if (f.__class__ is Function) and (function_globals(f) is not privileged_scope):
+                if (f.__class__ is Function) and (function_globals(f) is not GemPrivileged_scope):
                     name = intern_string(function_name(f))
 
                     return insert(
@@ -236,7 +225,7 @@ def gem():
         #   rename_export_code
         #
         if is_python_2:
-            def rename_code(code, name):
+            def rename_code(code, interned_name):
                 return Code(
                            code_argument_count   (code),
                            code_number_locals    (code),
@@ -247,14 +236,14 @@ def gem():
                            code_global_names     (code),
                            code_variable_names   (code),
                            code_filename         (code),
-                           intern_string(name),                              #   Rename to 'name'
+                           intern_string(interned_name),                #   Rename to 'name'
                            code_first_line_number(code),
                            code_line_number_table(code),
                            code_free_variables   (code),
                            code_cell_vars        (code),
                       )
         else:
-            def rename_code(code, name):
+            def rename_code(code, interned_name):
                 return Code(
                            code_argument_count             (code),
                            code_keyword_only_argument_count(code),
@@ -266,7 +255,7 @@ def gem():
                            code_global_names               (code),
                            code_variable_names             (code),
                            code_filename                   (code),
-                           intern_string(name),                              #   Rename to 'name'
+                           intern_string(interned_name),                #   Rename to 'name'
                            code_first_line_number          (code),
                            code_line_number_table          (code),
                            code_free_variables             (code),
@@ -274,14 +263,53 @@ def gem():
                       )
 
 
-        #
-        #   share_code
-        #
+    #
+    #
+    #
+    if __debug__:
+        def rename_function(name, f, code = none):
+            name = intern_string(name)
+
+            return Function(
+                       (code) or (rename_code(function_code(f), name)),
+                       function_globals(f),
+                       name,
+                       function_defaults(f),
+                       function_closure(f),
+                   )
+    else:
+        def rename_function(name, f, code = none):
+            return f
+
+
+    #
+    #   Rename
+    #
+    if __debug__:
+        def rename(name):
+            def rename(f):
+                return rename_function(name, f)
+
+            return rename
+
+                        
+    #
+    #   share_code
+    #
+    if __debug__:
         share_code = rename_code(function_code(produce_actual_export(0, 0)), 'share')
 
 
     #
-    #   produce__raise_already_exists
+    #   arrange
+    #
+    @localize
+    def arrange(format, *arguments):
+        return format % arguments
+
+
+    #
+    #   raise_already_exists
     #
     if __debug__:
         PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
@@ -289,53 +317,92 @@ def gem():
 
 
         @localize
-        def arrange(format, *arguments):
-            return format % arguments
+        def raise_already_exists(module_name, name, previous, exporting):
+            name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
+                                 module_name, name, previous, exporting)
+
+            raise NameError(name_error)
 
 
+    #
+    #   produce_dual_insert
+    #
+    if __debug__:
         @localize
-        def produce__raise_already_exists(interned_module_name):
-            def raise_already_exists(name, previous, exporting):
-                name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
-                                     interned_module_name, name, previous, exporting)
-
-                raise NameError(name_error)
+        def produce_dual_insert(function_name, single_insert, provide, module_name):
+            module_name = intern_string(module_name)
 
 
-            return raise_already_exists
+            @rename(function_name)
+            def dual_insert(name, exporting):
+                previous = provide(name, single_insert(name, exporting))
+
+                if previous is exporting:
+                    return exporting
+
+                raise_already_exists(module_name, name, previous, exporting)
+
+
+            return dual_insert
+    else:
+        @localize
+        def produce_dual_insert(function_name, single_insert, provide, module_name):
+            def dual_insert(name, exporting):
+                return provide(name, single_insert(name, exporting))
+
+
+            return dual_insert
 
 
     #
-    #   built_in
+    #   produce_single_insert
     #
-    provide__built_in = GemBuiltIn_scope.setdefault
+    if __debug__:
+        @localize
+        def produce_single_insert(function_name, provide, module_name):
+            module_name = intern_string(module_name)
+
+
+            @rename(function_name)
+            def single_insert(name, exporting):
+                previous = provide(name, exporting)
+
+                if previous is exporting:
+                    return previous
+
+                raise_already_exists(module_name, name, previous, exporting)
+
+
+            return single_insert
+    else:
+        @localize
+        def produce_single_insert(function_name, provide, module_name):
+            return provide
+
+
+    #
+    #   built_in & restricted
+    #
+    insert_privileged = produce_single_insert(
+                            'insert_privileged',
+                            GemPrivileged_scope.setdefault,
+                             GemPrivileged_scope[special_name],
+                        )
+
+    insert__built_in = produce_dual_insert(
+                           'insert__built_in',
+                           insert_privileged,
+                           GemBuiltIn_scope.setdefault,
+                           GemBuiltIn_scope[special_name],
+                       )
+
+    built_in   = produce_actual_export(GemShared_scope, insert__built_in)
+    restricted = produce_actual_export(GemShared_scope, insert_privileged)
 
 
     if __debug__:
-        raise__built_in__name_error = produce__raise_already_exists(intern_string('Gem.BuiltIn'))
-
-
-        @localize
-        def insert__built_in(name, exporting):
-            previous = provide__built_in(name, exporting)
-
-            if previous is exporting:
-                return previous
-
-            raise__built_in__name_error(name, previous, exporting)
-
-
-        built_in = produce_actual_export(GemShared_scope, insert__built_in)
-
-        built_in = Function(
-                       rename_code(share_code, 'built_in'),
-                       function_globals(built_in),
-                       intern_string('built_in'),
-                       function_defaults(built_in),
-                       function_closure(built_in),
-                   )
-    else:
-        built_in = produce_actual_export(GemShared_scope, provide__built_in)
+        built_in   = rename_function('built_in',   built_in,   code = share_code)
+        restricted = rename_function('restricted', restricted, code = share_code)
 
 
     #
@@ -345,88 +412,48 @@ def gem():
         share_name = intern_string('share')
 
 
-        @localize3_or_privileged2
-        def produce_export_and_share(module, shared_scope = none):
-            module_name    = module.__name__ = intern_string(module.__name__)
-            module_scope   = module.__dict__
-            provide_export = module_scope.setdefault
+    @localize
+    def produce_export_and_share(module, shared_scope = none):
+        module_name  = module.__name__ = intern_string(module.__name__)
+        module_scope = module.__dict__
 
-            if shared_scope is none:
-                shared_scope = {}
+        if shared_scope is none:
+            shared_scope = {}
 
-            provide_shared = shared_scope.setdefault
+        insert_share = produce_single_insert(
+                           'insert_share',
+                           shared_scope.setdefault,
+                           arrange('%s.Shared', module_name),
+                       )
 
-            raise_already_exists       = produce__raise_already_exists(module_name)
-            raise_share_already_exists = produce__raise_already_exists(
-                                             intern_string(arrange('%s.Shared', module_name)),
-                                         )
-
-
-            def insert_share(name, exporting):
-                previous = provide_shared(name, exporting)
-
-                if previous is exporting:
-                    return previous
-
-                raise_share_already_exists(name, previous, exporting)
+        insert_export = produce_dual_insert(
+                            'insert_export',
+                            insert_share,
+                            module_scope.setdefault,
+                            module_name,
+                        )
 
 
-            def insert_export(name, exporting):
-                #
-                #   Everything 'exported' is also 'shared', so call both 'provide_export' & 'insert_share'
-                #
-                previous = provide_export(name, insert_share(name, exporting))
+        export = produce_actual_export(shared_scope, insert_export)
+        share  = produce_actual_export(shared_scope, insert_share)
 
-                if previous is exporting:
-                    return exporting
+        if __debug__:
+            share = rename_function(share_name, share, code = share_code)
 
-                raise_already_exists(name, previous, exporting)
+        export('Shared', shared_scope)
 
-
-            export = produce_actual_export(shared_scope, insert_export)
-            share  = produce_actual_export(shared_scope, insert_share)
-
-            share = Function(
-                        share_code,
-                        function_globals(share),
-                        share_name,
-                        function_defaults(share),
-                        function_closure(share),
-                    )
-
-            export('Shared', shared_scope)
-
-            return ((export, share))
-    else:
-        @localize
-        def produce_export_and_share(module, shared_scope = none):
-            module_scope   = module.__dict__
-            provide_export = module_scope.setdefault
-
-            if shared_scope is none:
-                shared_scope = {}
-
-            provide_shared = shared_scope.setdefault
+        return ((export, share))
 
 
-            def insert_export(name, exporting):
-                #
-                #   Everything 'exported' is also 'shared', so call both 'provide_export' & 'provide_shared'
-                #
-                return provide_export(name, provide_shared(name, exporting))
-
-
-            export = produce_actual_export(shared_scope, insert_export)
-            share  = produce_actual_export(shared_scope, provide_shared)
-
-            export('Shared', shared_scope)
-
-            return ((export, share))
-
-
+    #
+    #   export & share
+    #
     [export, share] = produce_export_and_share(Gem, shared_scope = GemShared_scope)
 
 
+    #
+    #   Initial built-in's
+    #
     built_in(
         #
         #   Keywords
@@ -440,19 +467,32 @@ def gem():
         #
         #   Functions
         #
-        '__import__',   PythonCore.__import__,
+        'arrange',      arrange,
         'privileged',   privileged,
     )
 
 
+    #
+    #   Only put in GemBuiltin_scope: __build__class & __import__
+    #
+    #       (not needed in GemPrivileged_scope, since it is found in GemPrivileged_scope['__builtins__'])
+    #
     if is_python_3:
-        built_in(PythonCore.__build_class__.__name__, PythonCore.__build_class__)
+        GemBuiltIn_scope[intern_string(PythonCore.__build_class__.__name__)] = PythonCore.__build_class__
 
 
+    GemBuiltIn_scope[intern_string(PythonCore.__import__.__name__)] = PythonCore.__import__
+
+
+    #
+    #   Initial shares's
+    #
     share(
         'built_in',     built_in,
         'export',       export,
         'share',        share,
+        'restricted',   restricted,
+        'Privileged',   GemPrivileged_scope
     )
 
 
@@ -641,9 +681,13 @@ def gem():
     del Gem.__package__
 
 
-import Gem
+if 1:
+    import Gem
 
-Gem_keys = sorted(Gem.__dict__.keys())
-print('Gem: ', Gem_keys)
-print('Gem.Shared: ', sorted(k   for k in Gem.Shared.keys()   if k not in Gem_keys))
-print("Gem.Shared['__builtins__']: ", sorted(Gem.Shared['__builtins__'].keys()))
+    Gem_keys      = sorted(Gem.__dict__.keys())
+    built_in_keys = sorted(Gem.Shared['__builtins__'].keys())
+
+    print('Gem: ',        Gem_keys)
+    print('Builtins: ',   built_in_keys)
+    print('Shared: ',     sorted(k   for k in Gem.Shared.keys()   if k not in Gem_keys))
+    print('Privileged: ', sorted(k   for k in Gem.Shared['Privileged'].keys()   if k not in built_in_keys))

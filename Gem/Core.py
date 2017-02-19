@@ -16,14 +16,6 @@ def gem():
 
 
     #
-    #   arrange
-    #
-    @built_in
-    def arrange(format, *arguments):
-        return format % arguments
-
-
-    #
     #   line
     #
     flush_standard_output = PythonSystem.stdout.flush
