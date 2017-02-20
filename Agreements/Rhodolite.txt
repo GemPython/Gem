@@ -1,0 +1,106 @@
+Amit Green agrees to use MIT license for all his contributions.
+
+This means that everyone has the right to use the contributions for any reason
+whatsoever, including making a profit:
+
+    o  Without giving anything to Amit Green in return;
+    o  And also, that once contributed, the contribution is permanent & cannot
+       be undone.
+
+This agreement is dated 2017-02-09 and applies to all commits made via the
+GitHub username 'Rhodolite' to the following GitHub projects:
+
+	Rhodolite/Agate
+	Rhodolite/Gem
+	Rhodolite/Sardonyx
+	Rhodolite/Snake
+	Rhodolite/Topaz
+
+    (and any forks of these projects in GitHub).
+
+Signed electronically & committed with GPG key 93862907665BEEDA,
+
+Amit Green
+
+===============================================================================
+
+Here is a copy of the MIT license that Amit Green is agreeing to:
+
+MIT License
+
+Copyright (c) 2017 Amit Green
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+===============================================================================
+
+Here is a copy of Amit's GPG Key 93862907665BEEDA
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+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
+h5/0Og4NebxHp10W
+=8zWF
+-----END PGP PUBLIC KEY BLOCK-----

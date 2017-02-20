@@ -3,9 +3,11 @@
 #
 @gem('Gem.FileOutput')
 def gem():
-    require_gem('Gem.CatchException')
     require_gem('Gem.File')
     require_gem('Gem.Path')
+
+
+    from Gem.Privileged import open_file
 
 
     @export
@@ -22,6 +24,7 @@ def gem():
             t._write = t.f  = none
 
 
+        @privileged
         def __enter__(t):
             assert t.f is none
 
@@ -43,13 +46,9 @@ def gem():
             f.close()
 
             if e_type is none:
-                with catch_FileNotFoundError():
-                    path_remove(path_old)
-
-                with catch_FileNotFoundError():
-                    path_rename(path, path_old)
-
-                path_rename(path_new, path)
+                remove_file__ignore_file_not_found(path_old)
+                rename_file__ignore_file_not_found(path, path_old)
+                rename_file(path_new, path)
 
 
         def line(t, format, *arguments):

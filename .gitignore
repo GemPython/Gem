@@ -1,7 +1,7 @@
 *.new
 *.old
-*.pyc
 __pycache__/
+*.py[co]
 .*.sw[op]
 *.tmp
 tmp/

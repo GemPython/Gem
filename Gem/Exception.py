@@ -1,8 +1,6 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-
-
 @gem('Gem.Exception')
 def gem():
     PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)

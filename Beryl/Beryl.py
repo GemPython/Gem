@@ -1,16 +1,22 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-from sys     import path    as module_path
-from os.path import abspath as path_absolute, join as path_join
+def boot(module_name):
+    def execute(f):
+        return f()
 
-module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
-
-
-del module_path, path_absolute, path_join
+    return execute
 
 
-import Gem
+@boot('Boot')
+def boot():
+    from sys     import path    as module_path
+    from os.path import abspath as path_absolute, join as path_join
+
+    module_path.insert(1, path_absolute(path_join(module_path[0], '..')))
+
+
+    import Gem
 
 
 #
@@ -47,8 +53,9 @@ def main():
     require_gem('Gem.RegularExpression')
 
 
-    from Gem import arrange, execute_python_from_file, exists__regular_file, false, FileOutput, FrozenSet
-    from Gem import input, line, make_match_function, open_file, path_join, true
+    from Gem import execute_python_from_file, exists__regular_file, FileOutput
+    from Gem import input, make_match_function, path_join, privileged_2
+    from Gem.Privileged import open_file
 
 
     her_or_his    = 'her|his'
@@ -150,7 +157,7 @@ def main():
             question = arrange('Are you sure you want to use %r instead?', pronoun)
             answer   = ask(question, 'n|N|y|Y')
 
-            if (answer is 'y') or (answer is 'Y'):
+            if (answer == 'Y') or (answer == 'y'):
                 return pronoun
 
             pronoun = her_or_his
@@ -168,10 +175,10 @@ def main():
 
             answer = ask('Is this correct?', 'Y|y|N|n')
 
-            if (answer is 'Y') or (answer is 'y'):
+            if (answer == 'Y') or (answer == 'y'):
                 return true
 
-            if (answer is 'N') or (answer is 'n'):
+            if (answer == 'N') or (answer == 'n'):
                 return false
 
             line('')
@@ -180,7 +187,7 @@ def main():
 
     def ask_three_questions(github_username, name, pronoun):
         while 7 is 7:
-            line('Welcome to the RUNME, V0.0')
+            line('Welcome to the Beryl, V0.0')
             line('')
             line('This program will create a contribution agreement:')
             line('    A.  For you to add to your git repository; and')
@@ -202,11 +209,12 @@ def main():
                 return ((github_username, name, pronoun))
 
 
+    @privileged_2
     def write_contribution_agreement(github_username, name, pronoun):
         path = path_join('Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
-            if exists__regular_file(path):
+            if not exists__regular_file(path):
                 break
 
             line('')
@@ -216,10 +224,10 @@ def main():
             question = arrange('%s aleady exists.  Overwrite?', path)
             answer   = ask(question, 'n|y')
 
-            if (answer is 'Y') or (answer is 'y'):
+            if (answer == 'Y') or (answer == 'y'):
                 break
 
-            if (answer is 'N') or (answer is 'n'):
+            if (answer == 'N') or (answer == 'n'):
                 line('')
                 line('=====================')
                 line('')

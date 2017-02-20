@@ -108,7 +108,7 @@ def gem():
         with catch_FileNotFoundError() as e:
             status = python_file_status(path)
 
-        if e.caught is not none:
+        if e:
             return FileStatus(path, file_type__nonexistent)
 
         mode        = status.st_mode
