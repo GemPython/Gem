@@ -43,7 +43,7 @@ def gem():
 
 
     #
-    #   Python methods
+    #   python_modules & store_python_modules
     #
     python_modules      = PythonSystem.modules
     store_python_module = python_modules.__setitem__
@@ -103,31 +103,167 @@ def gem():
 
 
     #
-    #   localize, privilege, & localize3_or_privileged2
+    #   Code
     #
-    #       Strickly speaking:
+    if __debug__:
+        Code = function_code(boot).__class__
+
+
+        code_argument_count    = Code.co_argcount   .__get__
+        code_cell_vars         = Code.co_cellvars   .__get__
+        code_constants         = Code.co_consts     .__get__
+        code_filename          = Code.co_filename   .__get__
+        code_first_line_number = Code.co_firstlineno.__get__
+        code_flags             = Code.co_flags      .__get__
+        code_free_variables    = Code.co_freevars   .__get__
+        code_global_names      = Code.co_names      .__get__
+        code_line_number_table = Code.co_lnotab     .__get__
+        code_name              = Code.co_name       .__get__
+        code_number_locals     = Code.co_nlocals    .__get__
+        code_stack_size        = Code.co_stacksize  .__get__
+        code_variable_names    = Code.co_varnames   .__get__
+        code_virtual_code      = Code.co_code       .__get__
+
+        if not is_python_2:
+            code_keyword_only_argument_count = Code.co_kwonlyargcount.__get__
+
+
     #
-    #           We don't really need to localize ourselves ...
-    #           (since is never exported or referenced once this function finishes)
+    #   rename_code
     #
-    #       However ... might as well ... hence: 'localize = localize(localize)'
+    if __debug__:
+        if is_python_2:
+            def rename_code(code, interned_name):
+                return Code(
+                           code_argument_count   (code),
+                           code_number_locals    (code),
+                           code_stack_size       (code),
+                           code_flags            (code),
+                           code_virtual_code     (code),
+                           code_constants        (code),
+                           code_global_names     (code),
+                           code_variable_names   (code),
+                           code_filename         (code),
+                           interned_name,                           #   Rename to 'name'
+                           code_first_line_number(code),
+                           code_line_number_table(code),
+                           code_free_variables   (code),
+                           code_cell_vars        (code),
+                      )
+        else:
+            def rename_code(code, interned_name):
+                return Code(
+                           code_argument_count             (code),
+                           code_keyword_only_argument_count(code),
+                           code_number_locals              (code),
+                           code_stack_size                 (code),
+                           code_flags                      (code),
+                           code_virtual_code               (code),
+                           code_constants                  (code),
+                           code_global_names               (code),
+                           code_variable_names             (code),
+                           code_filename                   (code),
+                           interned_name,                           #   Rename to 'name'
+                           code_first_line_number          (code),
+                           code_line_number_table          (code),
+                           code_free_variables             (code),
+                           code_cell_vars                  (code),
+                      )
+
+
     #
-    def produce_change_scope(scope):
-        def change_scope(f):
+    #   rename_function
+    #
+    if __debug__:
+        def rename_function(actual_name, f, code = none, scope = none):
+            interned_name = intern_string(actual_name)
+
             return Function(
-                       function_code(f),
-                       scope,
-                       function_name(f),
+                       (code) or (rename_code(function_code(f), interned_name)),
+                       (scope) or (function_globals(f)),
+                       interned_name,
+                       function_defaults(f),
+                       function_closure(f),
+                   )
+    else:
+        def rename_function(name, f, code = none, scope = none):
+            if code is scope is none:
+                return f
+
+            return Function(
+                       (code) or (function_code(f)),
+                       (scope) or (function_globals(f)),
+                       intern_string(actual_name),
                        function_defaults(f),
                        function_closure(f),
                    )
 
-        return change_scope
+
+    #
+    #   rename
+    #
+    if __debug__:
+        def rename(name, scope = none):
+            def rename(f):
+                return rename_function(name, f, scope = scope)
 
 
-    privileged = produce_change_scope(GemPrivileged_scope)
-    privileged = privileged(privileged)                     #   Make ourselves privileged ;)
-    localize   = privileged(produce_change_scope(GemShared_scope))
+            return rename
+
+
+    #
+    #   localize & privilege
+    #
+    #       The original Code (this code works -- but is probably too verbose; especially since 'localize' is not
+    #       used after this function exists -- we don't need to share code; and the new implementation is
+    #       probably faster anyway -- less memory allocations & frees):
+    #
+    #            def produce_change_scope(name, new_scope):
+    #                @rename(name, scope = GemPrivileged_scope)
+    #                def change_scope(f):
+    #                    return Function(
+    #                               function_code(f),
+    #                               new_scope,
+    #                               function_name(f),
+    #                               function_defaults(f),
+    #                               function_closure(f),
+    #                           )
+    #        
+    #                return change_scope
+    #        
+    #        
+    #            localize   = produce_change_scope('localize',   GemShared_scope)
+    #            privileged = produce_change_scope('privileged', GemPrivileged_scope)
+    #
+    #       NOTE:
+    #           The original code would also required a non-debug version of 'rename', so again it
+    #           was sub-optimnal.
+    #
+    def localize(f):
+        return Function(
+                   function_code(f),
+                   GemShared_scope,
+                   intern_string(function_name(f)),
+                   function_defaults(f),
+                   function_closure(f),
+               )
+
+
+    def privileged(f):
+        return Function(
+                   function_code(f),
+                   GemPrivileged_scope,
+                   intern_string(function_name(f)),
+                   function_defaults(f),
+                   function_closure(f),
+               )
+
+
+    #
+    #   Now make ourselves peremnantly privileged!
+    #
+    privileged = privileged(privileged)
+
 
     localize3_or_privileged2 = (privileged   if is_python_2 else   localize)
 
@@ -151,7 +287,7 @@ def gem():
     #
     #   export
     #       Exports a function to Gem (Global Execution Module); also the actual function exported
-    #       is a copy of the original function -- but with its global scope replaced to be Gem's scope.
+    #       is a copy of the original function -- but with its global scope replaced to 'scope'.
     #
     #       Can also be used with multiple arguments to export a list of values (no replacement of
     #       global scope's is done in this case).
@@ -193,111 +329,13 @@ def gem():
 
 
     #
-    #   share_code
+    #   share_name & share_code
     #
+    share_name = intern_string('share')
+
+
     if __debug__:
-        #
-        #   Code
-        #
-        Code = function_code(boot).__class__
-
-
-        code_argument_count    = Code.co_argcount   .__get__
-        code_cell_vars         = Code.co_cellvars   .__get__
-        code_constants         = Code.co_consts     .__get__
-        code_filename          = Code.co_filename   .__get__
-        code_first_line_number = Code.co_firstlineno.__get__
-        code_flags             = Code.co_flags      .__get__
-        code_free_variables    = Code.co_freevars   .__get__
-        code_global_names      = Code.co_names      .__get__
-        code_line_number_table = Code.co_lnotab     .__get__
-        code_name              = Code.co_name       .__get__
-        code_number_locals     = Code.co_nlocals    .__get__
-        code_stack_size        = Code.co_stacksize  .__get__
-        code_variable_names    = Code.co_varnames   .__get__
-        code_virtual_code      = Code.co_code       .__get__
-
-        if not is_python_2:
-            code_keyword_only_argument_count = Code.co_kwonlyargcount.__get__
-
-
-        #
-        #   rename_export_code
-        #
-        if is_python_2:
-            def rename_code(code, interned_name):
-                return Code(
-                           code_argument_count   (code),
-                           code_number_locals    (code),
-                           code_stack_size       (code),
-                           code_flags            (code),
-                           code_virtual_code     (code),
-                           code_constants        (code),
-                           code_global_names     (code),
-                           code_variable_names   (code),
-                           code_filename         (code),
-                           intern_string(interned_name),                #   Rename to 'name'
-                           code_first_line_number(code),
-                           code_line_number_table(code),
-                           code_free_variables   (code),
-                           code_cell_vars        (code),
-                      )
-        else:
-            def rename_code(code, interned_name):
-                return Code(
-                           code_argument_count             (code),
-                           code_keyword_only_argument_count(code),
-                           code_number_locals              (code),
-                           code_stack_size                 (code),
-                           code_flags                      (code),
-                           code_virtual_code               (code),
-                           code_constants                  (code),
-                           code_global_names               (code),
-                           code_variable_names             (code),
-                           code_filename                   (code),
-                           intern_string(interned_name),                #   Rename to 'name'
-                           code_first_line_number          (code),
-                           code_line_number_table          (code),
-                           code_free_variables             (code),
-                           code_cell_vars                  (code),
-                      )
-
-
-    #
-    #
-    #
-    if __debug__:
-        def rename_function(name, f, code = none):
-            name = intern_string(name)
-
-            return Function(
-                       (code) or (rename_code(function_code(f), name)),
-                       function_globals(f),
-                       name,
-                       function_defaults(f),
-                       function_closure(f),
-                   )
-    else:
-        def rename_function(name, f, code = none):
-            return f
-
-
-    #
-    #   Rename
-    #
-    if __debug__:
-        def rename(name):
-            def rename(f):
-                return rename_function(name, f)
-
-            return rename
-
-                        
-    #
-    #   share_code
-    #
-    if __debug__:
-        share_code = rename_code(function_code(produce_actual_export(0, 0)), 'share')
+        share_code = rename_code(function_code(produce_actual_export(0, 0)), share_name)
 
 
     #
@@ -329,11 +367,11 @@ def gem():
     #
     if __debug__:
         @localize
-        def produce_dual_insert(function_name, single_insert, provide, module_name):
+        def produce_dual_insert(actual_name, single_insert, provide, module_name):
             module_name = intern_string(module_name)
 
 
-            @rename(function_name)
+            @rename(actual_name)
             def dual_insert(name, exporting):
                 previous = provide(name, single_insert(name, exporting))
 
@@ -346,7 +384,7 @@ def gem():
             return dual_insert
     else:
         @localize
-        def produce_dual_insert(function_name, single_insert, provide, module_name):
+        def produce_dual_insert(actual_name, single_insert, provide, module_name):
             def dual_insert(name, exporting):
                 return provide(name, single_insert(name, exporting))
 
@@ -359,11 +397,11 @@ def gem():
     #
     if __debug__:
         @localize
-        def produce_single_insert(function_name, provide, module_name):
+        def produce_single_insert(actual_name, provide, module_name):
             module_name = intern_string(module_name)
 
 
-            @rename(function_name)
+            @rename(actual_name)
             def single_insert(name, exporting):
                 previous = provide(name, exporting)
 
@@ -376,7 +414,7 @@ def gem():
             return single_insert
     else:
         @localize
-        def produce_single_insert(function_name, provide, module_name):
+        def produce_single_insert(actual_name, provide, module_name):
             return provide
 
 
@@ -385,7 +423,7 @@ def gem():
     #
     insert_privileged = produce_single_insert(
                             'insert_privileged',
-                            GemPrivileged_scope.setdefault,
+                             GemPrivileged_scope.setdefault,
                              GemPrivileged_scope[special_name],
                         )
 
@@ -408,10 +446,6 @@ def gem():
     #
     #   produce_export_and_share
     #
-    if __debug__:
-        share_name = intern_string('share')
-
-
     @localize
     def produce_export_and_share(module, shared_scope = none):
         module_name  = module.__name__ = intern_string(module.__name__)
@@ -432,7 +466,6 @@ def gem():
                             module_scope.setdefault,
                             module_name,
                         )
-
 
         export = produce_actual_export(shared_scope, insert_export)
         share  = produce_actual_export(shared_scope, insert_share)
@@ -490,7 +523,7 @@ def gem():
     share(
         'built_in',     built_in,
         'export',       export,
-        'share',        share,
+        share_name,     share,
         'restricted',   restricted,
         'Privileged',   GemPrivileged_scope
     )
@@ -623,7 +656,9 @@ def gem():
             blueprint = lookup_module_blueprint(module_name)
 
             if blueprint is none:
-                raise ImportError("Can't find module %s" % module_name)
+                import_error = arrange("Can't find module %s", module_name)
+
+                raise ImportError(import_error)
 
             module     = create_module_from_blueprint(blueprint)
             module.gem = gem
@@ -681,7 +716,7 @@ def gem():
     del Gem.__package__
 
 
-if 1:
+if 0:
     import Gem
 
     Gem_keys      = sorted(Gem.__dict__.keys())

@@ -19,28 +19,39 @@ then
 fi
 
 tmp1=$tmp_dir/tmp.1.$$.txt
+tmp2=$tmp_dir/tmp.2.$$.txt
 
 for i in 1 2 3 15
 do
-    trap "trap $i; rm -f $tmp1; kill -$i $$; exit $i" $i
+    trap "trap $i; rm -f $tmp1 $tmp2; kill -$i $$; exit $i" $i
 done
 
-amount=1
 command='python ../Beryl/Beryl.py'
+commandO='python -O ../Beryl/Beryl.py'
+command3='python3 ../Beryl/Beryl.py'
+command3O='python -O ../Beryl/Beryl.py'
+
+cat >$tmp1 <<END
+
+
+
+y
+y
+END
 
 while :
 do
-    $command </dev/null >&$tmp1
+    $command <$tmp1 >&$tmp2
+    mv $tmp2 2
 
-    if cmp -s $tmp1 r
-    then    
-        case $amount in
-          [1-8]) amount=`expr $amount + 1` ;;
-        esac
-    else
-        mv $tmp1 r
-        amount=1
-    fi
+    $commandO <$tmp1 >&$tmp2
+    mv $tmp2 2o
+
+    $command3 <$tmp1 >&$tmp2
+    mv $tmp2 3
+
+    $command3O <$tmp1 >&$tmp2
+    mv $tmp2 3o
 
     sleep 0.01
 done

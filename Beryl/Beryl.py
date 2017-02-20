@@ -156,7 +156,7 @@ def main():
             question = arrange('Are you sure you want to use %r instead?', pronoun)
             answer   = ask(question, 'n|N|y|Y')
 
-            if (answer is 'y') or (answer is 'Y'):
+            if (answer == 'Y') or (answer == 'y'):
                 return pronoun
 
             pronoun = her_or_his
@@ -174,10 +174,10 @@ def main():
 
             answer = ask('Is this correct?', 'Y|y|N|n')
 
-            if (answer is 'Y') or (answer is 'y'):
+            if (answer == 'Y') or (answer == 'y'):
                 return true
 
-            if (answer is 'N') or (answer is 'n'):
+            if (answer == 'N') or (answer == 'n'):
                 return false
 
             line('')
@@ -223,10 +223,10 @@ def main():
             question = arrange('%s aleady exists.  Overwrite?', path)
             answer   = ask(question, 'n|y')
 
-            if (answer is 'Y') or (answer is 'y'):
+            if (answer == 'Y') or (answer == 'y'):
                 break
 
-            if (answer is 'N') or (answer is 'n'):
+            if (answer == 'N') or (answer == 'n'):
                 line('')
                 line('=====================')
                 line('')
