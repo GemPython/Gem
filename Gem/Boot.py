@@ -41,10 +41,11 @@ def gem():
 
 
     #
-    #   python_modules & store_python_modules
+    #   python_modules (also lookup_python_module & store_python_module)
     #
-    python_modules      = PythonSystem.modules
-    store_python_module = python_modules.__setitem__
+    python_modules       = PythonSystem.modules
+    lookup_python_module = python_modules.get
+    store_python_module  = python_modules.__setitem__
 
 
     #
@@ -450,18 +451,28 @@ def gem():
     #
     #   produce_export_and_share
     #
+    interned_Shared_name = intern_string('Shared')
+
+
     @localize
-    def produce_export_and_share(module, shared_scope = none):
+    def produce_export_and_share(module, Shared = none):
         module_name  = module.__name__ = intern_string(module.__name__)
         module_scope = module.__dict__
 
-        if shared_scope is none:
-            shared_scope = {}
+        if Shared is none:
+            Shared_name = intern_string(arrange('%s.Shared', module_name))
+            Shared      = Module(interned_Shared_name)
+        else:
+            Shared_name = Shared.__name__
+
+            assert Shared_name is intern_string(Shared_name)
+
+        Shared_scope = Shared.__dict__
 
         insert_share = produce_single_insert(
                            'insert_share',
-                           shared_scope.setdefault,
-                           arrange('%s.Shared', module_name),
+                           Shared_scope.setdefault,
+                           Shared_name,
                        )
 
         insert_export = produce_dual_insert(
@@ -471,22 +482,30 @@ def gem():
                             module_name,
                         )
 
-        export = produce_actual_export(shared_scope, insert_export)
-        share  = produce_actual_export(shared_scope, insert_share)
+        export = produce_actual_export(Shared_scope, insert_export)
+        share  = produce_actual_export(Shared_scope, insert_share)
 
         if __debug__:
             share = rename_function(share_name, share, code = share_code)
 
-        share(special_builtins_name, GemBuiltIn_scope)
-        export('Shared',             shared_scope)
+        share(
+                special_builtins_name,  GemBuiltIn_scope,
+                'export',               export,
+                share_name,             share,
+            )
 
-        return ((export, share))
+        export(
+                interned_Shared_name,   Shared,
+            )
 
 
     #
     #   export & share
     #
-    [export, share] = produce_export_and_share(Gem, shared_scope = GemShared_scope)
+    produce_export_and_share(Gem, Shared = GemShared)
+
+    export = GemShared.export
+    share  = GemShared.share
 
 
     #
@@ -550,10 +569,8 @@ def gem():
         #   Functions
         #
         'built_in',     built_in,
-        'export',       export,
-        'Privileged',   GemPrivileged_scope,
+        'Privileged',   GemPrivileged,
         'restricted',   restricted,
-        share_name,     share,
 
         #
         #   Modules
@@ -591,20 +608,71 @@ def gem():
 
 
     #
+    #   Main
+    #
+    Main = python_modules['__main__']
+
+
+    #
     #   gem
     #
     gem_name = intern_string('gem')
 
 
-    @export
+    @built_in
     @localize3_or_privileged2
-    def gem(module_gem):
+    def gem(module_name):
+        dot_index = module_name.rfind('.')
+
+        assert dot_index is not -1
+
+        parent_module_name = module_name[:dot_index]
+        child_module_name  = module_name[dot_index + 1:]
+
+        parent_module = lookup_python_module(parent_module_name)
+
+        if parent_module is none:
+            parent_module_name = intern_string(parent_module_name)
+            parent_module      = Module(parent_module_name)
+
+            store_python_module(parent_module_name, parent_module)
+
+            produce_export_and_share(parent_module)
+
+        
+        Shared_Scope = parent_module.Shared.__dict__
+
+
+        if child_module_name == 'Main':
+            del Main.gem
+
+
+            def execute(f):
+                assert f.__name__ == gem_name
+
+                Function(
+                    function_code(f),
+                    Shared_Scope,            #   Replace global scope with the module's shared scope
+                    gem_name,
+                    function_defaults(f),
+                    function_closure(f),
+                )(
+                )
+
+                main = parent_module.Shared.__dict__.pop('main')
+
+                main()
+
+
+            return execute
+
+
         def execute(f):
             assert f.__name__ == gem_name
 
             Function(
                 function_code(f),
-                GemShared_scope,         #   Replace global scope with Gem' shared scope
+                Shared_Scope,            #   Replace global scope with the module's shared scope
                 gem_name,
                 function_defaults(f),
                 function_closure(f),
@@ -612,6 +680,7 @@ def gem():
             )
 
             return gem
+
 
         return execute
 
@@ -634,7 +703,7 @@ def gem():
         load_module     = PythonOldImport.load_module
 
 
-        @export
+        @built_in
         @privileged
         def require_gem(module_name):
             if has_gem_module(module_name):
@@ -705,7 +774,7 @@ def gem():
         create_module_from_blueprint = PythonImportUtility.module_from_spec
 
 
-        @export
+        @built_in
         def require_gem(module_name):
             if has_gem_module(module_name):
                 return
@@ -733,56 +802,42 @@ def gem():
     #
     #   main
     #
-    Main = python_modules['__main__']
-
-
-    @localize
-    def main(module_name):
-        assert module_name == 'Main'
-
-
-        def export(f):
-            assert f.__name__ == 'main'
-
-            del Main.export
-
-            return produce_export_and_share(Main)[0](f)
-
-
-        def execute(f):
-            assert f.__name__ == 'main'
-
-            f()
-
-            Main.main()
-
-
-        del Main.boot
-        del Main.main
-
-        Main.export      = export
-        Main.require_gem = require_gem
-
-        return execute
-
-
     Gem.boot = boot
+    Main.gem = gem
 
-
-    Main.__builtins__ = GemBuiltIn_scope
-    Main.main         = main
 
     del Gem.__builtins__
     del Gem.__package__
 
 
 if 0:
-    import Gem, sys
+    import Gem, sys as PythonSystem
+
+
+    none                  = Gem.BuiltIn.none
+    flush_standard_output = PythonSystem.stdout.flush
+    write_standard_output = PythonSystem.stdout.write
+
+
+    def line(format = none, *arguments):
+        if format is none:
+            assert length(arguments) is 0
+
+            write_standard_output('\n')
+        else:
+            write_standard_output((format % arguments   if arguments else   format) + '\n')
+
+        flush_standard_output()
+
+
 
     Gem_keys     = sorted(Gem.__dict__.keys())
-    BuiltIn_keys = sorted(sys.modules['Gem.BuiltIn'].__dict__.keys())
+    BuiltIn_keys = sorted(Gem.BuiltIn.__dict__.keys())
 
-    print('Gem: ',        Gem_keys)
-    print('BuiltIn: ',    BuiltIn_keys)
-    print('Shared: ',     sorted(k   for k in Gem.Shared.keys()   if k not in Gem_keys))
-    print('Privileged: ', sorted(Gem.Shared['Privileged'].keys()))
+    line('Gem:                   %s',        Gem_keys)
+    line('BuiltIn:               %s',    BuiltIn_keys)
+
+    line('Shared: [- exported]:  %s',
+          sorted(k   for k in Gem.Shared.__dict__.keys()   if k not in Gem_keys))
+
+    line('Privileged:            %s', sorted(Gem.Shared.Privileged.__dict__.keys()))

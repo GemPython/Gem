@@ -19,32 +19,8 @@ def boot():
     import Gem
 
 
-#
-#   The three main functions:
-#
-#
-#   1.  main('Main')
-#           The wrapper that for all functions defined 'Main' Module.  Defined in Gem.Boot
-#
-#           In addition to doing the standard wrapping, also calls the 'Main.main' function after the
-#           'Main' module is instantiated.
-#
-#
-#   2.  @main('Main')
-#       def main():
-#           This function instantiates the Main module.
-#
-#           It is reponsible for exporting a 'main' function to the 'Main' module.
-#
-#
-#   3.  @export
-#       def main():
-#           The actual main function.  Exported to the 'Main' module.
-#
-#           This funtion is automatically executed after the 'Main' module is instantiated.
-#
-@main('Main')
-def main():
+@gem('Beryl.Main')
+def gem():
     require_gem('Gem.ExecuteFile')
     require_gem('Gem.FileOutput')
     require_gem('Gem.FileStatus')
@@ -314,7 +290,7 @@ def main():
         line('Please EDIT the GPG key to the key you will sign with')
 
 
-    @export
+    @share
     def main():
         if exists__regular_file('Answers.py'):
             Answers = execute_python_from_file('Answers.py')
