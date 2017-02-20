@@ -3,7 +3,6 @@
 #
 @gem('Gem.FileOutput')
 def gem():
-    require_gem('Gem.CatchException')
     require_gem('Gem.File')
     require_gem('Gem.Path')
 
@@ -47,12 +46,8 @@ def gem():
             f.close()
 
             if e_type is none:
-                with catch_FileNotFoundError():
-                    remove_file(path_old)
-
-                with catch_FileNotFoundError():
-                    rename_file(path, path_old)
-
+                remove_file__ignore_file_not_found(path_old)
+                rename_file__ignore_file_not_found(path, path_old)
                 rename_file(path_new, path)
 
 

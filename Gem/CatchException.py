@@ -33,10 +33,5 @@ def gem():
 
 
     @export
-    def catch_ImportError():
-        return CatchException(ImportError)
-
-
-    @export
     def catch_FileNotFoundError():
         return CatchException(FileNotFoundError)
