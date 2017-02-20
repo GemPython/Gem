@@ -54,7 +54,8 @@ def main():
 
 
     from Gem import execute_python_from_file, exists__regular_file, FileOutput
-    from Gem import input, make_match_function, open_file, path_join
+    from Gem import input, make_match_function, path_join, privileged_2
+    from Gem.Privileged import open_file
 
 
     her_or_his    = 'her|his'
@@ -208,7 +209,7 @@ def main():
                 return ((github_username, name, pronoun))
 
 
-    @privileged
+    @privileged_2
     def write_contribution_agreement(github_username, name, pronoun):
         path = path_join('Agreements', arrange('%s.txt', github_username))
 

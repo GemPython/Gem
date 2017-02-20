@@ -1,8 +1,6 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-
-
 def gem(module_name):
     def execute(f):
         return f()
@@ -146,10 +144,51 @@ def gem():
 
 
     #
+    #   localize & privilege
+    #
+    #       Although it is possible to share code between 'localize' & 'privileged' -- it doesn't make
+    #       sense -- since 'localize' is local to this function.  Thus when this when this function
+    #       ends, 'localize' is deallocated anyay.
+    #
+    #       Also this way, 'localize' & privileged can be used on the next functions quickly.
+    #
+    def localize(f):
+        return Function(
+                   function_code(f),
+                   GemShared_scope,
+                   intern_string(function_name(f)),
+                   function_defaults(f),
+                   function_closure(f),
+               )
+
+
+    def privileged(f):
+        return Function(
+                   function_code(f),
+                   GemPrivileged_scope,
+                   intern_string(function_name(f)),
+                   function_defaults(f),
+                   function_closure(f),
+               )
+
+
+    #
+    #   'privileged' is currently privileged ... but it won't be once exported.
+    #
+    #       Hence make it permenantly privileged by calling it on itself :)
+    #
+    privileged = privileged(privileged)
+
+
+    localize3_or_privileged2 = (privileged   if is_python_2 else   localize)
+
+
+    #
     #   rename_code
     #
     if __debug__:
         if is_python_2:
+            @localize
             def rename_code(code, interned_name):
                 return Code(
                            code_argument_count   (code),
@@ -168,6 +207,7 @@ def gem():
                            code_cell_vars        (code),
                       )
         else:
+            @localize
             def rename_code(code, interned_name):
                 return Code(
                            code_argument_count             (code),
@@ -192,6 +232,7 @@ def gem():
     #   rename_function
     #
     if __debug__:
+        @localize3_or_privileged2
         def rename_function(actual_name, f, code = none, scope = none):
             interned_name = intern_string(actual_name)
 
@@ -203,6 +244,7 @@ def gem():
                        function_closure(f),
                    )
     else:
+        @localize3_or_privileged2
         def rename_function(name, f, code = none, scope = none):
             if code is scope is none:
                 return f
@@ -220,69 +262,12 @@ def gem():
     #   rename
     #
     if __debug__:
-        def rename(name, scope = none):
+        def rename(name):
             def rename(f):
-                return rename_function(name, f, scope = scope)
+                return rename_function(name, f)
 
 
             return rename
-
-
-    #
-    #   localize & privilege
-    #
-    #       The original Code (this code works -- but is probably too verbose; especially since 'localize' is not
-    #       used after this function exists -- we don't need to share code; and the new implementation is
-    #       probably faster anyway -- less memory allocations & frees):
-    #
-    #            def produce_change_scope(name, new_scope):
-    #                @rename(name, scope = GemPrivileged_scope)
-    #                def change_scope(f):
-    #                    return Function(
-    #                               function_code(f),
-    #                               new_scope,
-    #                               function_name(f),
-    #                               function_defaults(f),
-    #                               function_closure(f),
-    #                           )
-    #        
-    #                return change_scope
-    #        
-    #        
-    #            localize   = produce_change_scope('localize',   GemShared_scope)
-    #            privileged = produce_change_scope('privileged', GemPrivileged_scope)
-    #
-    #       NOTE:
-    #           The original code would also required a non-debug version of 'rename', so again it
-    #           was sub-optimnal.
-    #
-    def localize(f):
-        return Function(
-                   function_code(f),
-                   GemShared_scope,
-                   intern_string(function_name(f)),
-                   function_defaults(f),
-                   function_closure(f),
-               )
-
-
-    def privileged(f):
-        return Function(
-                   function_code(f),
-                   GemPrivileged_scope,
-                   intern_string(function_name(f)),
-                   function_defaults(f),
-                   function_closure(f),
-               )
-
-
-    #
-    #   Now make ourselves peremnantly privileged!
-    #
-    privileged = privileged(privileged)
-
-
-    localize3_or_privileged2 = (privileged   if is_python_2 else   localize)
 
 
     #
@@ -332,13 +317,9 @@ def gem():
             argument_iterator = iterate(arguments)
             next_argument     = next_method(argument_iterator)
 
-            assert f.__class__ is String
-
-            insert(f, next_argument())
+            insert(intern_string(f), next_argument())
 
             for name in argument_iterator:
-                assert name.__class__ is String
-
                 insert(intern_string(name), next_argument())
 
 
@@ -456,8 +437,8 @@ def gem():
 
 
     if __debug__:
-        built_in   = rename_function('built_in',   built_in,   code = share_code)
-        restricted = rename_function('restricted', restricted, code = share_code)
+        built_in   = rename_function('built_in',   built_in)
+        restricted = rename_function('restricted', restricted)
 
 
     #
@@ -531,7 +512,6 @@ def gem():
         #
         'arrange',          arrange,
         'length',           length,
-        'privileged',       privileged,
         'intern_string',    intern_string,
     )
 
@@ -588,13 +568,19 @@ def gem():
         #
         #   Types
         #
-        'Module',       Module,
+        'Module',   Module,
 
         #
         #   Modules
         #
-        'BuiltIn',      GemBuiltIn,
-        #'Shared',      GemShared,                  #   Done in produce_export_and_share
+        'BuiltIn',  GemBuiltIn,
+        #'Shared',  GemShared,                      #   Done in produce_export_and_share
+
+        #
+        #   Functions
+        #
+        'rename_function',  rename_function,
+        'privileged',       privileged,
 
         #
         #   Values
@@ -611,6 +597,7 @@ def gem():
 
 
     @export
+    @localize3_or_privileged2
     def gem(module_gem):
         def execute(f):
             assert f.__name__ == gem_name

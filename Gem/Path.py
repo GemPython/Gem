@@ -3,14 +3,11 @@
 #
 @gem('Gem.Path')
 def gem():
-    PythonOperatingSystem = __import__('os')
-    PythonPath            = __import__('os.path').path
+    PythonPath = __import__('os.path').path
 
 
     export(
         'path_basename',            PythonPath.basename,
         'path_join',                PythonPath.join,
-        'path_remove',              PythonOperatingSystem.remove,
-        'path_rename',              PythonOperatingSystem.rename,
         'path_split_extension',     PythonPath.splitext,
     )

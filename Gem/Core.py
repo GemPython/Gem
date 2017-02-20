@@ -22,6 +22,19 @@ def gem():
         flush_standard_output()
 
 
+    #
+    #   privileged_2
+    #
+    if is_python_2:
+        export(
+            'privileged_2',     rename_function('privileged_2', privileged)
+        )
+    else:
+        @export
+        def privileged_2(f):
+            return f
+
+
     built_in(
         #
         #   Functions

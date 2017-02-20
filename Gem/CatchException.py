@@ -28,6 +28,10 @@ def gem():
                 return true
 
 
+        def __nonzero__(t):
+            return t.caught is not none
+
+
     @export
     def catch_ImportError():
         return CatchException(ImportError)

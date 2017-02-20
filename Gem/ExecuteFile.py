@@ -7,40 +7,23 @@ def gem():
     require_gem('Gem.Path')
 
 
-    from Gem import Module, open_file, path_basename, path_split_extension
+    from Gem import Module, path_basename, path_split_extension, read_text_file
 
 
-    if is_python_2:
-        execute_file = PythonCore.execfile
+    compile_python = PythonCore.compile
+    execute_code   = PythonCore.eval
 
 
-        @export
-        def execute_python_from_file(path):
-            path                  = intern_string(path)
-            [basename, extension] = path_split_extension(path_basename(path))
-            basename              = intern_string(basename)
-            module                = Module(basename)
+    @export
+    def execute_python_from_file(path):
+        path                  = intern_string(path)
+        [basename, extension] = path_split_extension(path_basename(path))
+        basename              = intern_string(basename)
+        module                = Module(basename)
 
-            execute_file(path, module.__dict__)
+        execute_code(
+            compile_python(read_text_file(path), path, 'exec'),
+            module.__dict__,
+        )
 
-            return module
-
-
-    else:
-        compile_python = PythonCore.compile
-        execute_python = PythonCore.eval
-
-
-        @export
-        @privileged
-        def execute_python_from_file(path):
-            path                  = intern_string(path)
-            [basename, extension] = path_split_extension(path_basename(path))
-            basename              = intern_string(basename)
-            module                = Module(basename)
-
-            with open_file(path) as f:
-                code = compile_python(f.read(), path, 'exec')
-                execute_python(code, module.__dict__)
-
-            return module
+        return module

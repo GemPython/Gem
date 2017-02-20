@@ -32,9 +32,9 @@ command3='python3 ../Beryl/Beryl.py'
 command3O='python3 -O ../Beryl/Beryl.py'
 
 cat >$tmp1 <<END
-
-
-
+AmitGreen
+Amit Green
+his
 y
 y
 END

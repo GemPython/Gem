@@ -8,8 +8,7 @@ def gem():
     require_gem('Gem.Path')
 
 
-    from Gem         import open_file
-    from Gem.BuiltIn import none
+    from Gem.Privileged import open_file
 
 
     @export
@@ -49,12 +48,12 @@ def gem():
 
             if e_type is none:
                 with catch_FileNotFoundError():
-                    path_remove(path_old)
+                    remove_file(path_old)
 
                 with catch_FileNotFoundError():
-                    path_rename(path, path_old)
+                    rename_file(path, path_old)
 
-                path_rename(path_new, path)
+                rename_file(path_new, path)
 
 
         def line(t, format, *arguments):
