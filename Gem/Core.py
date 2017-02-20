@@ -3,18 +3,6 @@
 #
 @gem('Gem.Core')
 def gem():
-    PythonSystem = __import__('sys')
-    is_python_2   = PythonSystem.version_info.major is 2
-    PythonCore    = __import__('__builtin__'  if is_python_2 else   'builtins')
-
-
-    #
-    #   Python Functions
-    #
-    intern_string = (PythonCore   if is_python_2 else   PythonSystem).intern
-    length        = PythonCore.len
-
-
     #
     #   line
     #
@@ -39,29 +27,15 @@ def gem():
         #   Functions
         #
         'globals',          PythonCore.globals,
-        'intern_string',    intern_string,
         'introspection',    PythonCore.dir,
         'iterate',          PythonCore.iter,
-        'length',           length,
         'property',         PythonCore.property,
         'type',             PythonCore.type,
 
-        #
-        #   Modules
-        #
-        'PythonCore',       PythonCore,
-        'PythonSystem',     PythonSystem,
 
         #
         #   Types
         #
         'FrozenSet',        PythonCore.frozenset,
-        'Module',           PythonCore.__class__,
         'Object',           PythonCore.object,
-        'String',           PythonCore.str,
-
-        #
-        #   Values
-        #
-        'is_python_2',      is_python_2,
     )

@@ -8,7 +8,8 @@ def gem():
     require_gem('Gem.Path')
 
 
-    from Gem import open_file
+    from Gem         import open_file
+    from Gem.BuiltIn import none
 
 
     @export

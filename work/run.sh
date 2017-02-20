@@ -29,7 +29,7 @@ done
 command='python ../Beryl/Beryl.py'
 commandO='python -O ../Beryl/Beryl.py'
 command3='python3 ../Beryl/Beryl.py'
-command3O='python -O ../Beryl/Beryl.py'
+command3O='python3 -O ../Beryl/Beryl.py'
 
 cat >$tmp1 <<END
 

@@ -51,29 +51,46 @@ def gem():
 
     #
     #   Gem
-    #       Replace the index in python_modules & also Gem.__name__ with an intern'ed copy of 'Gem'.
     #
     Gem       = python_modules['Gem']
     Gem_name  = Gem.__name__ = intern_string(Gem.__name__)
     gem_scope = Gem.__dict__
 
-    store_python_module(Gem_name, Gem)
+
+    #
+    #   GemBuiltIn
+    #
+    GemBuiltIn       = Module(intern_string('Gem.BuiltIn'))
+    GemBuiltIn_scope = GemBuiltIn.__dict__
 
 
     #
-    #   Gem{Builtin,Privileged,Shared}_scope
+    #   GemPrivileged
     #
-    special_builtins_name = intern_string('__builtins__')
-    special_name          = intern_string('__name__')
-    GemBuiltIn_scope      = { special_name : intern_string('Gem.BuiltIn') }
-    GemPrivileged_scope   = {
-                                special_builtins_name : PythonCore.__dict__,
-                                special_name          : intern_string('Gem.Privileged'),
-                            }
-    GemShared_scope       = {
-                              special_builtins_name : GemBuiltIn_scope,
-                              special_name          : intern_string('Gem.Shared'),
-                            }
+    GemPrivileged       = Module(intern_string('Gem.Privileged'))
+    GemPrivileged_scope = GemPrivileged.__dict__
+
+    GemPrivileged.__builtins__ = PythonCore.__dict__
+
+
+    #
+    #   GemShared
+    #
+    GemShared       = Module(intern_string('Gem.Shared'))
+    GemShared_scope = GemShared.__dict__
+
+
+    #
+    #   Store in python modules:
+    #
+    #       Gem                 (overwritten)
+    #       Gem.Core
+    #       Gem.Restricted
+    #       Gem.Shared
+    #   
+    for module in [Gem, GemBuiltIn, GemPrivileged, GemShared]:
+        store_python_module(module.__name__, module)
+
 
     #
     #   boot
@@ -424,14 +441,14 @@ def gem():
     insert_privileged = produce_single_insert(
                             'insert_privileged',
                              GemPrivileged_scope.setdefault,
-                             GemPrivileged_scope[special_name],
+                             GemPrivileged.__name__,
                         )
 
     insert__built_in = produce_dual_insert(
                            'insert__built_in',
                            insert_privileged,
                            GemBuiltIn_scope.setdefault,
-                           GemBuiltIn_scope[special_name],
+                           GemBuiltIn.__name__,
                        )
 
     built_in   = produce_actual_export(GemShared_scope, insert__built_in)
@@ -441,6 +458,12 @@ def gem():
     if __debug__:
         built_in   = rename_function('built_in',   built_in,   code = share_code)
         restricted = rename_function('restricted', restricted, code = share_code)
+
+
+    #
+    #   special_builtins_name
+    #
+    special_builtins_name  = intern_string('__builtins__')
 
 
     #
@@ -473,7 +496,8 @@ def gem():
         if __debug__:
             share = rename_function(share_name, share, code = share_code)
 
-        export('Shared', shared_scope)
+        share(special_builtins_name, GemBuiltIn_scope)
+        export('Shared',             shared_scope)
 
         return ((export, share))
 
@@ -496,17 +520,24 @@ def gem():
         'none',     None,
         'true',     True,
 
+        #
+        #   Types
+        #
+        'LiquidSet',    PythonCore.set,
+        'String',       PythonCore.str,
 
         #
         #   Functions
         #
-        'arrange',      arrange,
-        'privileged',   privileged,
+        'arrange',          arrange,
+        'length',           length,
+        'privileged',       privileged,
+        'intern_string',    intern_string,
     )
 
 
     #
-    #   Only put in GemBuiltin_scope: __build__class & __import__
+    #   Only put in GemBuiltIn_scope: __build__class & __import__
     #
     #       (not needed in GemPrivileged_scope, since it is found in GemPrivileged_scope['__builtins__'])
     #
@@ -518,14 +549,58 @@ def gem():
 
 
     #
+    #   Privileged
+    #       Put the Python BuiltIn module into GemPrivileged: making it an unrestricted scope.
+    #
+    restricted(
+        special_builtins_name, PythonCore.__dict__,
+    )
+
+    #
     #   Initial shares's
     #
     share(
+        #
+        #   __builtins__
+        #
+        #'__builtins__',    GemBuiltIn_scope,       #   Done in produce_export_and_share
+        #
+
+        #
+        #   Functions
+        #
         'built_in',     built_in,
         'export',       export,
-        share_name,     share,
+        'Privileged',   GemPrivileged_scope,
         'restricted',   restricted,
-        'Privileged',   GemPrivileged_scope
+        share_name,     share,
+
+        #
+        #   Modules
+        #
+        'PythonCore',   PythonCore,
+        'PythonSystem', PythonSystem,
+        #'Shared',      Shared                      #   Done in produce_export_and_share
+    )
+
+
+    export(
+        #
+        #   Types
+        #
+        'Module',       Module,
+
+        #
+        #   Modules
+        #
+        'BuiltIn',      GemBuiltIn,
+        #'Shared',      GemShared,                  #   Done in produce_export_and_share
+
+        #
+        #   Values
+        #
+        'is_python_2',  is_python_2,
+        'is_python_3',  is_python_3,
     )
 
 
@@ -536,7 +611,6 @@ def gem():
 
 
     @export
-    @privileged
     def gem(module_gem):
         def execute(f):
             assert f.__name__ == gem_name
@@ -666,7 +740,6 @@ def gem():
             blueprint.loader.exec_module(module)
 
 
-
     require_gem('Gem.Core')
 
 
@@ -717,12 +790,12 @@ def gem():
 
 
 if 0:
-    import Gem
+    import Gem, sys
 
-    Gem_keys      = sorted(Gem.__dict__.keys())
-    built_in_keys = sorted(Gem.Shared['__builtins__'].keys())
+    Gem_keys     = sorted(Gem.__dict__.keys())
+    BuiltIn_keys = sorted(sys.modules['Gem.BuiltIn'].__dict__.keys())
 
     print('Gem: ',        Gem_keys)
-    print('Builtins: ',   built_in_keys)
+    print('BuiltIn: ',    BuiltIn_keys)
     print('Shared: ',     sorted(k   for k in Gem.Shared.keys()   if k not in Gem_keys))
-    print('Privileged: ', sorted(k   for k in Gem.Shared['Privileged'].keys()   if k not in built_in_keys))
+    print('Privileged: ', sorted(Gem.Shared['Privileged'].keys()))
