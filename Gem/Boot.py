@@ -13,10 +13,10 @@ def gem():
     #
     #   This really belongs in Gem.Core, but is here since we need it during Boot
     #
-    PythonSystem = __import__('sys')
+    PythonSystem  = __import__('sys')
     is_python_2   = PythonSystem.version_info.major is 2
     is_python_3   = PythonSystem.version_info.major is 3
-    PythonCore    = __import__('__builtin__'  if is_python_2 else   'builtins')
+    PythonBuiltIn = __import__('__builtin__'  if is_python_2 else   'builtins')
 
 
     #
@@ -27,17 +27,17 @@ def gem():
     #
     #   Python Functions
     #
-    intern_string = (PythonCore   if is_python_2 else   PythonSystem).intern
-    iterate       = PythonCore.iter
-    length        = PythonCore.len
+    intern_string = (PythonBuiltIn   if is_python_2 else   PythonSystem).intern
+    iterate       = PythonBuiltIn.iter
+    length        = PythonBuiltIn.len
 
 
     #
     #   Python types
     #
-    Module    = PythonCore.__class__
-    LiquidSet = PythonCore.set
-    String    = PythonCore.str
+    Module    = PythonBuiltIn.__class__
+    LiquidSet = PythonBuiltIn.set
+    String    = PythonBuiltIn.str
 
 
     #
@@ -68,7 +68,7 @@ def gem():
     GemPrivileged       = Module(intern_string('Gem.Privileged'))
     GemPrivileged_scope = GemPrivileged.__dict__
 
-    GemPrivileged.__builtins__ = PythonCore.__dict__
+    GemPrivileged.__builtins__ = PythonBuiltIn.__dict__
 
 
     #
@@ -348,7 +348,7 @@ def gem():
     #   raise_already_exists
     #
     if __debug__:
-        PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+        PythonException = (__import__('exceptions')   if is_python_2 else  PythonBuiltIn)
         NameError       = PythonException.NameError
 
 
@@ -495,7 +495,7 @@ def gem():
     built_in(
         #
         #   Keywords
-        #       implemented as keywords in Python 3.0 --so can't use an expression like 'PythonCore.None'.
+        #       implemented as keywords in Python 3.0 --so can't use an expression like 'PythonBuiltIn.None'.
         #
         'false',    False,
         'none',     None,
@@ -504,8 +504,8 @@ def gem():
         #
         #   Types
         #
-        'LiquidSet',    PythonCore.set,
-        'String',       PythonCore.str,
+        'LiquidSet',    PythonBuiltIn.set,
+        'String',       PythonBuiltIn.str,
 
         #
         #   Functions
@@ -522,10 +522,10 @@ def gem():
     #       (not needed in GemPrivileged_scope, since it is found in GemPrivileged_scope['__builtins__'])
     #
     if is_python_3:
-        GemBuiltIn_scope[intern_string(PythonCore.__build_class__.__name__)] = PythonCore.__build_class__
+        GemBuiltIn_scope[intern_string(PythonBuiltIn.__build_class__.__name__)] = PythonBuiltIn.__build_class__
 
 
-    GemBuiltIn_scope[intern_string(PythonCore.__import__.__name__)] = PythonCore.__import__
+    GemBuiltIn_scope[intern_string(PythonBuiltIn.__import__.__name__)] = PythonBuiltIn.__import__
 
 
     #
@@ -533,7 +533,7 @@ def gem():
     #       Put the Python BuiltIn module into GemPrivileged: making it an unrestricted scope.
     #
     restricted(
-        special_builtins_name, PythonCore.__dict__,
+        special_builtins_name, PythonBuiltIn.__dict__,
     )
 
     #
@@ -558,7 +558,7 @@ def gem():
         #
         #   Modules
         #
-        'PythonCore',   PythonCore,
+        'PythonBuiltIn',   PythonBuiltIn,
         'PythonSystem', PythonSystem,
         #'Shared',      Shared                      #   Done in produce_export_and_share
     )
@@ -700,7 +700,7 @@ def gem():
         #   Python 3.0 method of loading a module with 'gem' pre-initialized
         #
         PythonImportUtility          = __import__('importlib.util').util
-        ImportError                  = PythonCore.ImportError
+        ImportError                  = PythonBuiltIn.ImportError
         lookup_module_blueprint      = PythonImportUtility.find_spec
         create_module_from_blueprint = PythonImportUtility.module_from_spec
 

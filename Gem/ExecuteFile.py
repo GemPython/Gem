@@ -10,8 +10,8 @@ def gem():
     from Gem import Module, path_basename, path_split_extension, read_text_file
 
 
-    compile_python = PythonCore.compile
-    execute_code   = PythonCore.eval
+    compile_python = PythonBuiltIn.compile
+    execute_code   = PythonBuiltIn.eval
 
 
     @export

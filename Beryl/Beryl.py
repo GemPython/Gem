@@ -80,50 +80,50 @@ def main():
             f.line('gpg_key = %r', gpg_key)
 
     def ask__github_username(github_username):
-        line('')
+        line()
         line('=====================')
 
         while 7 is 7:
-            line('')
+            line()
             line('***  Question:  What is your GitHub user name?')
             line('===  Example Answer: JoeSmith')
 
             if github_username:
-                line('')
+                line()
                 line('***  HIT return to accept your previous answer:  %r  ***', github_username)
 
-            line('')
+            line()
             github_username = ask('First, what is your GitHub User name?', github_username)
 
             if github_username__match(github_username):
                 return github_username
 
-            line('')
+            line()
             line('***  GitHub user name must be alphanumeric characters or single hypens ***')
             line('***  GitHub user name may also not begin or end with a hypen  ***')
 
             github_username = ''
 
     def ask__gpg_key(gpg_key):
-        line('')
+        line()
         line('=====================')
 
         while 7 is 7:
-            line('')
+            line()
             line('***  Question:  What is your GPG key?')
             line('===  Example Answer: AAAAAAAAAAAAAAAA')
 
             if gpg_key:
-                line('')
+                line()
                 line('***  HIT return to accept your previous answer:  %r  ***', gpg_key)
 
-            line('')
+            line()
             gpg_key = ask('Second, what is your GPG key?', gpg_key)
 
             if gpg_key__match(gpg_key):
                 return gpg_key
 
-            line('')
+            line()
             line('***  Use the long form of the GPG key ID. It is a 16 digit hexadecimal number ***')
             line("***  You can use 'gpg -k --keyid-format LONG' to discover this ***")
 
@@ -131,21 +131,21 @@ def main():
 
 
     def ask_name(name):
-        line('')
+        line()
         line('=====================')
 
         while 7 is 7:
-            line('')
+            line()
             line('***  NOTE: You may use your real name or as pseudonym.  Both are acceptable  ***')
-            line('')
+            line()
             line('***  Question:  What name do you wish to use?')
             line('===  Example Answer: Susan Smith')
 
             if name:
-                line('')
+                line()
                 line('***  HIT return to accept your previous answer:  %s  ***', name)
 
-            line('')
+            line()
             name = ask('Third, what name do you wish to use?', name)
 
             if name is not '':
@@ -153,26 +153,26 @@ def main():
 
 
     def ask_pronoun(pronoun):
-        line('')
+        line()
         line('=====================')
 
         while 7 is 7:
-            line('')
+            line()
             line('***  Question:  Which prounoun to use?')
             line('===  Example Answer: her')
 
             if pronoun != her_or_his:
                 line('***  HIT return to accept your previous answer:  %s  ***', pronoun)
 
-            line('')
+            line()
             pronoun = ask('Finally, which pronoun to use?', pronoun)
 
             if is_her_or_his(pronoun):
                 return pronoun
 
-            line('')
+            line()
             line("***  Pronoun is expected to be %r or %r ***", 'her', 'his')
-            line('')
+            line()
 
             if pronoun == her_or_his:
                 #
@@ -191,14 +191,14 @@ def main():
 
     def ask_correct(github_username, name, pronoun, gpg_key):
         while 7 is 7:
-            line('')
+            line()
             line('=====================')
             line('GitHub username:  %s', github_username)
             line('GPG Key:          %s', gpg_key)
             line('Name:             %s', name)
             line('Pronoun:          %s', pronoun)
             line('=====================')
-            line('')
+            line()
 
             answer = ask('Is this correct?', 'Y|y|N|n')
 
@@ -208,24 +208,24 @@ def main():
             if (answer == 'N') or (answer == 'n'):
                 return false
 
-            line('')
+            line()
             line('***  Please answer Y, y, N, or n')
 
 
     def ask_four_questions(github_username, name, pronoun, gpg_key):
         while 7 is 7:
             line('Welcome to the Beryl, V0.0')
-            line('')
+            line()
             line('This program will create a contribution agreement:')
             line('    A.  For you to add to your git repository; and')
             line('    B.  For you to sign by committing with your GPG key.')
-            line('')
+            line()
             line('You will need to provide:')
             line('    1.  GitHub username;')
             line('    2.  Your name;') 
             line('    3.  Your GPG key;') 
             line('    4.  A pronoun.')
-            line('')
+            line()
 
             github_username = ask__github_username(github_username)
             gpg_key         = ask__gpg_key(gpg_key)
@@ -246,9 +246,9 @@ def main():
             if not exists__regular_file(path):
                 break
 
-            line('')
+            line()
             line('=====================')
-            line('')
+            line()
 
             question = arrange('%s aleady exists.  Overwrite?', path)
             answer   = ask(question, 'n|y')
@@ -257,46 +257,46 @@ def main():
                 break
 
             if (answer == 'N') or (answer == 'n'):
-                line('')
+                line()
                 line('=====================')
-                line('')
+                line()
                 line('Exiting WITHOUT overwriting %s', path)
                 return
 
-            line('')
+            line()
             line('***  Please answer Y, y, N, or n')
 
         with FileOutput(path) as f:
             f.line('%s agrees to use MIT license for all %s contributions.', name, pronoun)
-            f.line('')
+            f.line()
             f.line('This means that everyone has the right to use the contributions for any reason')
             f.line('whatsoever, including making a profit:')
-            f.line('')
+            f.line()
             f.line('    o  Without giving anything to %s in return;', name)
             f.line('    o  And also, that once contributed, the contribution is permenant & cannot')
             f.line('       be undone.')
-            f.line('')
+            f.line()
             f.line('This agreement is dated 2017-02-09 and applies to all commits made via the')
             f.line("GitHub username '%s' to the following GitHub projects:", github_username)
-            f.line('')
+            f.line()
             f.line('	Rhodolite/Agate')
             f.line('	Rhodolite/Gem')
             f.line('	Rhodolite/Sardonyx')
             f.line('	Rhodolite/Snake')
             f.line('	Rhodolite/Topaz')
-            f.line('')
+            f.line()
             f.line('    (and any forks of these projects in GitHub).')
-            f.line('')
+            f.line()
             f.line('Signed electronically & committed with GPG key %s,', gpg_key)
-            f.line('')
+            f.line()
             f.line('%s', name)
-            f.line('')
+            f.line()
             f.line('===============================================================================')
-            f.line('')
+            f.line()
             f.line('Here is a copy of the MIT license that %s is agreeing to:', name)
-            f.line('')
+            f.line()
             f.line('MIT License')
-            f.line('')
+            f.line()
             f.line('Copyright (c) 2017 %s', name)
 
             license_path = 'LICENSE'
@@ -308,9 +308,9 @@ def main():
                 for s in license.read().splitlines()[3:]:
                     f.line('%s', s)
 
-        line('')
+        line()
         line('CREATED: %s', path)
-        line('')
+        line()
         line('Please EDIT the GPG key to the key you will sign with')
 
 

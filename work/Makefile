@@ -37,7 +37,7 @@ files:
 	mv files.new files
 
 links:
-	ln -s ../Main/Agate.py              a.py
+	ln -s ../Agate/RUNME.py             a.py
 	ln -s ../Beryl/Beryl.py             be.py
 	ln -s ../Gem/Boot.py                bo.py
 	ln -s ../Gem/Core.py                c.py

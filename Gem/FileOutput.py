@@ -51,8 +51,13 @@ def gem():
                 rename_file(path_new, path)
 
 
-        def line(t, format, *arguments):
-            t._write((format % arguments) + '\n')
+        def line(t, format = none, *arguments):
+            if format is none:
+                assert length(arguments) is 0
+                t._write('\n')
+                return
+
+            t._write((format % arguments   if arguments else   format) + '\n')
 
 
         @property
