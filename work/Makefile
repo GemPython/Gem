@@ -22,6 +22,7 @@ clean:
 	rm -rf __pycache__
 	rm -f *.old *.new *.pyc
 
+	rm -f a.py
 	rm -f be.py bo.py
 	rm -f c.py ce.py
 	rm -f ef.py ex.py

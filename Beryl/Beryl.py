@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2017 Amit Green.  All rights reserved.
+#   Copyright (c) 2017 Amit Green & & Mike Zhukovskiy.  All rights reserved.
 #
 def boot(module_name):
     def execute(f):
@@ -92,7 +92,7 @@ def main():
                 line('***  HIT return to accept your previous answer:  %r  ***', github_username)
 
             line('')
-            github_username = ask('First what is your GitHub User name?', github_username)
+            github_username = ask('First, what is your GitHub User name?', github_username)
 
             if github_username__match(github_username):
                 return github_username
@@ -117,14 +117,14 @@ def main():
                 line('***  HIT return to accept your previous answer:  %r  ***', gpg_key)
 
             line('')
-            gpg_key = ask('What is your GPG key?', gpg_key)
-            print("GPG Key: " + gpg_key)
+            gpg_key = ask('Second, what is your GPG key?', gpg_key)
+
             if gpg_key__match(gpg_key):
                 return gpg_key
 
             line('')
             line('***  Use the long form of the GPG key ID. It is a 16 digit hexadecimal number ***')
-            line('***  You can use \'gpg -k --keyid-format LONG\' to discover this ***')
+            line("***  You can use 'gpg -k --keyid-format LONG' to discover this ***")
 
             gpg_key = ''
 
@@ -238,7 +238,7 @@ def main():
 
 
     def write_contribution_agreement(github_username, name, pronoun, gpg_key):
-        path = path_join('../Agate/Agreements', arrange('%s.txt', github_username))
+        path = path_join('Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
             if not exists__regular_file(path):
