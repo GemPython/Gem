@@ -39,16 +39,16 @@ def gem():
         #
         #   Functions
         #
-        'globals',          PythonCore.globals,
-        'introspection',    PythonCore.dir,
-        'iterate',          PythonCore.iter,
-        'property',         PythonCore.property,
-        'type',             PythonCore.type,
+        'globals',          PythonBuiltIn.globals,
+        'introspection',    PythonBuiltIn.dir,
+        'iterate',          PythonBuiltIn.iter,
+        'property',         PythonBuiltIn.property,
+        'type',             PythonBuiltIn.type,
 
 
         #
         #   Types
         #
-        'FrozenSet',        PythonCore.frozenset,
-        'Object',           PythonCore.object,
+        'FrozenSet',        PythonBuiltIn.frozenset,
+        'Object',           PythonBuiltIn.object,
     )

@@ -11,7 +11,7 @@ def gem():
     rename_file           = PythonOperatingSystem.rename
 
 
-    open_file = PythonCore.open
+    open_file = PythonBuiltIn.open
 
 
     @export
@@ -39,5 +39,5 @@ def gem():
     )
 
     restricted(
-        'open_file',    PythonCore.open,
+        'open_file',    PythonBuiltIn.open,
     )

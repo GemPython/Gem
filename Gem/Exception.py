@@ -3,7 +3,7 @@
 #
 @gem('Gem.Exception')
 def gem():
-    PythonException = (__import__('exceptions')   if is_python_2 else  PythonCore)
+    PythonException = (__import__('exceptions')   if is_python_2 else  PythonBuiltIn)
     RuntimeError    = PythonException.RuntimeError
 
 
@@ -15,6 +15,6 @@ def gem():
 
 
     export(
-        'FileNotFoundError',  (PythonCore.OSError   if is_python_2 else    PythonCore.FileNotFoundError),
+        'FileNotFoundError',  (PythonBuiltIn.OSError   if is_python_2 else    PythonBuiltIn.FileNotFoundError),
         'ImportError',        PythonException.ImportError,
     )
