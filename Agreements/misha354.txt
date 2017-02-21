@@ -1,6 +1,33 @@
+Mike Zhukovskiy agrees to use MIT license for all his contributions.
+
+This means that everyone has the right to use the contributions for any reason
+whatsoever, including making a profit:
+
+    o  Without giving anything to Mike Zhukovskiy in return;
+    o  And also, that once contributed, the contribution is permanent & cannot
+       be undone.
+
+This agreement is dated 2017-02-09 and applies to all commits made via the
+GitHub username 'misha354' to the following GitHub projects:
+
+	Rhodolite/Agate
+	Rhodolite/Gem
+	Rhodolite/Sardonyx
+	Rhodolite/Topaz
+
+    (and any forks of these projects in GitHub).
+
+Signed electronically & committed with GPG key 92E4EB887FEF103A,
+
+Mike Zhukovskiy
+
+===============================================================================
+
+Here is a copy of the MIT license that Mike Zhukovskiy is agreeing to:
+
 MIT License
 
-Copyright (c) 2017 Amit Green & Mike Zhukovskiy
+Copyright (c) 2017 Mike Zhukovskiy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

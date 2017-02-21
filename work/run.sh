@@ -33,6 +33,7 @@ command3O='python3 -O ../Beryl/Beryl.py'
 
 cat >$tmp1 <<END
 AmitGreen
+CA1A41C16B1D3F25
 Amit Green
 his
 y
