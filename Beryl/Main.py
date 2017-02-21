@@ -21,14 +21,15 @@ def boot():
 
 @gem('Beryl.Main')
 def gem():
+    require_gem('Beryl.Ask')
     require_gem('Gem.ExecuteFile')
     require_gem('Gem.FileOutput')
     require_gem('Gem.FileStatus')
-    require_gem('Gem.IO')
     require_gem('Gem.Path')
     require_gem('Gem.RegularExpression')
 
 
+    from Beryl.Shared import ask
     from Gem import execute_python_from_file, exists__regular_file, FileOutput
     from Gem import input, make_match_function, path_join, privileged_2
     from Gem.Privileged import open_file
@@ -41,12 +42,6 @@ def gem():
     github_username__match = make_match_function(r'[0-9A-Za-z]+(?:-[0-9A-Za-z]+)*\Z')
 
     gpg_key__match = make_match_function(r'[0-9A-F]{16}')
-
-    def ask(question, answer):
-        response = input(question + arrange(' [%s]  ', answer)   if answer else   question + '  ')
-
-        return (response) or (answer)
-
 
     def save_answers(github_username, name, pronoun, gpg_key):
         with FileOutput('Answers.py') as f:

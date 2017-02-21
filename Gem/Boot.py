@@ -492,11 +492,14 @@ def gem():
                 special_builtins_name,  GemBuiltIn_scope,
                 'export',               export,
                 share_name,             share,
+                interned_Shared_name,   Shared,
             )
 
         export(
                 interned_Shared_name,   Shared,
             )
+
+        store_python_module(Shared_name, Shared)
 
 
     #
@@ -614,6 +617,33 @@ def gem():
 
 
     #
+    #   Debugging
+    #
+    if 0:
+        flush_standard_output = PythonSystem.stdout.flush
+        write_standard_output = PythonSystem.stdout.write
+
+
+        def debug(format = none, *arguments):
+            if format is none:
+                assert length(arguments) is 0
+
+                write_standard_output('\n')
+            else:
+                write_standard_output((format % arguments   if arguments else   format) + '\n')
+
+            flush_standard_output()
+
+
+    #
+    #   gem_modules (also lookup_gem_module & store_gem_module)
+    #
+    gem_modules       = { Gem_name : Gem }
+    lookup_gem_module = gem_modules.get
+    store_gem_module  = gem_modules.__setitem__
+
+
+    #
     #   gem
     #
     gem_name = intern_string('gem')
@@ -622,6 +652,8 @@ def gem():
     @built_in
     @localize3_or_privileged2
     def gem(module_name):
+        #debug('gem: %r', module_name)
+
         dot_index = module_name.rfind('.')
 
         assert dot_index is not -1
@@ -632,16 +664,9 @@ def gem():
         parent_module = lookup_python_module(parent_module_name)
 
         if parent_module is none:
-            parent_module_name = intern_string(parent_module_name)
-            parent_module      = Module(parent_module_name)
-
-            store_python_module(parent_module_name, parent_module)
-
-            produce_export_and_share(parent_module)
-
+            parent_module = require_gem(parent_module_name)
         
         Shared_Scope = parent_module.Shared.__dict__
-
 
         if child_module_name == 'Main':
             del Main.gem
@@ -688,33 +713,37 @@ def gem():
     #
     #   require_gem
     #
-    gem_modules    = LiquidSet()
-    add_gem_module = gem_modules.add
-    has_gem_module = gem_modules.__contains__
-
     if is_python_2:
         #
         #   Python 2.0 method of loading a module with 'gem' pre-initialized
         #
         #       This is messy -- see below for the Python 3.0 method which is much cleaner.
         #
-        PythonOldImport = __import__('imp')
-        find_module     = PythonOldImport.find_module
-        load_module     = PythonOldImport.load_module
+        PythonOldImport   = __import__('imp')
+        find_module       = PythonOldImport.find_module
+        load_module       = PythonOldImport.load_module
+        PACKAGE_DIRECTORY = PythonOldImport.PKG_DIRECTORY
 
 
         @built_in
         @privileged
         def require_gem(module_name):
-            if has_gem_module(module_name):
-                return
+            module = lookup_gem_module(module_name)
+
+            if module is not none:
+                return module
+
+            #debug('require_gem: %r', module_name)
+
+            dot_index = module_name.rfind('.')
+
+            if dot_index is not -1:
+                parent_module = require_gem(module_name[:dot_index])
 
             module_name = intern_string(module_name)
+            module      = Module(module_name)
 
-            add_gem_module(module_name)
-
-            module     = Module(module_name)
-            module.gem = gem
+            is_package = 0
 
             #
             #   Temporarily store our module in 'python_modules[module_name]'.
@@ -735,15 +764,12 @@ def gem():
             #
             store_python_module(module_name, module)
 
-            dot_index = module_name.rfind('.')
-
             if dot_index is -1:
                 [f, pathname, description] = find_module(module_name)
             else:
-                [f, pathname, description] = find_module(
-                                                 module_name[dot_index + 1:],
-                                                 python_modules[module_name[:dot_index]].__path__,
-                                             )
+                [f, pathname, description] = find_module(module_name[dot_index + 1:], parent_module.__path__)
+
+            #debug('%r: %r, %r, %r', module_name, f, pathname, description)
 
             #
             #   CAREFUL here:
@@ -754,14 +780,27 @@ def gem():
             #
             if f is not none:
                 with f:
+                    module.gem = gem
                     load_module(module_name, f, pathname, description)
             else:
+                if description[2] == PACKAGE_DIRECTORY:
+                    is_package = 7
+                    produce_export_and_share(module)
+
                 load_module(module_name, f, pathname, description)
 
             #
-            #   discard the module, it is no longer needed
+            #   If this is a package: Keep this module
+            #   Otherwise:            Discard this module (it is no longer needed)
             #
-            del python_modules[module_name]
+            if is_package is 7:
+                store_gem_module(module_name, module)
+            else:
+                del python_modules[module_name]
+
+                store_gem_module(module_name, 0)
+
+            return module
 
 
     else:
@@ -776,24 +815,44 @@ def gem():
 
         @built_in
         def require_gem(module_name):
-            if has_gem_module(module_name):
-                return
+            module = lookup_gem_module(module_name)
+
+            if module is not none:
+                return module
+
+            #debug('require_gem: %r', module_name)
+
+            dot_index = module_name.rfind('.')
+
+            if dot_index is not -1:
+                parent_module = require_gem(module_name[:dot_index])
 
             module_name = intern_string(module_name)
-
-            add_gem_module(module_name)
-
-            blueprint = lookup_module_blueprint(module_name)
+            blueprint   = lookup_module_blueprint(module_name)
 
             if blueprint is none:
                 import_error = arrange("Can't find module %s", module_name)
 
                 raise ImportError(import_error)
 
+            is_package = 0
             module     = create_module_from_blueprint(blueprint)
-            module.gem = gem
+
+            if '__path__' in module.__dict__:
+                is_package = 7
+                produce_export_and_share(module)
+            else:
+                module.gem = gem
 
             blueprint.loader.exec_module(module)
+
+            if is_package is 7:
+                store_python_module(module_name, module)
+                store_gem_module   (module_name, module)
+            else:
+                store_gem_module(module_name, 0)
+
+            return module
 
 
     require_gem('Gem.Core')
@@ -808,36 +867,3 @@ def gem():
 
     del Gem.__builtins__
     del Gem.__package__
-
-
-if 0:
-    import Gem, sys as PythonSystem
-
-
-    none                  = Gem.BuiltIn.none
-    flush_standard_output = PythonSystem.stdout.flush
-    write_standard_output = PythonSystem.stdout.write
-
-
-    def line(format = none, *arguments):
-        if format is none:
-            assert length(arguments) is 0
-
-            write_standard_output('\n')
-        else:
-            write_standard_output((format % arguments   if arguments else   format) + '\n')
-
-        flush_standard_output()
-
-
-
-    Gem_keys     = sorted(Gem.__dict__.keys())
-    BuiltIn_keys = sorted(Gem.BuiltIn.__dict__.keys())
-
-    line('Gem:                   %s',        Gem_keys)
-    line('BuiltIn:               %s',    BuiltIn_keys)
-
-    line('Shared: [- exported]:  %s',
-          sorted(k   for k in Gem.Shared.__dict__.keys()   if k not in Gem_keys))
-
-    line('Privileged:            %s', sorted(Gem.Shared.Privileged.__dict__.keys()))
