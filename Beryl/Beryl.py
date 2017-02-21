@@ -63,6 +63,7 @@ def main():
 
     github_username__match = make_match_function(r'[0-9A-Za-z]+(?:-[0-9A-Za-z]+)*\Z')
 
+    gpg_key__match = make_match_function(r'[0-9A-F]{16}')
 
     def ask(question, answer):
         response = input(question + arrange(' [%s]  ', answer)   if answer else   question + '  ')
@@ -70,12 +71,12 @@ def main():
         return (response) or (answer)
 
 
-    def save_answers(github_username, name, pronoun):
+    def save_answers(github_username, name, pronoun, gpg_key):
         with FileOutput('Answers.py') as f:
             f.line('github_username = %r', github_username)
             f.line('name = %r', name)
             f.line('pronoun = %r', pronoun)
-
+            f.line('gpg_key = %r', gpg_key)
 
     def ask__github_username(github_username):
         line('')
@@ -102,6 +103,31 @@ def main():
 
             github_username = ''
 
+    def ask__gpg_key(gpg_key):
+        line('')
+        line('=====================')
+
+        while 7 is 7:
+            line('')
+            line('***  Question:  What is your GPG key?')
+            line('===  Example Answer: AAAAAAAAAAAAAAAA')
+
+            if gpg_key:
+                line('')
+                line('***  HIT return to accept your previous answer:  %r  ***', gpg_key)
+
+            line('')
+            gpg_key = ask('What is your GPG key?', gpg_key)
+            print("GPG Key: " + gpg_key)
+            if gpg_key__match(gpg_key):
+                return gpg_key
+
+            line('')
+            line('***  Use the long form of the GPG key ID. It is a 16 digit hexadecimal number ***')
+            line('***  You can use \'gpg -k --keyid-format LONG\' to discover this ***')
+
+            gpg_key = ''
+
 
     def ask_name(name):
         line('')
@@ -119,7 +145,7 @@ def main():
                 line('***  HIT return to accept your previous answer:  %s  ***', name)
 
             line('')
-            name = ask('Second, what name do you wish to use?', name)
+            name = ask('Third, what name do you wish to use?', name)
 
             if name is not '':
                 return name
@@ -138,7 +164,7 @@ def main():
                 line('***  HIT return to accept your previous answer:  %s  ***', pronoun)
 
             line('')
-            pronoun = ask('Third, which pronoun to use?', pronoun)
+            pronoun = ask('Finally, which pronoun to use?', pronoun)
 
             if is_her_or_his(pronoun):
                 return pronoun
@@ -162,11 +188,12 @@ def main():
             pronoun = her_or_his
 
 
-    def ask_correct(github_username, name, pronoun):
+    def ask_correct(github_username, name, pronoun, gpg_key):
         while 7 is 7:
             line('')
             line('=====================')
             line('GitHub username:  %s', github_username)
+            line('GPG Key:          %s', gpg_key)
             line('Name:             %s', name)
             line('Pronoun:          %s', pronoun)
             line('=====================')
@@ -184,7 +211,7 @@ def main():
             line('***  Please answer Y, y, N, or n')
 
 
-    def ask_three_questions(github_username, name, pronoun):
+    def ask_four_questions(github_username, name, pronoun, gpg_key):
         while 7 is 7:
             line('Welcome to the Beryl, V0.0')
             line('')
@@ -194,25 +221,27 @@ def main():
             line('')
             line('You will need to provide:')
             line('    1.  GitHub username;')
-            line('    2.  Your name; and')
-            line('    3.  A pronoun.')
+            line('    2.  Your name;') 
+            line('    3.  Your GPG key;') 
+            line('    4.  A pronoun.')
             line('')
 
             github_username = ask__github_username(github_username)
+            gpg_key         = ask__gpg_key(gpg_key)
             name            = ask_name(name)
             pronoun         = ask_pronoun(pronoun)
 
-            save_answers(github_username, name, pronoun)
+            save_answers(github_username, name, pronoun, gpg_key)
 
-            if ask_correct(github_username, name, pronoun):
-                return ((github_username, name, pronoun))
+            if ask_correct(github_username, name, pronoun, gpg_key):
+                return ((github_username, name, pronoun, gpg_key))
 
 
-    def write_contribution_agreement(github_username, name, pronoun):
-        path = path_join('Agreements', arrange('%s.txt', github_username))
+    def write_contribution_agreement(github_username, name, pronoun, gpg_key):
+        path = path_join('../Agate/Agreements', arrange('%s.txt', github_username))
 
         while 7 is 7:
-            if exists__regular_file(path):
+            if not exists__regular_file(path):
                 break
 
             line('')
@@ -256,7 +285,7 @@ def main():
             f.line('')
             f.line('    (and any forks of these projects in GitHub).')
             f.line('')
-            f.line('Signed electronically & committed with GPG key 93862907665BEEDA,')
+            f.line('Signed electronically & committed with GPG key %s,', gpg_key)
             f.line('')
             f.line('%s', name)
             f.line('')
@@ -291,11 +320,13 @@ def main():
             github_username = Answers.github_username
             name            = Answers.name
             pronoun         = Answers.pronoun
+            gpg_key         = Answers.gpg_key
         else:
             github_username = ''
+            gpg_key  = ''
             name            = ''
             pronoun         = her_or_his
 
-        [github_username, name, pronoun] = ask_three_questions(github_username, name, pronoun)
+        [github_username, name, pronoun, gpg_key] = ask_four_questions(github_username, name, pronoun, gpg_key)
 
-        write_contribution_agreement(github_username, name, pronoun)
+        write_contribution_agreement(github_username, name, pronoun, gpg_key)
