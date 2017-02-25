@@ -22,29 +22,12 @@ def boot():
 @gem('Beryl.Main')
 def gem():
     require_gem('Beryl.BerylAnswer')
-    require_gem('Gem.ExecuteFile')
-    require_gem('Gem.FileStatus')
-
-
-    from Gem import execute_python_from_file, exists__regular_file
 
 
     @share
     def main():
-        if exists__regular_file('Answers.py'):
-            Answers = execute_python_from_file('Answers.py')
+        answers = BerylAnswer()
 
-            github_username = Answers.github_username
-            name            = Answers.name
-            pronoun         = Answers.pronoun
-            gpg_key         = Answers.gpg_key
-        else:
-            github_username = ''
-            gpg_key         = ''
-            name            = ''
-            pronoun         = her_or_his
-
-        answers = BerylAnswer(github_username, name, pronoun, gpg_key)
-
+        answers.load_answers__if_exists()
         answers.ask_four_questions()
         answers.write_contribution_agreement()

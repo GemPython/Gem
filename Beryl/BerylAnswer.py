@@ -4,6 +4,7 @@
 @gem('Beryl.BerylAnswer')
 def gem():
     require_gem('Beryl.Ask')
+    require_gem('Gem.ExecuteFile')
     require_gem('Gem.FileOutput')
     require_gem('Gem.FileStatus')
     require_gem('Gem.Path')
@@ -11,9 +12,8 @@ def gem():
 
 
     from Beryl.Shared import ask
-    from Gem import exists__regular_file, FileOutput
-    from Gem import input, make_match_function, path_join, privileged_2
-    from Gem.Privileged import open_file
+    from Gem import exists__regular_file, execute_python_from_file, FileOutput
+    from Gem import input, make_match_function, path_join, read_text_file
 
 
     her_or_his    = 'her|his'
@@ -34,11 +34,9 @@ def gem():
         ))
 
 
-        def __init__(t, github_username, name, gpg_key, pronoun):
-            t.github_username = github_username
-            t.name            = name
-            t.gpg_key         = gpg_key
-            t.pronoun         = pronoun
+        def __init__(t):
+            t.gpg_key = t.name = t.github_username = ''
+            t.pronoun = her_or_his
 
 
         def ask_correct(t):
@@ -212,6 +210,16 @@ def gem():
                     return
 
 
+        def load_answers__if_exists(t):
+            if exists__regular_file('Answers.py'):
+                Answers = execute_python_from_file('Answers.py')
+
+                t.github_username = Answers.github_username
+                t.name            = Answers.name
+                t.pronoun         = Answers.pronoun
+                t.gpg_key         = Answers.gpg_key
+
+
         def save_answers(t):
             with FileOutput('Answers.py') as f:
                 f.line('github_username = %r', t.github_username)
@@ -220,7 +228,6 @@ def gem():
                 f.line('gpg_key = %r',         t.gpg_key)
 
 
-        @privileged_2
         def write_contribution_agreement(t):
             github_username = t.github_username
             name            = t.name
@@ -292,16 +299,10 @@ def gem():
                 if exists__regular_file(license_path) is false:
                     license_path = path_join('..', license_path)
 
-                with open_file(license_path) as license:
-                    for s in license.read().splitlines()[3:]:
-                        f.line('%s', s)
+                for s in read_text_file(license_path).splitlines()[3:]:
+                    f.line('%s', s)
 
             line()
             line('CREATED: %s', path)
             line()
             line('Please EDIT the GPG key to the key you will sign with')
-
-
-    share(
-        'her_or_his',   her_or_his,
-    )
