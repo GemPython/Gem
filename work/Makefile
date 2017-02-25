@@ -1,3 +1,6 @@
+#
+#   Copyright (c) 2017 Amit Green.  All rights reserved.
+#
 AGATE_FILES = ../Agate/RUNME.py
 
 BERYL_FILES = ../Beryl/Beryl.py
@@ -12,9 +15,11 @@ GEM_FILES = \
 	../Gem/Path.py \
 	../Gem/RegularExpression.py
 
+IVORY_FILES = ../Ivory/Main/py
+
 WORK_FILES = Makefile
 
-FILES = $(AGATE_FILES) $(BERYL_FILES) $(GEM_FILES) $(WORK_FILES)
+FILES = $(AGATE_FILES) $(BERYL_FILES) $(GEM_FILES) $(IVORY_FILES) $(WORK_FILES)
 
 all: clean files links
 
@@ -27,7 +32,7 @@ clean:
 	rm -f c.py ce.py
 	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
-	rm -f in.py im.py io.py
+	rm -f in.py im.py io.py iv.py
 	rm -f m
 	rm -f p.py
 	rm -f r.py rx.py
@@ -49,6 +54,7 @@ links:
 	ln -s ../Gem/FileStatus.py          fs.py
 	ln -s ../Gem/__init__.py            in.py
 	ln -s ../Gem/Import.py              im.py
+	ln -s ../Ivory/Main.py              iv.py
 	ln -s ../Gem/IO.py                  io.py
 	ln -s Makefile                      m
 	ln -s ../Gem/Path.py                p.py
@@ -60,4 +66,5 @@ wc:
 	wc -l \
 		$(BERYL_FILES) \
         $(GEM_FILES) \
+        $(IVORY_FILES) \
         $(WORK_FILES)

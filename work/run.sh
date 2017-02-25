@@ -1,3 +1,6 @@
+#
+#   Copyright (c) 2017 Amit Green.  All rights reserved.
+#
 usage=false
 
 case $# in
@@ -26,10 +29,12 @@ do
     trap "trap $i; rm -f $tmp1 $tmp2; kill -$i $$; exit $i" $i
 done
 
-command='python ../Beryl/Beryl.py'
-commandO='python -O ../Beryl/Beryl.py'
-command3='python3 ../Beryl/Beryl.py'
-command3O='python3 -O ../Beryl/Beryl.py'
+Main_py=../Ivory/Main.py
+
+command="python $Main_py"
+commandO="python -O $Main_py"
+command3="python3 $Main_py"
+command3O="python3 -O $Main_py"
 
 cat >$tmp1 <<END
 AmitGreen
