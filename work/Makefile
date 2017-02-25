@@ -1,3 +1,6 @@
+#
+#   Copyright (c) 2017 Amit Green.  All rights reserved.
+#
 AGATE_FILES = ../Agate/RUNME.py
 
 BERYL_FILES = ../Beryl/Beryl.py

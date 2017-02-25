@@ -1,3 +1,6 @@
+#
+#   Copyright (c) 2017 Amit Green
+#
 if __name__ == '__main__':
     def gem(module_name):
         def execute(f):
