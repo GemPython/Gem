@@ -3,7 +3,11 @@
 #
 AGATE_FILES = ../Agate/RUNME.py
 
-BERYL_FILES = ../Beryl/Beryl.py
+BERYL_FILES = \
+    ../Beryl/__init__.py \
+    ../Beryl/Ask.py \
+    ../Beryl/BerylAnswer.py \
+    ../Beryl/Main.py
 
 GEM_FILES = \
 	../Gem/__init__.py \
@@ -28,11 +32,12 @@ clean:
 	rm -f *.old *.new *.pyc
 
 	rm -f a.py
-	rm -f be.py bo.py
+	rm -f ba.py bi.py bk.py bm.py bo.py
 	rm -f c.py ce.py
 	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
 	rm -f in.py im.py io.py iv.py
+	rm -f jb.py
 	rm -f m
 	rm -f p.py
 	rm -f r.py rx.py
@@ -43,7 +48,10 @@ files:
 
 links:
 	ln -s ../Agate/RUNME.py             a.py
-	ln -s ../Beryl/Beryl.py             be.py
+	ln -s ../Beryl/BerylAnswer.py       ba.py
+	ln -s ../Beryl/__init__.py          bi.py
+	ln -s ../Beryl/Ask.py               bk.py
+	ln -s ../Beryl/Main.py              bm.py
 	ln -s ../Gem/Boot.py                bo.py
 	ln -s ../Gem/Core.py                c.py
 	ln -s ../Gem/CatchException.py      ce.py
@@ -56,6 +64,7 @@ links:
 	ln -s ../Gem/Import.py              im.py
 	ln -s ../Ivory/Main.py              iv.py
 	ln -s ../Gem/IO.py                  io.py
+	ln -s ../Junk/Boot.py               jb.py
 	ln -s Makefile                      m
 	ln -s ../Gem/Path.py                p.py
 	ln -s ../Agate/RUNME.py             r.py
