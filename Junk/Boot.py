@@ -1,3 +1,6 @@
+#
+#   Copyright (c) 2017 Amit Green
+#
 if 0:
     import Gem, sys as PythonSystem
 

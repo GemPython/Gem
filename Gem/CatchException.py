@@ -18,6 +18,10 @@ def gem():
             t.caught         = none
 
 
+        def __bool__(t):
+            return t.caught is not none
+
+
         def __enter__(t):
             return t
 
@@ -28,8 +32,13 @@ def gem():
                 return true
 
 
-        def __nonzero__(t):
-            return t.caught is not none
+        def __repr__(t):
+            return arrange('<CatchException %r %r>', t.exception_type, t.caught)
+
+
+        if is_python_2:
+
+            __nonzero__ = __bool__
 
 
     @export

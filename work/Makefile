@@ -6,6 +6,7 @@ AGATE_FILES = ../Agate/RUNME.py
 BERYL_FILES = \
     ../Beryl/__init__.py \
     ../Beryl/Ask.py \
+    ../Beryl/BerylAnswer.py \
     ../Beryl/Main.py
 
 GEM_FILES = \
@@ -31,7 +32,7 @@ clean:
 	rm -f *.old *.new *.pyc
 
 	rm -f a.py
-	rm -f ba.py bi.py bm.py bo.py
+	rm -f ba.py bi.py bk.py bm.py bo.py
 	rm -f c.py ce.py
 	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
@@ -47,8 +48,9 @@ files:
 
 links:
 	ln -s ../Agate/RUNME.py             a.py
-	ln -s ../Beryl/Ask.py               ba.py
+	ln -s ../Beryl/BerylAnswer.py       ba.py
 	ln -s ../Beryl/__init__.py          bi.py
+	ln -s ../Beryl/Ask.py               bk.py
 	ln -s ../Beryl/Main.py              bm.py
 	ln -s ../Gem/Boot.py                bo.py
 	ln -s ../Gem/Core.py                c.py

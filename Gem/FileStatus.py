@@ -119,6 +119,9 @@ def gem():
 
         return FileStatus(path, find__file_type(file_type))
 
+        #line('file_status__or__nonexistent => %r', r)
+        #return r
+
 
     @export
     def exists__regular_file(path):
