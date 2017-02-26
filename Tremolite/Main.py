@@ -32,10 +32,10 @@ def gem():
                 [   r'x(?P<abc>y)\Z',           'xy'        ],
                 [   r'x(?P<abc>y)(?P<z>z)\Z',   'xyz'       ],
         ]:
-            parsed   = parse_regular_expression(regular_expression)
-            compiled = compile_regular_expression(regular_expression, *parsed)
-            m        = compiled.match(test)
+            parsed   = parse_ascii_regular_expression(regular_expression)
+            compiled = compile_regular_expression(regular_expression, parsed)
+            #m        = compiled.match(test)
 
             line('%s:', regular_expression)
-            line('  %s', parsed)
-            line('  %r %r', m.group(), m.groups())
+            line('  %r', parsed)
+            #line('  %r %r', m.group(), m.groups())
