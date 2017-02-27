@@ -21,6 +21,7 @@ def boot():
 
 @gem('Tremolite.Main')
 def gem():
+    require_gem('Tremolite.Build')
     require_gem('Tremolite.Compile')
     require_gem('Tremolite.Parse')
 
