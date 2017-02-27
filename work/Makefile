@@ -16,8 +16,9 @@ GEM_FILES = \
 	../Gem/Exception.py ../Gem/ExecuteFile.py \
 	../Gem/File.py ../Gem/FileOutput.py ../Gem/FileStatus.py \
 	../Gem/Import.py ../Gem/IO.py \
+    ../Gem/Map.py \
 	../Gem/Path.py \
-	../Gem/RegularExpression.py
+	../Gem/RawString.py ../Gem/RegularExpression.py
 
 DRAVITE_FILES = \
     ../Dravite/Euclid.py \
@@ -30,6 +31,9 @@ IVORY_FILES = ../Ivory/Main.py
 LICENSE_FILES = \
     ../OtherLicenses/README.txt
 
+TOPAZ_FILES = \
+    ../Topaz/Main.py
+
 WORK_FILES = Makefile
 
 FILES = \
@@ -39,6 +43,7 @@ FILES = \
     $(GEM_FILES) \
     $(IVORY_FILES) \
     $(LICENSE_FILES) \
+    $(TOPAZ_FILES) \
     $(WORK_FILES)
 
 all: clean files links
@@ -56,49 +61,56 @@ clean:
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
 	rm -f lr.txt
-	rm -f m
+	rm -f m m.py
 	rm -f p.py
-	rm -f r.py rx.py
+	rm -f rm.py rs.py rx.py
+	rm -f zm.py
+
 
 files:
 	echo $(FILES) >files.new
 	mv files.new files
 
 links:
-	ln -s ../Agate/RUNME.py             a.py
-	ln -s ../Beryl/BerylAnswer.py       ba.py
-	ln -s ../Beryl/__init__.py          bi.py
-	ln -s ../Beryl/Ask.py               bk.py
-	ln -s ../Beryl/Main.py              bm.py
-	ln -s ../Gem/Boot.py                bo.py
-	ln -s ../Gem/Core.py                c.py
-	ln -s ../Dravite/Euclid.py          de.py
-	ln -s ../Dravite/__init__.py        di.py
-	ln -s ../Dravite/Main.py            dm.py
-	ln -s ../Dravite/RSA_Example.py     dr.py
-	ln -s ../Gem/CatchException.py      ce.py
-	ln -s ../Gem/ExecuteFile.py         ef.py
-	ln -s ../Gem/Exception.py           ex.py
-	ln -s ../Gem/File.py                fi.py
-	ln -s ../Gem/FileOutput.py          fo.py
-	ln -s ../Gem/FileStatus.py          fs.py
-	ln -s ../Gem/__init__.py            in.py
-	ln -s ../Gem/Import.py              im.py
-	ln -s ../Ivory/Main.py              iv.py
-	ln -s ../Gem/IO.py                  io.py
-	ln -s ../Junk/Boot.py               jb.py
-	ln -s ../OtherLicenses/README.txt   lr.txt
-	ln -s Makefile                      m
-	ln -s ../Gem/Path.py                p.py
-	ln -s ../Agate/RUNME.py             r.py
-	ln -s ../Gem/RegularExpression.py   rx.py
+	ln -s ../Agate/RUNME.py                     a.py
+	ln -s ../Beryl/BerylAnswer.py               ba.py
+	ln -s ../Beryl/__init__.py                  bi.py
+	ln -s ../Beryl/Ask.py                       bk.py
+	ln -s ../Beryl/Main.py                      bm.py
+	ln -s ../Gem/Boot.py                        bo.py
+	ln -s ../Gem/Core.py                        c.py
+	ln -s ../Gem/CatchException.py              ce.py
+	ln -s ../Dravite/Euclid.py                  de.py
+	ln -s ../Dravite/__init__.py                di.py
+	ln -s ../Dravite/Main.py                    dm.py
+	ln -s ../Dravite/RSA_Example.py             dr.py
+	ln -s ../Gem/ExecuteFile.py                 ef.py
+	ln -s ../Gem/Exception.py                   ex.py
+	ln -s ../Gem/File.py                        fi.py
+	ln -s ../Gem/FileOutput.py                  fo.py
+	ln -s ../Gem/FileStatus.py                  fs.py
+	ln -s ../Gem/__init__.py                    in.py
+	ln -s ../Gem/Import.py                      im.py
+	ln -s ../Ivory/Main.py                      iv.py
+	ln -s ../Gem/IO.py                          io.py
+	ln -s ../Junk/Boot.py                       jb.py
+	ln -s ../OtherLicenses/README.txt           lr.txt
+	ln -s Makefile                              m
+	ln -s ../Gem/Map.py                         m.py
+	ln -s ../Gem/Path.py                        p.py
+	ln -s ../Agate/RUNME.py                     rm.py
+	ln -s ../Gem/RawString.py                   rs.py
+	ln -s ../Gem/RegularExpression.py           rx.py
+	ln -s ../Topaz/Main.py                      zm.py
+
 
 wc:
-	#  Excludes $(AGATE_FIELS)
+	#  Excludes $(AGATE_FILES)
 	wc -l \
 		$(BERYL_FILES) \
 		$(DRAVITE_FILES) \
         $(GEM_FILES) \
         $(IVORY_FILES) \
         $(LICENSE_FILES) \
+        $(TOPAZ_FILES) \
         $(WORK_FILES)

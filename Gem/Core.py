@@ -3,6 +3,13 @@
 #
 @gem('Gem.Core')
 def gem():
+    @export
+    def execute(f):
+        f()
+
+        return execute
+
+
     #
     #   line
     #
@@ -39,17 +46,22 @@ def gem():
         #
         #   Functions
         #
+        'character',        PythonBuiltIn.chr,
         'globals',          PythonBuiltIn.globals,
         'introspection',    PythonBuiltIn.dir,
         'iterate',          PythonBuiltIn.iter,
         'iterate_range',    PythonBuiltIn.range,
+        'ordinal',          PythonBuiltIn.ord,
+        'portray',          PythonBuiltIn.repr,
         'property',         PythonBuiltIn.property,
+        'sorted_list',      PythonBuiltIn.sorted,
         'type',             PythonBuiltIn.type,
 
 
         #
         #   Types
         #
+        'Map',              PythonBuiltIn.dict,
         'FrozenSet',        PythonBuiltIn.frozenset,
         'Object',           PythonBuiltIn.object,
     )
