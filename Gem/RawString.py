@@ -95,7 +95,8 @@ def gem():
         is_2_3_5_6_or_7 = FrozenSet([2, 3, 5, 6, 7]).__contains__
         is_3_5_or_7     = FrozenSet([3, 5, 7      ]).__contains__
 
-    is_0_or_2   = FrozenSet([ 0,  2]).__contains__
+    is_1_or_4   = FrozenSet([ 1,  4]).__contains__
+    is_2_or_6   = FrozenSet([ 2,  6]).__contains__
     is_4_or_5   = FrozenSet([ 4,  5]).__contains__
     is_6_or_7   = FrozenSet([ 6,  7]).__contains__
     is_9_or_10  = FrozenSet([ 9, 10]).__contains__
@@ -346,16 +347,26 @@ def gem():
 
         #
         #   0 = no ' or " seen
-        #   2 = saw a "
         #
-        if is_0_or_2(saw):
-            return "r'" + s + "'"
+        if saw is 0:
+            if favorite >= 0:
+                return "r'" + s + "'"
+
+            return 'r"' + s + '"'
 
         #
         #   1 = saw a '
+        #   4 = saw a '''
         #
-        if saw is 1:
+        if is_1_or_4(saw):
             return 'r"' + s + '"'
+
+        #
+        #   2 = saw a "
+        #   6 = saw a """
+        #
+        if is_2_or_6(saw):
+            return "r'" + s + "'"
 
         #
         #<special-cases>
@@ -402,18 +413,15 @@ def gem():
 
             return 'r"""' + s + '"""'
 
-
         #
-        #   4 = saw a '''
         #   5 = saw a ''' & "
         #
-        if is_4_or_5(saw):
+        if saw is 5:
             return 'r"""' + s + '"""'
 
         #
-        #   6 = saw a """
         #   7 = saw a """ & '
         #
-        assert is_6_or_7(saw)
+        assert saw is 7
 
         return "r'''" + s + "'''"
