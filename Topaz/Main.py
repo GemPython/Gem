@@ -21,7 +21,8 @@ def boot():
 
 @gem('Topaz.Main')
 def gem():
-    require_gem('Gem.RawString')
+    require_gem('Gem.Exception')
+    require_gem('Gem.RawString_2')
 
 
     from Gem import portray_raw_string, raise_value_error
@@ -31,47 +32,27 @@ def gem():
     def main():
         for [s, expected] in [
                 [   r'',                            "r''"                               ],
+                [   'backslash: \\',                portray('backslash: \\')            ],
+                [   r'test',                        r"r'test'"                          ],
+                [   r'double backslash: \\',        r"r'double backslash: \\'"          ],
+                [   r"\'",                          r'''r"\'"'''                        ],
+                [   r"ending single quote '",       r'''r"ending single quote '"'''     ],
 
-                #   
-                #   8  = last saw \
-                #
-                [   'backslash: \\',                portray('backslash: \\')            ],  #   0,8,0
+                [   r"can't",                       r'''r"can't"'''                     ],
+                [   r"'",                           r'''r"'"'''                         ],
+                [   r"quoted: ''",                  r'''r"quoted: ''"'''                ],
+                [   r'''\"'\"''',                   r"""r'''\"'\"'''"""                 ],
 
-                #
-                #   0 = no ' or " seen
-                #
-                [   r'test',                        r"r'test'"                          ],  #   0,0,0
-                [   r'double backslash: \\',        r"r'double backslash: \\'"          ],  #   0,0,0
-                [   r"\'",                          r'''r"\'"''',                       ],  #   0,0,-1
-
-                #
-                #   1 = saw a '
-                #       11 = last saw '
-                #       12 = last saw ''
-                #
-                [   r"can't",                       r'''r"can't"'''                     ],  #   1,0,-1
-                [   r"'",                           r'''r"'"'''                         ],  #   1,11,-1
-                [   r"quoted: ''",                  r'''r"quoted: ''"'''                ],  #   1,12,-2
-                [   r"\"'\"",                       r'''r"\"'\""''',                    ],  #   1,0,1
-
-                #
-                #   4 = saw a '''
                 #
                 #   NOTE:
                 #       vim 7.4 gets confused with """x\"""" - so use string concatanation so vim can properly
                 #       parse it.
                 #
-                [   r"lots of ''''' - lots!",       """r"lots of ''''' - lots!""" + '"' ],  #   4,0,-5
-
-                #
-                #   2 = saw a "
-                #       9  = last saw "
-                #       10 = last saw ""
-                #
-                [   r'She said "hello"',            r"""r'She said "hello"'"""          ],  #   2,9,2
-                [   r'"',                           r"""r'"'"""                         ],  #   2,9,1
-                [   r'double quoted: ""',           r"""r'double quoted: ""'"""         ],  #   2,10,2
-                [   r'\'"\'',                       r"""r'\'"\''""",                    ],  #   2,0,-1
+                [   r"lots of ''''' - lots!",       """r"lots of ''''' - lots!""" + '"' ],
+                [   r'She said "hello"',            r"""r'She said "hello"'"""          ],
+                [   r'"',                           r"""r'"'"""                         ],
+                [   r'double quoted: ""',           r"""r'double quoted: ""'"""         ],
+                [   r"""\'"\'""",                   r'''r"""\'"\'"""'''                 ],
 
                 #
                 #   5 = saw a """
@@ -80,41 +61,41 @@ def gem():
                 #       vim 7.4 gets confused with '''x\'''' - so use string concatanation so vim can properly
                 #       parse it.
                 #
-                [   r'lots of """"" - lots!',       '''r'lots of """"" - lots!''' + "'" ],  #   6,0,5
+                [   r'lots of """"" - lots!',       '''r'lots of """"" - lots!''' + "'" ],
 
                 #<special-cases>
                 #
                 #   Begin with " & has ''' internally
                 #
-                [   '''"triple" is: ''\'.''',       portray('''"triple" is: ''\'.''')   ],  #   5,0,-1
+                [   '''"triple" is: ''\'.''',       portray('''"triple" is: ''\'.''')   ],
                 #
                 #   Begin with " & more ' than "
                 #
-                [   r'''"'' ''"!''',                r"""r'''"'' ''"!'''"""              ],  #   3,0,-2
+                [   r'''"'' ''"!''',                r"""r'''"'' ''"!'''"""              ],
                 #
                 #   End with " & has ''' internally
                 #
-                [   '''three: "''\'."''',           portray('''three: "''\'."''')       ],  #   5,9,-1
+                [   '''three: "''\'."''',           portray('''three: "''\'."''')       ],
                 #
                 #   End with " & more ' than "
                 #
-                [   r'''Wow: ''"''',                r"""r'''Wow: ''"'''"""              ],  #   3,9,-1
+                [   r'''Wow: ''"''',                r"""r'''Wow: ''"'''"""              ],
                 #
                 #   Begin with ' & has """ internally
                 #
-                [   """'triple' is: ""\".""",       portray("""'triple' is: ""\".""")   ],  #   7,0,1
+                [   """'triple' is: ""\".""",       portray("""'triple' is: ""\".""")   ],
                 #
                 #   Begin with ' & more " than '
                 #
-                [   r"""'"" ""'2""",                r'''r"""'"" ""'2"""'''              ],  #   3,0,2
+                [   r"""'"" ""'2""",                r'''r"""'"" ""'2"""'''              ],
                 #
                 #   End with ' & has """ internally
                 #
-                [   """3: '""\".'""",               portray("""3: '""\".'""")           ],  #   7,11,1
+                [   """3: '""\".'""",               portray("""3: '""\".'""")           ],
                 #
                 #   End with ' & more " than '
                 #
-                [   r"""End with "'": "'""",       r'''r"""End with "'": "'"""'''       ],  #   3,11,1
+                [   r"""End with "'": "'""",       r'''r"""End with "'": "'"""'''       ],
                 #</special-cases>
 
                 #
@@ -123,29 +104,30 @@ def gem():
                 #       10 = last saw ""
                 #       11 = last saw '
                 #
-                [   r'''the quotes: ' & "''',       r"""r'''the quotes: ' & "'''"""     ],  #   3,9,0
-                [   r"""single: ', '' .vs. "?""",   r'''r"""single: ', '' .vs. "?"""''' ],  #   3,0,-2
-                [   r'''singles "'" & "''"''',      r"""r'''singles "'" & "''"'''"""    ],  #   3,9,1
-                [   r'''more quotes: '' & ""''',    r"""r'''more quotes: '' & ""'''"""  ],  #   3,10,0
-                [   r"""other way: " & '""",        r'''r"""other way: " & '"""'''      ],  #   3,11,1
-                [   r"""prefer ", "", ', or ''""",  r'''r"""prefer ", "", ', or ''"""'''],  #   3,12,0
+                [   r'''the quotes: ' & "''',       r"""r'''the quotes: ' & "'''"""     ],
+                [   r"""single: ', '' .vs. "?""",   r'''r"""single: ', '' .vs. "?"""''' ],
+                [   r'''singles "'" & "''"''',      r"""r'''singles "'" & "''"'''"""    ],
+                [   r'''more quotes: '' & ""''',    r"""r'''more quotes: '' & ""'''"""  ],
+                [   r"""other way: " & '""",        r'''r"""other way: " & '"""'''      ],
+                [   r"""prefer ", "", ', or ''""",  r'''r"""prefer ", "", ', or ''"""'''],
 
                 #
                 #   5 = saw a ''' & "
                 #
-                [   r"""more '''' than "!""",      '''r"""more ''\'' than "!"""''',     ],  #   5,0,-3
-                [   r"""l""s '''' t""n "!""",      '''r"""l""s ''\'' t""n "!"""''',     ],  #   5,0,1
+                [   r"""more '''' than "!""",      '''r"""more ''\'' than "!"""''',     ],
+                [   r"""l""s '''' t""n "!""",      '''r"""l""s ''\'' t""n "!"""''',     ],
 
                 #
                 #   7 = saw a """ & '
                 #
-                [   r'''more """" than '!''',      """r'''more ""\"" than '!'''""",     ],  #   7,0,3
-                [   r'''l''s """" t''n '!''',      """r'''l''s ""\"" t''n '!'''""",     ],  #   7,0,-1
+                [   r'''more """" than '!''',      """r'''more ""\"" than '!'''""",     ],
+                [   r'''l''s """" t''n '!''',      """r'''l''s ""\"" t''n '!'''""",     ],
         ]:
             actual = portray_raw_string(s)
 
             if actual != expected:
-                line('  %s', actual)
-                line('  %s', expected)
+                line('%r', s)
+                line('  actual:   %s', actual)
+                line('  expected: %s', expected)
 
                 raise_value_error('portray_raw_string(%r): %r (expected: %r)', s, actual, expected)
