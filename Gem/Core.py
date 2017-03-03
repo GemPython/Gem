@@ -42,6 +42,7 @@ def gem():
         'globals',          PythonBuiltIn.globals,
         'introspection',    PythonBuiltIn.dir,
         'iterate',          PythonBuiltIn.iter,
+        'iterate_range',    PythonBuiltIn.range,
         'property',         PythonBuiltIn.property,
         'type',             PythonBuiltIn.type,
 
