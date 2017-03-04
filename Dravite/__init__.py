@@ -1,10 +1,3 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-[23]
-[23]o
-Agreements/
-files
-lr.txt
-m
-*.py

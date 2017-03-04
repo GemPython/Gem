@@ -19,11 +19,27 @@ GEM_FILES = \
 	../Gem/Path.py \
 	../Gem/RegularExpression.py
 
-IVORY_FILES = ../Ivory/Main/py
+DRAVITE_FILES = \
+    ../Dravite/Euclid.py \
+    ../Dravite/__init__.py \
+    ../Dravite/Main.py \
+    ../Dravite/RSA_Example.py
+
+IVORY_FILES = ../Ivory/Main.py
+
+LICENSE_FILES = \
+    ../OtherLicenses/README.txt
 
 WORK_FILES = Makefile
 
-FILES = $(AGATE_FILES) $(BERYL_FILES) $(GEM_FILES) $(IVORY_FILES) $(WORK_FILES)
+FILES = \
+    $(AGATE_FILES) \
+    $(BERYL_FILES) \
+    $(DRAVITE_FILES) \
+    $(GEM_FILES) \
+    $(IVORY_FILES) \
+    $(LICENSE_FILES) \
+    $(WORK_FILES)
 
 all: clean files links
 
@@ -34,10 +50,12 @@ clean:
 	rm -f a.py
 	rm -f ba.py bi.py bk.py bm.py bo.py
 	rm -f c.py ce.py
+	rm -f de.py di.py dm.py dr.py
 	rm -f ef.py ex.py
 	rm -f files fi.py fo.py fs.py
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
+	rm -f lr.txt
 	rm -f m
 	rm -f p.py
 	rm -f r.py rx.py
@@ -54,6 +72,10 @@ links:
 	ln -s ../Beryl/Main.py              bm.py
 	ln -s ../Gem/Boot.py                bo.py
 	ln -s ../Gem/Core.py                c.py
+	ln -s ../Dravite/Euclid.py          de.py
+	ln -s ../Dravite/__init__.py        di.py
+	ln -s ../Dravite/Main.py            dm.py
+	ln -s ../Dravite/RSA_Example.py     dr.py
 	ln -s ../Gem/CatchException.py      ce.py
 	ln -s ../Gem/ExecuteFile.py         ef.py
 	ln -s ../Gem/Exception.py           ex.py
@@ -65,6 +87,7 @@ links:
 	ln -s ../Ivory/Main.py              iv.py
 	ln -s ../Gem/IO.py                  io.py
 	ln -s ../Junk/Boot.py               jb.py
+	ln -s ../OtherLicenses/README.txt   lr.txt
 	ln -s Makefile                      m
 	ln -s ../Gem/Path.py                p.py
 	ln -s ../Agate/RUNME.py             r.py
@@ -74,6 +97,8 @@ wc:
 	#  Excludes $(AGATE_FIELS)
 	wc -l \
 		$(BERYL_FILES) \
+		$(DRAVITE_FILES) \
         $(GEM_FILES) \
         $(IVORY_FILES) \
+        $(LICENSE_FILES) \
         $(WORK_FILES)
