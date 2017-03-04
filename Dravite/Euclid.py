@@ -89,12 +89,15 @@ def gem():
     #   P.S.:  An MIT license is much easier to comply with than a "Attribute-ShareAlike" license,
     #          which is why we use the MIT license for the Gem project for all our own original code.
     #
-    #          Of course the MIT license, does *NOT* apply to this section of code, which has its
+    #          Of course the MIT license, does *NOT* apply to the orignal of the code, which has its
     #          own license as indicated above.
     #
-    #          To make things simple, all changes to the original code below are also licensed under
-    #          the exact same "Creative Commons Attribution-ShareAlike 3.0 Unported" license as the
-    #          original code.
+    #          To make things simple, all *changes* to the original code below are dual licensed under
+    #          both (1) the MIT License that the rest of Gem is licensed; and (2) under the exact same
+    #          "Creative Commons Attribution-ShareAlike 3.0 Unported" license as the original code.
+    #
+    #   NOTE:  Dual copyright only applies to the changes, not to the original code which is obviously
+    #          only licensed under the original license.
     #
     @share
     def greatest_common_demominator(b, n):

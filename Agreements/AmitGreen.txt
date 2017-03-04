@@ -22,7 +22,46 @@ Signed electronically & committed with GPG key CA1A41C16B1D3F25,
 
 Amit Green
 
+
 ===============================================================================
+
+
+Amended on 2017-03-04:
+
+    The Gem project uses the MIT license for all original code.
+
+    For code copied from other projects:
+
+        The copyright & code is enclosed in:
+
+            #
+            #<copyright>
+            #
+            #      Copyright ...
+            #
+            def external_code():
+                pass
+            #</copyright>
+
+        Any changes to the original code between the <copyright> and
+        </copyright> tags, are dual licensed by both the MIT license & the
+        same license as the original external code.
+
+        NOTE:  Dual license only applies to the changes, not to the
+               original code which is obviously only licensed under the
+               original license.
+
+
+Here is a list of all files in the Gem project, contributed by Amit Green,
+that include other copyrights:
+
+    1.  Dravite/Euclid.py - Parts of which are licensed by:
+    
+            "Creative Commons Attribution-ShareAlike 3.0 Unported license"
+
+
+===============================================================================
+
 
 Here is a copy of the MIT license that Amit Green is agreeing to:
 
@@ -48,7 +87,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+
 ===============================================================================
+
 
 Here is a copy of Amit's GPG Key CA1A41C16B1D3F25
 

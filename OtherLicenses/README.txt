@@ -2,23 +2,31 @@ The Gem project uses the MIT license for all original code.
 
 For code copied from other projects:
 
-    (1)  The copyright & code is enclosed in:
+     The copyright & code is enclosed in:
 
-             #
-             #<copyright>
-             #
-             #      Copyright ...
-             #
-             def external_code()
-                pass
-             #</copyright>
+         #
+         #<copyright>
+         #
+         #      Copyright ...
+         #
+         def external_code()
+            pass
+         #</copyright>
 
-        Any changes to the copyright code are between the <copyright> and </copyright> tags, and
-        [for simplicity] are copyright by the same license as the external code.
+    Any changes to the copyright code are between the <copyright> and </copyright> tags, and
+    [for simplicity] are dual licensed by both the MIT license & the same license as the external
+    code.
+
+    NOTE:  Dual license only applies to the changes, not to the original code which is obviously
+           only licensed under the original license.
+
+
+===================================================================================================
+
 
 For licenses copied from other projects:
 
-    (2)  This file lists their copyrights
+         This file lists their copyrights
 
 
 ===================================================================================================
@@ -26,16 +34,19 @@ For licenses copied from other projects:
 
 Here is a list of all files in the Gem projects that include other copyrights:
 
-    1.  Dravite/Euclid.py - Parts of which are copyright:
+    1.  Dravite/Euclid.py - Parts of which are licensed by:
     
-            Creative Commons Attribution-ShareAlike License (as of 2016-03-02)
+            "Creative Commons Attribution-ShareAlike 3.0 Unported license"
+
+            Which as of 2016-03-02 linked to https://creativecommons.org/licenses/by-sa/3.0/
 
 
 ===================================================================================================
 
-Here is a list of licenses copyied from Creative Commons & their copyrights:
 
-    As of 2017-03-02 the URL https://creativecommons.org/ reads as follows:
+Here a list of both the home page & licenses copied from Creative Commons & their copyrights:
+
+    As of 2017-03-02 the home page at https://creativecommons.org/ reads as follows:
 
         "Except where otherwise noted, content on this site is licensed under a Creative Commons
         Attribution 4.0 International license."
@@ -74,7 +85,7 @@ Here is a list of licenses copyied from Creative Commons & their copyrights:
     
         ".../OtherLicenses/cc/2017-03-02-by-4.0.html"
 
-    The actual license the summary links to is at:
+    The full license the above summary links to is at:
 
        https://creativecommons.org/licenses/by/4.0/legalcode
 
@@ -82,29 +93,36 @@ Here is a list of licenses copyied from Creative Commons & their copyrights:
     
         "../OtherLicenses/cc/2017-03-02-by-4.0_legalcode.html"
 
-    Since all the four license files below did note otherwise, they are all licensed by:
+    Since the home page & the four license files below did note otherwise, then as the home page at
+    https://creativecommons.org/ states they are all licensed by:
 
         "Creative Commons Attribution 4.0 International license."
 
+    The five files copied are as follows (again, all licensed by "Creative Commons Attribution 4.0
+    International license."):
 
-    The four files copied are as follows:
+        1.  .../OtherLicenses/cc/2017-03-04-home-page.html
 
-    1.  .../OtherLicenses/cc/2017-03-02-by-sa_3.0.html
+                Copied from:     https://creativecommons.org/
+                Reason:          States "Except where otherwise noted, content on this site is licensed under
+                                 a Creative Commons Attribution 4.0 International license."
 
-            Copied from:     https://creativecommons.org/licenses/by-sa/3.0/
-            Summary of:      Creative Commons Attribution-ShareAlike License
+        2.  .../OtherLicenses/cc/2017-03-02-by-sa_3.0.html
 
-    2.  .../OtherLicenses/cc/2017-03-02-by-sa_3.0_legalcode.html
+                Copied from:     https://creativecommons.org/licenses/by-sa/3.0/
+                Summary of:      Creative Commons Attribution-ShareAlike License
 
-            Copied from:     https://creativecommons.org/licenses/by-sa/3.0/legalcode
-            Legal Code for:  Creative Commons Attribution-ShareAlike License
+        3.  .../OtherLicenses/cc/2017-03-02-by-sa_3.0_legalcode.html
 
-    3.  .../OtherLicenses/cc/2017-03-02-by-4.0.html
+                Copied from:     https://creativecommons.org/licenses/by-sa/3.0/legalcode
+                Legal Code for:  Creative Commons Attribution-ShareAlike License
 
-            Copied from:     https://creativecommons.org/licenses/by/4.0/
-            Summary of:      Creative Commons Attribution 4.0 International license.
+        4.  .../OtherLicenses/cc/2017-03-02-by-4.0.html
 
-    4.  .../OtherLicenses/cc/2017-03-02-by-4.0_legalcode.html
+                Copied from:     https://creativecommons.org/licenses/by/4.0/
+                Summary of:      Creative Commons Attribution 4.0 International license.
 
-            Copied from:     https://creativecommons.org/licenses/by/4.0/legalcode
-            Legal Code for:  Creative Commons Attribution 4.0 International license.
+        5.  .../OtherLicenses/cc/2017-03-02-by-4.0_legalcode.html
+
+                Copied from:     https://creativecommons.org/licenses/by/4.0/legalcode
+                Legal Code for:  Creative Commons Attribution 4.0 International license.

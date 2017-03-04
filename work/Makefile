@@ -28,7 +28,7 @@ DRAVITE_FILES = \
 IVORY_FILES = ../Ivory/Main.py
 
 LICENSE_FILES = \
-    ../OtherLicences/README.py
+    ../OtherLicenses/README.txt
 
 WORK_FILES = Makefile
 
@@ -55,6 +55,7 @@ clean:
 	rm -f files fi.py fo.py fs.py
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
+	rm -f lr.txt
 	rm -f m
 	rm -f p.py
 	rm -f r.py rx.py
