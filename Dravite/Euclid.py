@@ -12,7 +12,7 @@ def gem():
     #
     #       https://en.wikibooks.org/wiki/Algorithm_Implementation/Mathematics/Extended_Euclidean_algorithm
     #
-    #   As of 2017-03-02 when the code was copied, it said:
+    #   As of 2017-03-02, when the code was copied, it said:
     #
     #       "This page was last modified on 19 April 2016, at 15:15."
     #
@@ -53,86 +53,21 @@ def gem():
     #           No additional restrictions — You may not apply legal terms or technological measures that
     #           legally restrict others from doing anything the license permits.
     #
-    #   As of 2017-03-02, a copy of this summary has been saved as "by-sa_3.0.html" in the same directory
-    #   as this file.
+    #   As of 2017-03-03, a copy of this summary has been saved as:
+    #
+    #       "../OtherLicenses/cc/2017-03-02-by-sa_3.0.html".
     #
     #   The actual license the summary links to is at:
     #
     #       https://creativecommons.org/licenses/by-sa/3.0/legalcode
     #
-    #   As of 2017-03-02, a copy of this license has been saved as "by-sa_3.0_legalcode.html" in the same
-    #   directory of as this file.
+    #   As of 2017-03-02, a copy of this license has been saved as:
+    #
+    #       "../OtherLicenses/cc/2017-03-02-by-sa_3.0_legalcode.html" in the same
     #
     #-----------------------------------------------------------------------------------------------------
     #
-    #   As of 2017-03-02 according to https://creativecommons.org/ reads:
-    #
-    #       "Except where otherwise noted, content on this site is licensed under a Creative Commons
-    #       Attribution 4.0 International license."
-    #
-    #       Which links to https://creativecommons.org/licenses/by/4.0/
-    #
-    #   Thus the license to the "Creative Commons Attribution-ShareAlike 3.0 Unported" is the
-    #   "Creative Commons Attribution 4.0 International license. (since it was not noted otherwise on
-    #   those pages).
-    #
-    #   As of 2017-03-02 the "Creative Commons Attribution 4.0 International license." at:
-    #
-    #       https://creativecommons.org/licenses/by/4.0/
-    #
-    #   reads as follows:
-    #
-    #                                       (CC) Creative
-    #                                            Commons
-    #                       
-    #                           Attribution 4.0 International (CC BY 4.0) 
-    #
-    #               This is a human-readable summary of (and not a substitute for) the license.
-    #
-    #       You are free to:
-    #
-    #           Share — copy and redistribute the material in any medium or format
-    #
-    #           Adapt — remix, transform, and build upon the material
-    #
-    #           for any purpose, even commercially.
-    #
-    #           The licensor cannot revoke these freedoms as long as you follow the license terms.
-    #
-    #       Under the following terms:
-    #
-    #           Attribution — You must give appropriate credit, provide a link to the license, and indicate if
-    #           changes were made. You may do so in any reasonable manner, but not in any way that suggests
-    #           the licensor endorses you or your use.
-    #
-    #       No additional restrictions — You may not apply legal terms or technological measures that
-    #       legally restrict others from doing anything the license permits.
-    #
-    #   As of 2017-03-02, a copy of this summary has been saved as "by-4.0.html" in the same directory
-    #   as this file.
-    #
-    #   The actual license the summary links to is at:
-    #
-    #       https://creativecommons.org/licenses/by-sa/3.0/legalcode
-    #
-    #   As of 2017-03-02, a copy of this license has been saved as "by-4.0_legalcode.html"
-    #   in the same directory of as this file.
-    #
-    #-----------------------------------------------------------------------------------------------------
-    #
-    #   As of 2017-03-02 according to https://creativecommons.org/ reads:
-    #
-    #       "Except where otherwise noted, content on this site is licensed under a Creative Commons
-    #       Attribution 4.0 International license."
-    #
-    #       Which links to https://creativecommons.org/licenses/by/4.0/
-    #
-    #   Thus the license to the ""Creative Commons Attribution 4.0 International license." is itself
-    #   (since it was not noted otherwise on its own page).
-    #
-    #-----------------------------------------------------------------------------------------------------
-    #
-    #   As stated above for "Creative Commons Attribution-ShareAlike 3.0 Unported" under the "Attribute"
+    #   As stated above for "Creative Commons Attribution-ShareAlike 3.0 Unported" under the "Attribution"
     #   section:
     #
     #       "Attribution — You must give appropriate credit, provide a link to the license, and indicate
@@ -163,14 +98,14 @@ def gem():
     #
     @share
     def greatest_common_demominator(b, n):
-        [x0, x1, y0, y1] = 1, 0, 0, 1
+        [x0, x1, y0, y1] = ((1, 0, 0, 1))
 
         while n != 0:
-            [q, b, n] = b // n, n, b % n
-            [x0, x1]  = x1, x0 - q * x1
-            [y0, y1]  = y1, y0 - q * y1
+            [q, b, n] = ((b // n, n, b % n))
+            [x0, x1]  = ((x1, x0 - q * x1))
+            [y0, y1]  = ((y1, y0 - q * y1))
 
-        return  b, x0, y0
+        return ((b, x0, y0))
 
 
     #

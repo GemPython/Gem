@@ -27,9 +27,19 @@ DRAVITE_FILES = \
 
 IVORY_FILES = ../Ivory/Main.py
 
+LICENSE_FILES = \
+    ../OtherLicences/README.py
+
 WORK_FILES = Makefile
 
-FILES = $(AGATE_FILES) $(BERYL_FILES) $(DRAVITE_FILES) $(GEM_FILES) $(IVORY_FILES) $(WORK_FILES)
+FILES = \
+    $(AGATE_FILES) \
+    $(BERYL_FILES) \
+    $(DRAVITE_FILES) \
+    $(GEM_FILES) \
+    $(IVORY_FILES) \
+    $(LICENSE_FILES) \
+    $(WORK_FILES)
 
 all: clean files links
 
@@ -76,6 +86,7 @@ links:
 	ln -s ../Ivory/Main.py              iv.py
 	ln -s ../Gem/IO.py                  io.py
 	ln -s ../Junk/Boot.py               jb.py
+	ln -s ../OtherLicenses/README.txt   lr.txt
 	ln -s Makefile                      m
 	ln -s ../Gem/Path.py                p.py
 	ln -s ../Agate/RUNME.py             r.py
@@ -88,4 +99,5 @@ wc:
 		$(DRAVITE_FILES) \
         $(GEM_FILES) \
         $(IVORY_FILES) \
+        $(LICENSE_FILES) \
         $(WORK_FILES)
