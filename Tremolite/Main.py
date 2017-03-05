@@ -21,9 +21,13 @@ def boot():
 
 @gem('Tremolite.Main')
 def gem():
+    require_gem('Gem.PortrayString')
     require_gem('Tremolite.Build')
     require_gem('Tremolite.Compile')
     require_gem('Tremolite.Parse')
+
+
+    from Gem import portray_raw_string
 
 
     @share
@@ -37,6 +41,6 @@ def gem():
             compiled = compile_regular_expression(regular_expression, parsed)
             #m        = compiled.match(test)
 
-            line('%s:', regular_expression)
+            line('%s:', portray_raw_string(regular_expression))
             line('  %r', parsed)
             #line('  %r %r', m.group(), m.groups())
