@@ -18,8 +18,8 @@ GEM_FILES = \
 	../Gem/File.py ../Gem/FileOutput.py ../Gem/FileStatus.py \
 	../Gem/Import.py ../Gem/IO.py \
     ../Gem/Map.py \
-	../Gem/Path.py \
-	../Gem/RawString.py ../Gem/RawString_2.py ../Gem/RegularExpression.py
+	../Gem/Path.py ../Gem/PortrayString.py \
+	../Gem/RegularExpression.py
 
 DRAVITE_FILES = \
     ../Dravite/Euclid.py \
@@ -65,8 +65,8 @@ clean:
 	rm -f jb.py
 	rm -f lr.txt
 	rm -f m m.py
-	rm -f p.py
-	rm -f rm.py rs.py rs2.py rx.py
+	rm -f pa.py ps.py
+	rm -f rm.py rx.py
 	rm -f tc.py tm.py tp.py tu.py tx.py
 	rm -f zm.py
 
@@ -110,10 +110,9 @@ links:
 	ln -s ../OtherLicenses/README.txt           lr.txt
 	ln -s Makefile                              m
 	ln -s ../Gem/Map.py                         m.py
-	ln -s ../Gem/Path.py                        p.py
+	ln -s ../Gem/Path.py                        pa.py
+	ln -s ../Gem/PortrayString.py               ps.py
 	ln -s ../Agate/RUNME.py                     rm.py
-	ln -s ../Gem/RawString.py                   rs.py
-	ln -s ../Gem/RawString_2.py                 rs2.py
 	ln -s ../Gem/RegularExpression.py           rx.py
 	ln -s ../Topaz/Main.py                      zm.py
 

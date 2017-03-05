@@ -17,8 +17,8 @@ def gem():
             'c',                        #   String
             'portray',                  #   String
             'is_backslash',             #   Boolean
+            'is_portray_boring',        #   Boolean
             'is_double_quote',          #   Boolean
-            'is_portray_special',       #   Boolean
             'is_printable',             #   Boolean
             'is_single_quote',          #   Boolean
         ))
@@ -35,11 +35,18 @@ def gem():
             t.c       = c
             t.portray = portray
 
-            t.is_backslash       = is_backslash
-            t.is_double_quote    = is_double_quote
-            t.is_portray_special = (is_backslash) or (is_double_quote) or (not is_printable) or (is_single_quote)
-            t.is_printable       = is_printable
-            t.is_single_quote    = is_single_quote
+            t.is_backslash    = is_backslash
+            t.is_double_quote = is_double_quote
+
+            t.is_portray_boring = not (
+                                         is_backslash
+                                      or is_double_quote
+                                      or not is_printable
+                                      or is_single_quote
+                                  )
+
+            t.is_printable    = is_printable
+            t.is_single_quote = is_single_quote
 
 
         if __debug__:
@@ -47,8 +54,8 @@ def gem():
                 other = ''
 
                 if t.is_backslash:         other += ' is_backslash'
+                if t.is_portray_boring:    other += ' is_portray_boring'
                 if t.is_double_quote:      other += ' is_double_quote'
-                if t.is_portray_special:   other += ' is_portray_special'
                 if t.is_printable:         other += ' is_printable'
                 if t.is_single_quote:      other += ' is_single_quote'
 

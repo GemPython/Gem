@@ -232,32 +232,32 @@ def gem():
             old = state.name
             a   = lookup_ascii(c, unknown_ascii)
 
-            if a.is_portray_special:
-                if a.is_backslash:
-                    state = state.backslash
-                    #line('%s: %r, %s', old, c, state.name)
-                    continue
+            if a.is_portray_boring:
+                state = state.normal
+                continue
 
-                if a.is_double_quote:
-                    state = state.quotation_mark
-                    favorite += 1
-                    #line('%s: %r, %s', old, c, state.name)
-                    continue
-
-                if a.is_single_quote:
-                    state = state.apostrophe
-                    favorite -= 1
-                    #line('%s: %r, %s', old, c, state.name)
-                    continue
-
-                assert not a.is_printable
-
-                state = X
+            if a.is_backslash:
+                state = state.backslash
                 #line('%s: %r, %s', old, c, state.name)
                 continue
 
-            state = state.normal
+            if a.is_double_quote:
+                state = state.quotation_mark
+                favorite += 1
+                #line('%s: %r, %s', old, c, state.name)
+                continue
+
+            if a.is_single_quote:
+                state = state.apostrophe
+                favorite -= 1
+                #line('%s: %r, %s', old, c, state.name)
+                continue
+
+            assert not a.is_printable
+
+            state = X
             #line('%s: %r, %s', old, c, state.name)
+            continue
 
         #line('final state: %s', state.name)
 

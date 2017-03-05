@@ -22,7 +22,7 @@ def boot():
 @gem('Topaz.Main')
 def gem():
     require_gem('Gem.Exception')
-    require_gem('Gem.RawString_2')
+    require_gem('Gem.PortrayString')
 
 
     from Gem import portray_raw_string, raise_value_error
@@ -32,78 +32,24 @@ def gem():
     def main():
         for [s, expected] in [
                 [   r'',                            "r''"                               ],
-                [   'backslash: \\',                portray('backslash: \\')            ],
                 [   r'test',                        r"r'test'"                          ],
                 [   r'double backslash: \\',        r"r'double backslash: \\'"          ],
                 [   r"\'",                          r'''r"\'"'''                        ],
                 [   r"ending single quote '",       r'''r"ending single quote '"'''     ],
-
                 [   r"can't",                       r'''r"can't"'''                     ],
                 [   r"'",                           r'''r"'"'''                         ],
                 [   r"quoted: ''",                  r'''r"quoted: ''"'''                ],
                 [   r'''\"'\"''',                   r"""r'''\"'\"'''"""                 ],
-
-                #
-                #   NOTE:
-                #       vim 7.4 gets confused with """x\"""" - so use string concatanation so vim can properly
-                #       parse it.
-                #
-                [   r"lots of ''''' - lots!",       """r"lots of ''''' - lots!""" + '"' ],
                 [   r'She said "hello"',            r"""r'She said "hello"'"""          ],
                 [   r'"',                           r"""r'"'"""                         ],
                 [   r'double quoted: ""',           r"""r'double quoted: ""'"""         ],
                 [   r"""\'"\'""",                   r'''r"""\'"\'"""'''                 ],
-
-                #
-                #   5 = saw a """
-                #
-                #   NOTE:
-                #       vim 7.4 gets confused with '''x\'''' - so use string concatanation so vim can properly
-                #       parse it.
-                #
-                [   r'lots of """"" - lots!',       '''r'lots of """"" - lots!''' + "'" ],
-
-                #<special-cases>
-                #
-                #   Begin with " & has ''' internally
-                #
-                [   '''"triple" is: ''\'.''',       portray('''"triple" is: ''\'.''')   ],
-                #
-                #   Begin with " & more ' than "
-                #
-                [   r'''"'' ''"!''',                r"""r'''"'' ''"!'''"""              ],
-                #
-                #   End with " & has ''' internally
-                #
-                [   '''three: "''\'."''',           portray('''three: "''\'."''')       ],
-                #
-                #   End with " & more ' than "
-                #
+                [   r'''"triple" is: ''\'.''',      r'''r""""triple" is: ''\'."""'''    ],
+                [   r'''"'' ''"!''',                r'''r""""'' ''"!"""'''              ],
                 [   r'''Wow: ''"''',                r"""r'''Wow: ''"'''"""              ],
-                #
-                #   Begin with ' & has """ internally
-                #
-                [   """'triple' is: ""\".""",       portray("""'triple' is: ""\".""")   ],
-                #
-                #   Begin with ' & more " than '
-                #
-                [   r"""'"" ""'2""",                r'''r"""'"" ""'2"""'''              ],
-                #
-                #   End with ' & has """ internally
-                #
-                [   """3: '""\".'""",               portray("""3: '""\".'""")           ],
-                #
-                #   End with ' & more " than '
-                #
-                [   r"""End with "'": "'""",       r'''r"""End with "'": "'"""'''       ],
-                #</special-cases>
-
-                #
-                #   3  = saw a ' & a "
-                #       9  = last saw "
-                #       10 = last saw ""
-                #       11 = last saw '
-                #
+                [   r''''triple' is: ""\".''',      r"""r''''triple' is: ""\".'''"""    ],
+                [   r''''"" ""'2''',                r"""r''''"" ""'2'''"""              ],
+                [   r"""End with "'": "'""",        r'''r"""End with "'": "'"""'''      ],
                 [   r'''the quotes: ' & "''',       r"""r'''the quotes: ' & "'''"""     ],
                 [   r"""single: ', '' .vs. "?""",   r'''r"""single: ', '' .vs. "?"""''' ],
                 [   r'''singles "'" & "''"''',      r"""r'''singles "'" & "''"'''"""    ],
@@ -112,16 +58,40 @@ def gem():
                 [   r"""prefer ", "", ', or ''""",  r'''r"""prefer ", "", ', or ''"""'''],
 
                 #
-                #   5 = saw a ''' & "
+                #   Have to represent what we "expect" using \' or \" internally
                 #
                 [   r"""more '''' than "!""",      '''r"""more ''\'' than "!"""''',     ],
                 [   r"""l""s '''' t""n "!""",      '''r"""l""s ''\'' t""n "!"""''',     ],
-
-                #
-                #   7 = saw a """ & '
-                #
                 [   r'''more """" than '!''',      """r'''more ""\"" than '!'''""",     ],
                 [   r'''l''s """" t''n '!''',      """r'''l''s ""\"" t''n '!'''""",     ],
+
+                #
+                #   NOTE:
+                #       vim 7.4 gets confused with """x\"""" & '''x\'''' - so use string concatanation so
+                #       vim can properly parse it.
+                #
+                [   r"lots of ''''' - lots!",       """r"lots of ''''' - lots!""" + '"' ],
+                [   r'lots of """"" - lots!',       '''r'lots of """"" - lots!''' + "'" ],
+
+                #
+                #<have-to-use-normal-portray>
+                #
+                #   Ends in backslash
+                #
+                [   'backslash: \\',                portray('backslash: \\')            ],
+                #
+                #   End with " & has ''' internally
+                #
+                [   '''\'333: "''\'."''',           portray('''\'333: "''\'."''')       ],
+                [   '''three: "''\'."''',           portray('''three: "''\'."''')       ],
+                #
+                #   End with ' & has """ internally
+                #
+                [   """\': '""\".'""",              portray("""\': '""\".'""")          ],
+                [   """\'\\'""\".'""",              portray("""\'\\'""\".'""")          ],
+                [   """3: '""\".'""",               portray("""3: '""\".'""")           ],
+                #<have-to-use-normal-portray>
+
         ]:
             actual = portray_raw_string(s)
 
@@ -131,3 +101,5 @@ def gem():
                 line('  expected: %s', expected)
 
                 raise_value_error('portray_raw_string(%r): %r (expected: %r)', s, actual, expected)
+
+        line('PASSED: portray_raw_string')

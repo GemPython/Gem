@@ -59,6 +59,11 @@ def gem():
 
 
         #
+        #   Values
+        #
+        '__debug__',        PythonBuiltIn.__debug__,
+
+        #
         #   Types
         #
         'Map',              PythonBuiltIn.dict,
