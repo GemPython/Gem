@@ -9,8 +9,6 @@ def gem():
     PythonRegularExpressionCompile = import_module('sre_compile')
     PythonRegularExpressionParse   = import_module('sre_parse')
 
-    list_of_single_none = [none]
-
 
     @export
     def parse_regular_expression(regular_expression, flags = 0):
@@ -37,11 +35,15 @@ def gem():
         #   NOTE:  Dual copyright only applies to the changes, not to the original code which is obviously
         #          only licensed under the original license.
         #
-        python__parse_regular_expression = PythonRegularExpressionParse.parse
-        p                                = python__parse_regular_expression(regular_expression, flags)
-        p_pattern                        = p.pattern
-        groups                           = p_pattern.groups
-        group_map                        = p_pattern.groupdict
+        python__create_regular_expression_code = PythonRegularExpressionCompile._code
+        python__parse_regular_expression       = PythonRegularExpressionParse.parse
+
+        p          = python__parse_regular_expression(regular_expression, flags)
+        code       = python__create_regular_expression_code(p, flags)
+        p_pattern  = p.pattern
+        full_flags = flags | p_pattern.flags
+        groups     = p_pattern.groups
+        group_map  = p_pattern.groupdict
 
         if groups is 1:
             assert length(group_map) is 0
@@ -72,4 +74,4 @@ def gem():
             index_group = Tuple(intern_string(k)   for k in index_group)
         #</copyright>
 
-        line('index_group: %r', index_group)
+        return ((''.join(character(i)   for i in code), full_flags, index_group))
