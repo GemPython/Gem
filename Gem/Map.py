@@ -31,6 +31,13 @@ def gem():
             yield (( k, value(k) ))
 
 
+    @export
+    def values_tuple_sorted_by_key(mapping):
+        value = mapping.__getitem__
+
+        return Tuple(value(k)   for k in sorted_list(mapping))
+
+
     export(
         'view_items',   view_items,
     )

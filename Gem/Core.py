@@ -44,6 +44,19 @@ def gem():
 
     built_in(
         #
+        #   Types
+        #
+        'Boolean',          PythonBuiltIn.bool,
+        'Bytes',            PythonBuiltIn.bytes,
+        'Integer',          PythonBuiltIn.int,
+        'FrozenSet',        PythonBuiltIn.frozenset,
+        'List',             PythonBuiltIn.list,
+        'Map',              PythonBuiltIn.dict,
+        'Object',           PythonBuiltIn.object,
+        'Tuple',            PythonBuiltIn.tuple,
+
+
+        #
         #   Functions
         #
         'character',        PythonBuiltIn.chr,
@@ -62,11 +75,4 @@ def gem():
         #   Values
         #
         '__debug__',        PythonBuiltIn.__debug__,
-
-        #
-        #   Types
-        #
-        'Map',              PythonBuiltIn.dict,
-        'FrozenSet',        PythonBuiltIn.frozenset,
-        'Object',           PythonBuiltIn.object,
     )

@@ -18,8 +18,9 @@ GEM_FILES = \
 	../Gem/File.py ../Gem/FileOutput.py ../Gem/FileStatus.py \
 	../Gem/Import.py ../Gem/IO.py \
     ../Gem/Map.py \
-	../Gem/Path.py ../Gem/PortrayString.py \
-	../Gem/RegularExpression.py
+    ../Gem/Path.py ../Gem/PortrayString.py \
+    ../Gem/RegularExpression.py \
+    ../Gem/StringIO.py
 
 DRAVITE_FILES = \
     ../Dravite/Euclid.py \
@@ -33,7 +34,9 @@ LICENSE_FILES = \
     ../OtherLicenses/README.txt
 
 TOPAZ_FILES = \
-    ../Topaz/Main.py
+    ../Topaz/Core.py \
+    ../Topaz/Main.py \
+    ../Topaz/PortrayString.py
 
 WORK_FILES = Makefile
 
@@ -65,10 +68,11 @@ clean:
 	rm -f jb.py
 	rm -f lr.txt
 	rm -f m m.py
-	rm -f pa.py ps.py
+	rm -f pa.py ps.py ps3.py
 	rm -f rm.py rx.py
+	rm -f sio.py
 	rm -f tc.py tm.py tp.py tu.py tx.py
-	rm -f zm.py
+	rm -f zc.py zm.py zps.py
 
 
 files:
@@ -112,9 +116,13 @@ links:
 	ln -s ../Gem/Map.py                         m.py
 	ln -s ../Gem/Path.py                        pa.py
 	ln -s ../Gem/PortrayString.py               ps.py
+	ln -s ../Junk/PortrayString_3.py            ps3.py
 	ln -s ../Agate/RUNME.py                     rm.py
 	ln -s ../Gem/RegularExpression.py           rx.py
+	ln -s ../Gem/StringIO.py                    sio.py
+	ln -s ../Topaz/Core.py                      zc.py
 	ln -s ../Topaz/Main.py                      zm.py
+	ln -s ../Topaz/PortrayString.py             zps.py
 
 
 wc:
