@@ -38,14 +38,17 @@ LICENSE_FILES = \
 TOPAZ_FILES = \
     ../Topaz/Core.py \
     ../Topaz/Main.py \
-    ../Topaz/Path.py ../Topaz/PortrayString.py \
+    ../Topaz/Path.py ../Topaz/Pattern.py ../Topaz/PortrayString.py \
     ../Topaz/StringOutput.py
 
 TREMOLITE_FILES = \
     ../Tremolite/Build.py \
-    ../Tremolite/Compile.py ../Tremolite/Core.py \
+    ../Tremolite/Compile.py ../Tremolite/Core.py ../Tremolite/CreateMatch.py \
     ../Tremolite/Main.py \
     ../Tremolite/Parse.py
+    #
+    #   Excludes both:  ../Tremolite/Match.py & ../Tremolite/ParsedMatch.py (generated code)
+    #
 
 
 WORK_FILES = Makefile
@@ -85,8 +88,8 @@ clean:
 	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
 	rm -f so.py ssio.py
-	rm -f tc.py tm.py tp.py tu.py tx.py
-	rm -f zc.py zm.py zpa.py zps.py zso.py
+	rm -f tcm.py tco.py tma.py tmc.py tp.py tpm.py tu.py tx.py
+	rm -f zc.py zm.py zpa.py zps.py zpt.py zso.py
 
 
 files:
@@ -141,15 +144,19 @@ links:
 	ln -s ../Gem/RegularExpression.py           rx.py
 	ln -s ../Gem/StringOutput.py                so.py
 	ln -s ../Gem/SimpleStringIO.py              ssio.py
-	ln -s ../Tremolite/Core.py                  tc.py
-	ln -s ../Tremolite/Main.py                  tm.py
+	ln -s ../Tremolite/CreateMatch.py           tcm.py
+	ln -s ../Tremolite/Core.py                  tco.py
+	ln -s ../Tremolite/Main.py                  tma.py
+	ln -s ../Tremolite/Match.py                 tmc.py
 	ln -s ../Tremolite/Parse.py                 tp.py
+	ln -s ../Tremolite/ParsedMatch.py           tpm.py
 	ln -s ../Tremolite/Build.py                 tu.py
 	ln -s ../Tremolite/Compile.py               tx.py
 	ln -s ../Topaz/Core.py                      zc.py
 	ln -s ../Topaz/Main.py                      zm.py
 	ln -s ../Topaz/Path.py                      zpa.py
 	ln -s ../Topaz/PortrayString.py             zps.py
+	ln -s ../Topaz/Pattern.py                   zpt.py
 	ln -s ../Topaz/StringOutput.py              zso.py
 
 

@@ -35,7 +35,7 @@ For licenses copied from other projects:
 Here is a list of all files in the Gem projects that include other copyrights:
 
     1.  Dravite/Euclid.py - Parts of which are licensed by:
-    
+
             "Creative Commons Attribution-ShareAlike 3.0 Unported license"
 
             Which as of 2016-03-02 linked to https://creativecommons.org/licenses/by-sa/3.0/

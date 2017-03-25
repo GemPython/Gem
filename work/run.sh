@@ -30,9 +30,9 @@ do
     trap "trap $i; rm -f $tmp1 $tmp2 $tmp3; kill -$i $$; exit $i" $i
 done
 
-Main_py=../Ivory/Main.py
 Main_py=../Beryl/Main.py
 Main_py=../Topaz/Main.py
+Main_py=../Ivory/Main.py
 Main_py=../Tremolite/Main.py
 
 command="python $Main_py"
