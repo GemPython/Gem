@@ -41,6 +41,12 @@ TOPAZ_FILES = \
     ../Topaz/Path.py ../Topaz/PortrayString.py \
     ../Topaz/StringOutput.py
 
+TREMOLITE_FILES = \
+    ../Tremolite/Core.py \
+    ../Tremolite/Main.py \
+    ../Tremolite/Parse.py
+
+
 WORK_FILES = Makefile
 
 FILES = \
@@ -51,10 +57,12 @@ FILES = \
     $(IVORY_FILES) \
     $(LICENSE_FILES) \
     $(TOPAZ_FILES) \
+    $(TREMOLITE_FILES) \
     $(WORK_FILES)
 
 
 all: clean files links
+
 
 clean:
 	rm -rf __pycache__
@@ -76,12 +84,14 @@ clean:
 	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
 	rm -f so.py ssio.py
+	rm -f tc.py tm.py tp.py
 	rm -f zc.py zm.py zpa.py zps.py zso.py
 
 
 files:
 	echo $(FILES) >files.new
 	mv files.new files
+
 
 links:
 	ln -s ../Gem/Absent.py                      ab.py
@@ -130,6 +140,9 @@ links:
 	ln -s ../Gem/RegularExpression.py           rx.py
 	ln -s ../Gem/StringOutput.py                so.py
 	ln -s ../Gem/SimpleStringIO.py              ssio.py
+	ln -s ../Tremolite/Core.py                  tc.py
+	ln -s ../Tremolite/Main.py                  tm.py
+	ln -s ../Tremolite/Parse.py                 tp.py
 	ln -s ../Topaz/Core.py                      zc.py
 	ln -s ../Topaz/Main.py                      zm.py
 	ln -s ../Topaz/Path.py                      zpa.py
@@ -148,4 +161,5 @@ wc:
         $(IVORY_FILES) \
         $(LICENSE_FILES) \
         $(TOPAZ_FILES) \
+        $(TREMOLITE_FILES) \
         $(WORK_FILES)

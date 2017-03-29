@@ -59,6 +59,20 @@ that include other copyrights:
     
             "Creative Commons Attribution-ShareAlike 3.0 Unported license"
 
+    Amended on 2017-03-05:
+
+    2.  Tremolite/Compile.py - Parts of which are licensed by:
+
+            This version of the SRE library can be redistributed under CNRI's
+            Python 1.6 license.  For any other use, please contact Secret Labs
+            AB (info@pythonware.com).
+
+    2.  Tremolite/Parse.py - Parts of which are licensed by:
+
+            This version of the SRE library can be redistributed under CNRI's
+            Python 1.6 license.  For any other use, please contact Secret Labs
+            AB (info@pythonware.com).
+
 
 ===============================================================================
 
