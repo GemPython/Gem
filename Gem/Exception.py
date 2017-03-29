@@ -3,7 +3,10 @@
 #
 @gem('Gem.Exception')
 def gem():
-    PythonException = (__import__('exceptions')   if is_python_2 else  PythonBuiltIn)
+    require_gem('Gem.Import')
+
+
+    PythonException = (import_module('exceptions')   if is_python_2 else  PythonBuiltIn)
     RuntimeError    = PythonException.RuntimeError
     ValueError      = PythonException.ValueError
 
@@ -18,7 +21,7 @@ def gem():
     #
     #   raise_runtime_error
     #
-    @export
+    @built_in
     def raise_runtime_error(format, *arguments):
         runtime_error = (format   % arguments   if arguments else   format)
 
@@ -28,7 +31,7 @@ def gem():
     #
     #   raise_value_error
     #
-    @export
+    @built_in
     def raise_value_error(format, *arguments):
         value_error = format % arguments
 
@@ -39,7 +42,32 @@ def gem():
         raise ValueError(value_error)
 
 
+    if is_python_2:
+        EnvironmentError = PythonException.EnvironmentError
+
+
+        class FileNotFoundError(EnvironmentError):
+            pass
+
+
+        class PermissionError(EnvironmentError):
+            pass
+    else:
+        FileNotFoundError = PythonBuiltIn.FileNotFoundError
+        PermissionError   = PythonBuiltIn.PermissionError
+
+
     export(
-        'FileNotFoundError',  (PythonBuiltIn.OSError   if is_python_2 else    PythonBuiltIn.FileNotFoundError),
+        #
+        #   Exception Types
+        #
+        'FileNotFoundError',  FileNotFoundError,
         'ImportError',        PythonException.ImportError,
+        'OSError',            PythonException.OSError,
+        'PermissionError',    PermissionError,
+
+        #
+        #   Functions
+        #
+        'exception_information',    PythonSystem.exc_info,
     )

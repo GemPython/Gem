@@ -7,14 +7,12 @@ def gem():
     require_gem('Gem.Map')
 
 
-    from Gem import raise_runtime_error, raise_value_error, values_tuple_sorted_by_key
+    from Gem import values_tuple_sorted_by_key
 
 
     share(
         #
         #   Imported functions
         #
-        'raise_runtime_error',          raise_runtime_error,
-        'raise_value_error',            raise_value_error,
         'values_tuple_sorted_by_key',   values_tuple_sorted_by_key,
     )

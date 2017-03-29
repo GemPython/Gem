@@ -13,7 +13,7 @@ def gem():
 
     from Beryl.Shared import ask
     from Gem import exists__regular_file, execute_python_from_file, FileOutput
-    from Gem import input, make_match_function, path_join, read_text_file
+    from Gem import input, make_match_function, path_join, read_text_from_path
 
 
     her_or_his    = 'her|his'
@@ -72,8 +72,8 @@ def gem():
                 line()
                 line('You will need to provide:')
                 line('    1.  GitHub username;')
-                line('    2.  Your name;') 
-                line('    3.  Your GPG key;') 
+                line('    2.  Your name;')
+                line('    3.  Your GPG key;')
                 line('    4.  A pronoun.')
                 line()
 
@@ -299,7 +299,7 @@ def gem():
                 if exists__regular_file(license_path) is false:
                     license_path = path_join('..', license_path)
 
-                for s in read_text_file(license_path).splitlines()[3:]:
+                for s in read_text_from_path(license_path).splitlines()[3:]:
                     f.line('%s', s)
 
             line()

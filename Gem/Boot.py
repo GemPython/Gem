@@ -13,10 +13,11 @@ def gem():
     #
     #   This really belongs in Gem.Core, but is here since we need it during Boot
     #
-    PythonSystem  = __import__('sys')
-    is_python_2   = PythonSystem.version_info.major is 2
-    is_python_3   = PythonSystem.version_info.major is 3
-    PythonBuiltIn = __import__('__builtin__'  if is_python_2 else   'builtins')
+    PythonSystem    = __import__('sys')
+    is_python_2     = PythonSystem.version_info.major is 2
+    is_python_3     = PythonSystem.version_info.major is 3
+    PythonBuiltIn   = __import__('__builtin__'  if is_python_2 else   'builtins')
+    PythonException = (__import__('exceptions')   if is_python_2 else  PythonBuiltIn)
 
 
     #
@@ -86,7 +87,7 @@ def gem():
     #       Gem.Core
     #       Gem.Restricted
     #       Gem.Shared
-    #   
+    #
     for module in [Gem, GemBuiltIn, GemPrivileged, GemShared]:
         store_python_module(module.__name__, module)
 
@@ -349,8 +350,7 @@ def gem():
     #   raise_already_exists
     #
     if __debug__:
-        PythonException = (__import__('exceptions')   if is_python_2 else  PythonBuiltIn)
-        NameError       = PythonException.NameError
+        NameError = PythonException.NameError
 
 
         @localize
@@ -358,6 +358,10 @@ def gem():
             name_error = arrange("%s.%s already exists (value: %r): can't export %r also",
                                  module_name, name, previous, exporting)
 
+            #
+            #   Since the next line will appear in stack traces, make it look prettier by using 'name_error'
+            #   (to make the line shorter & more readable)
+            #
             raise NameError(name_error)
 
 
@@ -534,7 +538,14 @@ def gem():
         #
         'arrange',          arrange,
         'length',           length,
+        'next_method',      next_method,
         'intern_string',    intern_string,
+
+        #
+        #   Values
+        #
+        'is_python_2',  is_python_2,
+        'is_python_3',  is_python_3,
     )
 
 
@@ -578,8 +589,9 @@ def gem():
         #
         #   Modules
         #
-        'PythonBuiltIn',   PythonBuiltIn,
-        'PythonSystem', PythonSystem,
+        'PythonBuiltIn',    PythonBuiltIn,
+        'PythonSystem',     PythonSystem,
+        'PythonException',  PythonException,
         #'Shared',      Shared                      #   Done in produce_export_and_share
     )
 
@@ -601,12 +613,6 @@ def gem():
         #
         'rename_function',  rename_function,
         'privileged',       privileged,
-
-        #
-        #   Values
-        #
-        'is_python_2',  is_python_2,
-        'is_python_3',  is_python_3,
     )
 
 
@@ -665,7 +671,7 @@ def gem():
 
         if parent_module is none:
             parent_module = require_gem(parent_module_name)
-        
+
         Shared_Scope = parent_module.Shared.__dict__
 
         if child_module_name == 'Main':

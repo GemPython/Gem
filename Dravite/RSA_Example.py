@@ -13,9 +13,6 @@ def gem():
     require_gem('Dravite.Euclid')
 
 
-    from Gem import raise_runtime_error
-
-
     #
     #<copyright>
     #

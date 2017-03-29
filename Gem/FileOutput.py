@@ -3,11 +3,10 @@
 #
 @gem('Gem.FileOutput')
 def gem():
-    require_gem('Gem.File')
     require_gem('Gem.Path')
 
 
-    from Gem.Privileged import open_file
+    from Gem.Privileged import open_path
 
 
     @export
@@ -28,32 +27,35 @@ def gem():
         def __enter__(t):
             assert t.f is none
 
-            t.f      = f       = open_file(t.path_new, 'w')
+            t.f      = f       = open_path(t.path_new, 'w')
             t._write = f.write
 
             return t
 
 
         def __exit__(t, e_type, value, traceback):
-            path = t.path
-            f    = t.f
-
-            path_new = t.path_new       #   Grab t.path_new & t.path_old before zaping t.path
-            path_old = t.path_old
-
-            t._write = t.f = t.path = none
+            f        = t.f
+            t._write = t.f = none
 
             f.close()
 
+            path = t.path
+
+            path_new = t.path_new       #   Grab t.path_new & t.path_old before zapping t.path
+            path_old = t.path_old
+
+            t.path = none
+
             if e_type is none:
-                remove_file__ignore_file_not_found(path_old)
-                rename_file__ignore_file_not_found(path, path_old)
-                rename_file(path_new, path)
+                remove_path__ignore_file_not_found(path_old)
+                rename_path__ignore_file_not_found(path, path_old)
+                rename_path(path_new, path)
 
 
         def line(t, format = none, *arguments):
             if format is none:
                 assert length(arguments) is 0
+
                 t._write('\n')
                 return
 

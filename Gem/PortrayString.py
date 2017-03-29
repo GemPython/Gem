@@ -5,7 +5,7 @@
 def gem():
     require_gem('Gem.Ascii')
     require_gem('Gem.Exception')
-    require_gem('Gem.StringIO')
+    require_gem('Gem.SimpleStringIO')
 
 
     P = String.__repr__
@@ -55,7 +55,7 @@ def gem():
             def __repr__(t):
                 return arrange('<PortrayStringState %s>', t.name)
 
-                
+
         def overall(t, A, K, L, Q, ra = 7, rq = 7, pc = 7, ps = 7, is_K = 0):
             if rq is 7:     rq = ra
             if pc is 7:     pc = rq
@@ -266,7 +266,7 @@ def gem():
     def portray_backslash_string_with_triple_apostrophe(s):
         #line('KC: %r', s)
 
-        f     = create_StringOutput()
+        f     = create_SimpleStringOutput()
         w     = f.write
         state = A_B
 
@@ -310,7 +310,7 @@ def gem():
     def portray_backslash_string_with_triple_quotation_mark(s):
         #line('KS: %r', s)
 
-        f     = create_StringOutput()
+        f     = create_SimpleStringOutput()
         w     = f.write
         state = Q_R
 
@@ -458,7 +458,7 @@ def gem():
     del PortrayStringState.__init__, PortrayStringState.setup
 
 
-    @export
+    @built_in
     def portray_raw_string(s):
         iterator = iterate(s)
         overall  = E
@@ -581,7 +581,7 @@ def gem():
         return overall.rq(raw_state)(s)
 
 
-    @export
+    @built_in
     def portray_string(s):
         iterator = iterate(s)
         overall  = E
