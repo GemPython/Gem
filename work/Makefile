@@ -19,7 +19,7 @@ GEM_FILES = \
 	../Gem/FileOutput.py ../Gem/FileStatus.py \
 	../Gem/Import.py ../Gem/IO.py \
     ../Gem/Map.py \
-    ../Gem/Path.py ../Gem/PortrayString.py \
+    ../Gem/Path.py ../Gem/Path2.py ../Gem/PortrayString.py \
     ../Gem/RegularExpression.py \
     ../Gem/SimpleStringIO.py ../Gem/StringOutput.py
 
@@ -38,7 +38,7 @@ LICENSE_FILES = \
 TOPAZ_FILES = \
     ../Topaz/Core.py \
     ../Topaz/Main.py \
-    ../Topaz/PortrayString.py \
+    ../Topaz/Path.py ../Topaz/PortrayString.py \
     ../Topaz/StringOutput.py
 
 WORK_FILES = Makefile
@@ -73,10 +73,10 @@ clean:
 	rm -f jb.py
 	rm -f lr.txt
 	rm -f m m.py
-	rm -f pa.py ps.py ps3.py
+	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
 	rm -f so.py ssio.py
-	rm -f zc.py zm.py zps.py zso.py
+	rm -f zc.py zm.py zpa.py zps.py zso.py
 
 
 files:
@@ -123,6 +123,7 @@ links:
 	ln -s Makefile                              m
 	ln -s ../Gem/Map.py                         m.py
 	ln -s ../Gem/Path.py                        pa.py
+	ln -s ../Gem/Path2.py                       pa2.py
 	ln -s ../Gem/PortrayString.py               ps.py
 	ln -s ../Junk/PortrayString_3.py            ps3.py
 	ln -s ../Agate/RUNME.py                     rm.py
@@ -131,6 +132,7 @@ links:
 	ln -s ../Gem/SimpleStringIO.py              ssio.py
 	ln -s ../Topaz/Core.py                      zc.py
 	ln -s ../Topaz/Main.py                      zm.py
+	ln -s ../Topaz/Path.py                      zpa.py
 	ln -s ../Topaz/PortrayString.py             zps.py
 	ln -s ../Topaz/StringOutput.py              zso.py
 

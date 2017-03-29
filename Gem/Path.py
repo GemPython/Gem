@@ -7,12 +7,17 @@ def gem():
     require_gem('Gem.ErrorNumber')
     require_gem('Gem.Import')
 
-
     PythonOperatingSystem = import_module('os')
     PythonPath            = import_module('os.path')
-    python__rename_path   = PythonOperatingSystem.rename
-    python__remove_path   = PythonOperatingSystem.remove
     open_path             = PythonBuiltIn.open
+
+    if is_python_2:
+        require_gem('Gem.Path2')
+
+        from Gem import rename_path, remove_path
+    else:
+        rename_path = PythonOperatingSystem.rename
+        remove_path = PythonOperatingSystem.remove
 
 
     @export
@@ -29,81 +34,27 @@ def gem():
             return f.write(data)
 
 
-    if is_python_2:
-        def adjust_OSError_exception():
-            [e_type, e, e_traceback] = e_all = exception_information()
-
-            assert e_type is OSError
-
-            arguments = e.args
-
-            if (type(arguments) is Tuple) and (length(arguments) is 2):
-                error_number = arguments[0]
-
-                if error_number is ERROR_NO_ACCESS:
-                    return ((PermissionError, arguments, e_traceback))
-
-                if error_number is ERROR_NO_ENTRY:
-                    return ((FileNotFoundError, arguments, e_traceback))
-
-            line('e_all: %r', e_all)
-            raise e_all
-
-
-    if is_python_2:
-        @export
-        def remove_path(path):
-            try:
-                python__remove_path(path)
-            except OSError as e:
-                #
-                #   NOTE:
-                #       To avoid adding an extra frame in the traceback, the 'raise' must be issued in this function,
-                #       instead of inside adjust_OSError_exception()
-                #
-                [e_type, e, e_traceback] = adjust_OSError_exception()
-
-                raise e_type, e, e_traceback
-    else:
-        remove_path = python__remove_path
-
+    if is_python_3:
         export(
             'remove_path',  remove_path,
-        )
-
-
-    if is_python_2:
-        @export
-        def rename_path(from_path, to_path):
-            try:
-                python__rename_path(from_path, to_path)
-            except OSError as e:
-                #
-                #   NOTE:
-                #       To avoid adding an extra frame in the traceback, the 'raise' must be issued in this function,
-                #       instead of inside adjust_OSError_exception()
-                #
-                [e_type, e, e_traceback] = adjust_OSError_exception()
-
-                raise e_type, e, e_traceback
-    else:
-        rename_path = python__rename_path
-
-        export(
             'rename_path',  rename_path,
         )
 
 
     @export
     def remove_path__ignore_file_not_found(path):
-        with catch_FileNotFoundError():
+        with catch_FileNotFoundError() as e:
             remove_path(path)
+
+        return e.caught is none
 
 
     @export
     def rename_path__ignore_file_not_found(from_path, to_path):
-        with catch_FileNotFoundError():
+        with catch_FileNotFoundError() as e:
             rename_path(from_path, to_path)
+
+        return e.caught is none
 
 
     export(
