@@ -13,7 +13,7 @@ def gem():
     #   import_module
     #
     if is_python_2:
-        @export
+        @built_in
         def import_module(module_name):
             module_name = intern_string(module_name)
 
@@ -28,11 +28,11 @@ def gem():
 
         #
         #   NOTE:
-        #       Do not use 'export(import_module)' as this will *CHANGE* it's global scope to be
-        #       GEM's scope -- which fails miserably since it can't find '_bootstrap' in the Gem scope.
+        #       Do not use 'built_in(import_module)' as this will *CHANGE* it's global scope to be
+        #       Gem's shared scope -- which fails miserably since it can't find '_bootstrap' in the Gem scope.
         #
         #       Instead use two arguments, so its exported without having its global scope changed.
         #
-        export(
+        built_in(
             'import_module',    import_module,
         )

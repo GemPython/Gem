@@ -425,7 +425,7 @@ if __name__ == '__main__':
 
         return gem
 
-        
+
     @gem('Ivory.Main')
     def __name__():
         PythonPlatform  = __import__('platform')
@@ -528,7 +528,7 @@ if __name__ == '__main__':
             def __init__(t, header):
                 t.header = header
 
-            
+
             def __enter__(t):
                 partial('%s ...', t.header)
 

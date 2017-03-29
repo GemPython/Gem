@@ -7,7 +7,7 @@ def gem():
     require_gem('Gem.PortrayString')
 
 
-    from Gem import N_N, portray_raw_string, portray_string
+    from Gem import N_N
 
 
     def test_portray_raw_string__raw_string():
@@ -750,7 +750,7 @@ def gem():
                     "''",
                 ],
 
-                [ 
+                [
                     'test#2',
                     "r'test#2'",
                     "'test#2'",

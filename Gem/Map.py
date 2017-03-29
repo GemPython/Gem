@@ -32,6 +32,14 @@ def gem():
 
 
     @export
+    def iterate_values_sorted_by_key(mapping):
+        value = mapping.__getitem__
+
+        for k in sorted_list(mapping):
+            yield value(k)
+
+
+    @export
     def values_tuple_sorted_by_key(mapping):
         value = mapping.__getitem__
 

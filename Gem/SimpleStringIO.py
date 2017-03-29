@@ -1,7 +1,7 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-@gem('Gem.StringIO')
+@gem('Gem.SimpleStringIO')
 def gem():
     require_gem('Gem.Import')
 
@@ -13,5 +13,5 @@ def gem():
 
 
     @export
-    def create_StringOutput():
+    def create_SimpleStringOutput():
         return StringIO()

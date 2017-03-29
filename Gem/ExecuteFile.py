@@ -3,11 +3,10 @@
 #
 @gem('Gem.ExecuteFile')
 def gem():
-    require_gem('Gem.File')
     require_gem('Gem.Path')
 
 
-    from Gem import Module, path_basename, path_split_extension, read_text_file
+    from Gem import Module, path_basename, path_split_extension, read_text_from_path
 
 
     compile_python = PythonBuiltIn.compile
@@ -22,7 +21,7 @@ def gem():
         module                = Module(basename)
 
         execute_code(
-            compile_python(read_text_file(path), path, 'exec'),
+            compile_python(read_text_from_path(path), path, 'exec'),
             module.__dict__,
         )
 
