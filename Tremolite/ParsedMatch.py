@@ -13,11 +13,15 @@ def gem():
         return compile_regular_expression(regular_expression, code, groups, flags).match
 
 
-    C = (
+    C = ((
         #
         #<copyright>
-        #   The following is produced from python's standard library
-        #   'sre_compile.py', function 'compile' and is thus:
+        #   The following is generated from calling python's standard library:
+        #
+        #       1.  'sre_parse.py', function parse; and
+        #       2.  'sre_compile.py', function '_code'
+        #
+        #   then saving the result; and is thus possibly:
         #
         #       Copyright (c) 1998-2001 by Secret Labs AB.  All rights reserved.
         #
@@ -38,10 +42,13 @@ def gem():
         #
         #   r'[a-z][0-9a-z_]*\Z'
         #
-        (17, 8, 4, 1, 0, 27, 97, 122, 0, 15, 5, 27, 97, 122, 0, 29, 16, 0, 4294967295L, 15, 11, 10, 0, 67043328, 2147483648, 134217726, 0, 0, 0, 0, 0, 1, 6, 7, 1),
+        ((
+            17, 8, 4, 1, 0, 27, 97, 122, 0, 15, 5, 27, 97, 122, 0, 29, 16, 0, Long(4294967295), 15, 11, 10, 0,
+            67043328, 2147483648, 134217726, 0, 0, 0, 0, 0, 1, 6, 7, 1,
+        )),
 
         #</copyright>
-    ).__getitem__
+    )).__getitem__
 
     #
     #   group_name_match

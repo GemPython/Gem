@@ -62,6 +62,10 @@ def gem():
                 t._blank = 2
 
 
+        def blank_suppress(t):
+            t._blank = -1
+
+
         def close(t):
             f        = t.f
             t._write = t.f = none

@@ -34,7 +34,6 @@ IVORY_FILES = ../Ivory/Main.py
 LICENSE_FILES = \
     ../OtherLicenses/README.txt
 
-
 TOPAZ_FILES = \
     ../Topaz/Core.py \
     ../Topaz/Main.py \
@@ -47,7 +46,10 @@ TREMOLITE_FILES = \
     ../Tremolite/Main.py \
     ../Tremolite/Parse.py
     #
-    #   Excludes both:  ../Tremolite/Match.py & ../Tremolite/ParsedMatch.py (generated code)
+    #   Excludes:
+    #       ../Tremolite/LICENSE
+    #       ../Tremolite/Match.py
+    #       ../Tremolite/ParsedMatch.py
     #
 
 
@@ -88,7 +90,7 @@ clean:
 	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
 	rm -f so.py ssio.py
-	rm -f tcm.py tco.py tma.py tmc.py tp.py tpm.py tu.py tx.py
+	rm -f tcm.py tco.py tlp.txt tma.py tmc.py tp.py tpm.py tu.py tx.py
 	rm -f zc.py zm.py zpa.py zps.py zpt.py zso.py
 
 
@@ -146,6 +148,7 @@ links:
 	ln -s ../Gem/SimpleStringIO.py              ssio.py
 	ln -s ../Tremolite/CreateMatch.py           tcm.py
 	ln -s ../Tremolite/Core.py                  tco.py
+	ln -s ../Tremolite/LicenseTemplate.txt      tlp.txt
 	ln -s ../Tremolite/Main.py                  tma.py
 	ln -s ../Tremolite/Match.py                 tmc.py
 	ln -s ../Tremolite/Parse.py                 tp.py

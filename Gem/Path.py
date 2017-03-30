@@ -7,6 +7,9 @@ def gem():
     require_gem('Gem.ErrorNumber')
     require_gem('Gem.Import')
 
+    if is_python_3:
+        require_gem('Gem.Codec')
+
     PythonOperatingSystem = import_module('os')
     PythonPath            = import_module('os.path')
     open_path             = PythonBuiltIn.open
@@ -27,11 +30,21 @@ def gem():
             return f.read()
 
 
-    @export
-    @privileged_2
-    def write_binary_to_path(path, data):
-        with open_path(path, 'wb') as f:
-            return f.write(data)
+    if is_python_2:
+        @export
+        @privileged_2
+        def write_binary_to_path(path, data):
+            with open_path(path, 'wb') as f:
+                return f.write(data)
+    else:
+        @export
+        @privileged_2
+        def write_binary_to_path(path, data):
+            if type(data) is String:
+                data = encode_ascii(data)
+
+            with open_path(path, 'wb') as f:
+                return f.write(data)
 
 
     if is_python_3:

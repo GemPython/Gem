@@ -59,6 +59,7 @@ def gem():
         'Integer',          PythonBuiltIn.int,
         'FrozenSet',        PythonBuiltIn.frozenset,
         'List',             PythonBuiltIn.list,
+        'Long',             (PythonBuiltIn.long    if is_python_2 else   PythonBuiltIn.int),
         'Map',              PythonBuiltIn.dict,
         'Object',           PythonBuiltIn.object,
         'Tuple',            PythonBuiltIn.tuple,

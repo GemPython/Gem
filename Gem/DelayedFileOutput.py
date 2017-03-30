@@ -17,6 +17,7 @@ def gem():
             'f',                        #   File
             'blank',                    #   Method
             'blank2',                   #   Method
+            'blank_suppress',           #   Method
             'indent',                   #   Method
             'line',                     #   Method
         ))
@@ -31,11 +32,12 @@ def gem():
         def __enter__(t):
             assert t.f is none
 
-            t.f      = f       = create_StringOutput()
-            t.blank2 = f.blank2
-            t.blank  = f.blank
-            t.indent = f.indent
-            t.line   = f.line
+            t.f              = f       = create_StringOutput()
+            t.blank2         = f.blank2
+            t.blank          = f.blank
+            t.blank_suppress = f.blank_suppress
+            t.indent         = f.indent
+            t.line           = f.line
 
             return t
 
@@ -61,7 +63,7 @@ def gem():
 
         def close(t):
             f      = t.f
-            t.line = t.indent = t.blank2 = t.blank = t.f = t.data = none
+            t.line = t.indent = t.blank_suppress = t.blank2 = t.blank = t.f = t.data = none
 
             if f is not none:
                 f.close()
@@ -86,6 +88,10 @@ def gem():
         @property
         def path_old(t):
             return arrange('%s.old', t.path)
+
+        @property
+        def prefix_total(t):
+            return length(t.f.prefix)
 
 
     export(

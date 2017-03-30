@@ -44,16 +44,14 @@ def gem():
         append_notice = notice.append
         found         = 0
 
-        for s in read_text_from_path('../Tremolite/Parse.py').splitlines():
-            if s == '        #<copyright>':
-                found = 3
-            elif s[:9] != '        #':
-                found = 0
-            elif found > 1:
-                found -= 1
+        for s in read_text_from_path('../Tremolite/LicenseTemplate.txt').splitlines():
+            if s == '#':
+                found = 1
+            elif s == '<generated-output-goes-here />':
+                found = 2
 
             if found is 1:
-                append_notice(s[8:])
+                append_notice(s)
 
         with create_DelayedFileOutput(path) as f:
             f.line('#')
@@ -71,32 +69,54 @@ def gem():
                     f.line('return compile_regular_expression(regular_expression, code, groups, flags).match')
                 f.blank2()
 
-                with f.indent('C = (', ').__getitem__'):
-                    f.line('#')
-                    f.line('#<copyright>')
-                    f.line("#   The following is produced from python's standard library")
-                    f.line("#   'sre_compile.py', function 'compile' and is thus:")
+                for s in notice:
+                    f.line(s)
+                with f.indent('if is_python_2:'):
+                    with f.indent('C = ((', ')).__getitem__'):
+                        f.blank_suppress()
 
-                    for s in notice:
-                        f.line(s)
+                        for v in iterate_values_sorted_by_key(cache):
+                            [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
 
-                    for v in iterate_values_sorted_by_key(cache):
-                        [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
+                            f.blank()
+                            f.line('#')
+                            f.line('#   %s', portray_string(v.pattern.regular_expression))
+                            f.line('#')
 
-                        f.blank()
-                        f.line('#')
-                        f.line('#   %s', portray_string(v.pattern.regular_expression))
-                        f.line('#')
-                        f.line('%s,', portray_string(code)   if type(code) is String else   portray(code))
+                            if type(code) is String:
+                                f.line('%s,', portray_string(code))
+                            else:
+                                with f.indent('((', ')),'):
+                                    data     = none
+                                    position = 0
 
-                        if groups is not 0:
-                            f.line('%s,', portray(groups))
+                                    for w in code:
+                                        if (is_python_2) and (type(w) is Long):
+                                            s = arrange('Long(%d)', w)
+                                        else:
+                                            s = arrange('%d', w)
 
-                        if flags is not 0:
-                            f.line('%d,', flags)
+                                        s_total = length(s)
 
-                    f.blank()
-                    f.line('#</copyright>')
+                                        if (position is not 0) and (position + s_total + 2) > 120:
+                                            f.line(data)
+                                            position = 0
+
+                                        if position is 0:
+                                            data     = s + ','
+                                            position = f.prefix_total + s_total + 1
+                                        else:
+                                            data     += ' ' + s + ','
+                                            position += 1 + s_total + 1
+
+                                    f.line(data)
+
+                            if groups is not 0:
+                                f.line('%s,', portray(groups))
+
+                            if flags is not 0:
+                                f.line('%d,', flags)
+                f.line('#</copyright>')
 
                 index = 0
 

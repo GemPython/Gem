@@ -1,0 +1,32 @@
+This file is for use in Tremolite generated code.
+
+Tremolite generates code by calling function sre_parse.parse & sre_compile._code and then saving the result.
+
+The generated output of these functions is saved between the following template:
+
+#
+#<copyright>
+#   The following is generated from calling python's standard library:
+#
+#       1.  'sre_parse.py', function parse; and
+#       2.  'sre_compile.py', function '_code'
+#
+#   then saving the result; and is thus possibly:
+#
+#       Copyright (c) 1998-2001 by Secret Labs AB.  All rights reserved.
+#
+#       This version of the SRE library can be redistributed under CNRI's
+#       Python 1.6 license.  For any other use, please contact Secret Labs
+#       AB (info@pythonware.com).
+#
+#   (Currently the same copyright is used for both python 2.7 & 3.5 versions)
+#
+#   P.S.:  To make things simple, all *changes* to the original code below are dual licensed under
+#          both (1) the MIT License that the rest of Gem is licensed; and (2) under the exact same
+#          "CNRI's Python 1.6" license as the original code.
+#
+#   NOTE:  Dual copyright only applies to the changes, not to the original code which is obviously
+#          only licensed under the original license.
+#
+<generated-output-goes-here />
+#</copyright>
