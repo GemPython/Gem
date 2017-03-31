@@ -60,20 +60,19 @@ def gem():
             f.line('@gem(%r)', module_name)
             
             with f.indent('def gem():'):
+                f.line('require_gem(%r)', 'Gem.System')
                 f.line('require_gem(%r)', 'Tremolite.Compile')
                 f.blank2()
+                f.line('from Gem import python_version')
                 f.line('from Tremolite import compile_regular_expression')
-
-                f.blank2()
-                with f.indent('def M(regular_expression, code, groups = 0, flags = 0):'):
-                    f.line('return compile_regular_expression(regular_expression, code, groups, flags).match')
                 f.blank2()
 
-                for s in notice:
-                    f.line(s)
-                with f.indent('if is_python_2:'):
+                with f.indent(arrange('if python_version == %s:', portray_string(python_version))):
                     with f.indent('C = ((', ')).__getitem__'):
-                        f.blank_suppress()
+                        for s in notice:
+                            f.line(s)
+
+                        f.line('0,')
 
                         for v in iterate_values_sorted_by_key(cache):
                             [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
@@ -116,9 +115,30 @@ def gem():
 
                             if flags is not 0:
                                 f.line('%d,', flags)
-                f.line('#</copyright>')
 
-                index = 0
+                        f.line('#</copyright>')
+
+                    f.blank2()
+
+                    with f.indent('def M(regular_expression, code, groups = 0, flags = 0):'):
+                        f.line('return compile_regular_expression(regular_expression, C(code), C(groups), C(flags)).match')
+
+                f.blank2()
+
+                with f.indent('else:'):
+                    f.line('require_gem(%r)', 'Tremolite.Parse')
+                    f.blank2()
+                    f.line('from Tremolite import parse_ascii_regular_expression')
+                    f.blank2()
+
+                    with f.indent('def M(regular_expression, code, groups = none, flags = none):'):
+                        with f.indent('return compile_regular_expression(', ').match'):
+                            f.line('regular_expression,')
+                            f.line('*parse_ascii_regular_expression(regular_expression)#,')
+
+                f.blank2()
+
+                index = 1
 
                 for v in iterate_values_sorted_by_key(cache):
                     [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
@@ -135,17 +155,17 @@ def gem():
                             ')',
                     ):
                         f.line('%s,', portray_string(v.pattern.regular_expression))
-                        f.line('C(%d),', index)
+                        f.line('%d,', index)
                         index += 1
 
                         if groups is not 0:
-                            f.line('C(%d),', index)
+                            f.line('%d,', index)
                             index += 1
                         elif flags is not 0:
                             f.line('0,')
 
                         if flags is not 0:
-                            f.line('C(%d),', index)
+                            f.line('%d,', index)
                             index += 1
 
                 f.blank2()

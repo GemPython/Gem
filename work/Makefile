@@ -21,7 +21,7 @@ GEM_FILES = \
     ../Gem/Map.py \
     ../Gem/Path.py ../Gem/Path2.py ../Gem/PortrayString.py \
     ../Gem/RegularExpression.py \
-    ../Gem/SimpleStringIO.py ../Gem/StringOutput.py
+    ../Gem/SimpleStringIO.py ../Gem/StringOutput.py ../Gem/System.py
 
 DRAVITE_FILES = \
     ../Dravite/Euclid.py \
@@ -89,7 +89,7 @@ clean:
 	rm -f m m.py
 	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
-	rm -f so.py ssio.py
+	rm -f so.py ssio.py sy.py
 	rm -f tcm.py tco.py tlp.txt tma.py tmc.py tp.py tpm.py tu.py tx.py
 	rm -f zc.py zm.py zpa.py zps.py zpt.py zso.py
 
@@ -146,6 +146,7 @@ links:
 	ln -s ../Gem/RegularExpression.py           rx.py
 	ln -s ../Gem/StringOutput.py                so.py
 	ln -s ../Gem/SimpleStringIO.py              ssio.py
+	ln -s ../Gem/System.py                      sy.py
 	ln -s ../Tremolite/CreateMatch.py           tcm.py
 	ln -s ../Tremolite/Core.py                  tco.py
 	ln -s ../Tremolite/LicenseTemplate.txt      tlp.txt

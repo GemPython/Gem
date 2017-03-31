@@ -4,15 +4,12 @@
 @gem('Gem.Import')
 def gem():
     #
-    #   Python values
-    #
-    python_modules = PythonSystem.modules
-
-
-    #
     #   import_module
     #
     if is_python_2:
+        python_modules = PythonSystem.modules
+
+
         @built_in
         def import_module(module_name):
             module_name = intern_string(module_name)
@@ -20,10 +17,10 @@ def gem():
             __import__(module_name)
 
             return python_modules[module_name]
+
+
     else:
         PythonImportLibrary = __import__('importlib')
-
-        import_module = PythonImportLibrary.import_module
 
 
         #
@@ -34,5 +31,5 @@ def gem():
         #       Instead use two arguments, so its exported without having its global scope changed.
         #
         built_in(
-            'import_module',    import_module,
+            'import_module',    PythonImportLibrary.import_module,
         )

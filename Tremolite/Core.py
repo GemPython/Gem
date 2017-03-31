@@ -12,11 +12,12 @@ def gem():
     require_gem('Gem.Map')
     require_gem('Gem.Path')
     require_gem('Gem.PortrayString')
+    require_gem('Gem.System')
 
 
     from Gem import create_DelayedFileOutput, encode_ascii, first_map_item
     from Gem import iterate_items_sorted_by_key, iterate_values_sorted_by_key
-    from Gem import lookup_ascii, produce_cache_and_insert_function, read_text_from_path, view_items
+    from Gem import lookup_ascii, produce_cache_and_insert_function, python_version, read_text_from_path, view_items
 
 
     share(
@@ -38,4 +39,5 @@ def gem():
         #   Values
         #
         'list_of_single_none',  [none],
+        'python_version',       python_version,
     )
