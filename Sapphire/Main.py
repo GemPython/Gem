@@ -28,4 +28,5 @@ def gem():
 
     @share
     def main():
+        create_sapphire_match()
         parse_python_from_path('../Sapphire/Main.py')
