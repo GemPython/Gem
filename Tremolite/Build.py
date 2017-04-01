@@ -155,15 +155,11 @@ def gem():
                            suffix)
 
 
-    class TremoliteGroup(TremoliteBase):
+    class TremoliteGroupBase(TremoliteBase):
         __slots__ = ((
             'group_name',               #   String
             'inside',                   #   String
         ))
-
-
-        repeatable = true
-        singular   = true
 
 
         def __init__(t, regular_expression, portray, group_name, inside):
@@ -174,7 +170,23 @@ def gem():
 
 
         def __repr__(t):
-            return arrange('<TremoliteGroup %s %r>', t.group_name, t.inside)
+            return arrange('<%s %s %r>', t.__class__.__name__, t.group_name, t.inside)
+
+
+    class TremoliteGroup(TremoliteGroupBase):
+        __slots__ = (())
+
+
+        repeatable = true
+        singular   = true
+
+
+    class TremoliteOptionalGroup(TremoliteGroupBase):
+        __slots__ = (())
+
+
+        repeatable = false
+        singular   = false
 
 
     class TremoliteOr(TremoliteBase):
@@ -477,6 +489,24 @@ def gem():
     @export
     def OPTIONAL(inside):
         return create_simple_repeat('OPTIONAL', inside, '?')
+
+
+    @export
+    def OPTIONAL_GROUP(group_name, inside):
+        if type(inside) is String:
+            inside = INVISIBLE_EXACT(inside)
+        else:
+            assert inside.repeatable
+
+        if group_name_match(group_name) is none:
+            raise_runtime_error('GROUP: invalid group name: %s (expected a python identifier)', group_name)
+
+        return TremoliteOptionalGroup(
+                   intern_arrange('(?P<%s>%s)?', group_name, inside.regular_expression),
+                   arrange('OPTIONAL_GROUP(%s, %s)', portray_string(group_name), inside),
+                   group_name,
+                   inside,
+               )
 
 
     @export

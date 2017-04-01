@@ -9,7 +9,10 @@ def gem():
 
     from Tremolite import ANY_OF, DOT, END_OF_PATTERN, EMPTY, EXACT, GROUP
     from Tremolite import MINIMUM_OF_ONE_OR_MORE, MINIMUM_OF_OPTIONAL, MINIMUM_OF_REPEAT_OR_MORE, MINIMUM_OF_ZERO_OR_MORE
-    from Tremolite import ONE_OR_MORE, OPTIONAL, REPEAT, ZERO_OR_MORE
+    from Tremolite import ONE_OR_MORE, OPTIONAL, OPTIONAL_GROUP, REPEAT, ZERO_OR_MORE
+
+
+    show = false
 
 
     @share
@@ -23,15 +26,17 @@ def gem():
                 [   'x' + MINIMUM_OF_OPTIONAL('y') + MINIMUM_OF_ONE_OR_MORE('z') + END_OF_PATTERN,  'xzz'       ],
                 [   MINIMUM_OF_ZERO_OR_MORE('x') + REPEAT('yz', 2, 3) + END_OF_PATTERN,             'yzyzyz'    ],
                 [   MINIMUM_OF_REPEAT_OR_MORE('x' | EXACT('z'), 0) + 'y' + END_OF_PATTERN,          'xzxy'      ],
-                [   'x' + ZERO_OR_MORE(DOT) + END_OF_PATTERN,                                       'xqq'       ],
+                [   'x' + ZERO_OR_MORE(DOT) + OPTIONAL_GROUP('never', 'never') + END_OF_PATTERN,    'xqq'       ],
         ]:
-            #line('%s', pattern)
-            #line('%r', pattern)
+            if show:
+                line('%s', pattern)
+                line('%r', pattern)
 
             compiled = pattern.compile_ascii_regular_expression()
             m        = compiled.match(test)
 
-            #line('  %s %r', portray_string(m.group()), m.groups())
-            #line()
+            if show:
+                line('  %s %r', portray_string(m.group()), m.groups())
+                line()
 
         line('PASSED: pattern')
