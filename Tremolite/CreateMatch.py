@@ -6,7 +6,7 @@ def gem():
     require_gem('Tremolite.Name')
 
 
-    show = true
+    show = false
 
 
     @export

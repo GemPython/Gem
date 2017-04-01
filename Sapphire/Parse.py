@@ -24,8 +24,27 @@ def gem():
         __slots__ = (())
 
 
+    class IndentedComment(Token):
+        __slots__ = ((
+            'indented',                     #   String
+        ))
+
+
+        def __init__(t, indented, s):
+            t.indented = indented
+            t.s        = s
+
+
+        def __repr__(t):
+            if t.s is '':
+                return arrange('<+# %r #>', t.indented)
+
+            return arrange('<+# %r # %s>', t.indented, portray_string(t.s))
+
+
     class DefineHeader(Token):
         __slots__ = ((
+            'indented',                     #   String
             'keyword_define',               #   String
             'name',                         #   String
             'left_parenthesis',             #   String
@@ -34,7 +53,8 @@ def gem():
         ))
 
 
-        def __init__(t, keyword_define, name, left_parenthesis, argument_1, right_parenthesis__colon):
+        def __init__(t, indented, keyword_define, name, left_parenthesis, argument_1, right_parenthesis__colon):
+            t.indented                 = indented
             t.keyword_define           = keyword_define
             t.name                     = name
             t.left_parenthesis         = left_parenthesis
@@ -43,7 +63,8 @@ def gem():
 
 
         def  __repr__(t):
-            return arrange('<DefineHeader %s %s %s %s %s>',
+            return arrange('<DefineHeader %r %s %s %s %s %s>',
+                           t.indented,
                            portray_string(t.keyword_define),
                            t.name,
                            portray_string(t.left_parenthesis),
@@ -51,23 +72,30 @@ def gem():
                            portray_string(t.right_parenthesis__colon))
 
 
+    class EmptyComment(Token):
+        __slots__ = (())
+
+
+        @static_method
+        def __repr__():
+            return '<EmptyComment>'
+
+
+    empty_comment = EmptyComment('')
+
+
     class EmptyLine(Token):
-        __slots__ = ((
-            'portray',                  #   String
-        ))
-
-
-        def __init__(t, portray, s):
-            t.portray = portray
-            t.s       = s
+        __slots__ = (())
 
 
         def __repr__(t):
-            return arrange('<%s>', t.portray)
+            if t.s is '':
+                return '<EmptyLine>'
+
+            return arrange('<EmptyLine %r>', t.s)
 
 
-    empty_line    = EmptyLine('EmptyLine', '')
-    empty_comment = EmptyLine('EmptyComment', '#')
+    empty_line = EmptyLine('')
 
 
     class UnknownLine(Token):
@@ -81,17 +109,21 @@ def gem():
         append_line = many.append
 
         for s in data.splitlines():
-            m = comment_match(s)
+            m = line_match(s)
 
             if m is not none:
-                comment = m.group('comment')
+                [indented, comment] = m.group('ow1', 'comment')
 
                 if comment is not none:
-                    if comment == '':
-                        append_line(empty_comment)
+                    if indented is '':
+                        if comment is '':
+                            append_line(empty_comment)
+                            continue
+
+                        append_line(Comment(comment))
                         continue
 
-                    append_line(Comment(comment))
+                    append_line(IndentedComment(indented, comment))
                     continue
 
                 keyword_define= m.group('keyword_define')
@@ -102,13 +134,24 @@ def gem():
                     ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
 
                     append_line(
-                        DefineHeader(keyword_define, name_1, left_parenthesis, name_2, right_parenthesis__colon),
+                        DefineHeader(
+                            indented,
+                            keyword_define,
+                            name_1,
+                            left_parenthesis,
+                            name_2,
+                            right_parenthesis__colon,
+                        ),
                     )
 
                     continue
 
 
-                append_line(empty_line)
+                if indented is '':
+                    append_line(empty_line)
+                    continue
+
+                append_line(EmptyLine(indented))
                 continue
 
             append_line(UnknownLine(s))
