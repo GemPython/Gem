@@ -22,6 +22,8 @@ def boot():
 @gem('Tremolite.Main')
 def gem():
     require_gem('Tremolite.Core')
+    require_gem('Tremolite.Name')
+    require_gem('Tremolite.Build')
     require_gem('Tremolite.CreateMatch')
 
 

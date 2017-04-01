@@ -3,39 +3,10 @@
 #
 @gem('Tremolite.Match')
 def gem():
-    require_gem('Tremolite.Build')
-    require_gem('Tremolite.Core')
+    require_gem('Tremolite.Name')
 
 
-    class TremoliteMatch(Object):
-        __slots__ = ((
-            'name',                     #   String
-            'pattern',                  #   TremoliteBase+
-        ))
-
-
-        def __init__(t, name, pattern):
-            t.name    = name
-            t.pattern = pattern
-
-
-        def __repr__(t):
-            return arrange('<TremoliteMatch %s %r>', t.name, t.pattern)
-
-
-    [cache, insert] = produce_cache_and_insert_function('tremolite.match')
-
-
-    @export
-    def MATCH(name, pattern):
-        assert (type(name) is String) and (length(name) > 0)
-
-        if type(pattern) is String:
-            pattern = INVISIBLE_EXACT(pattern)
-
-        name = intern_string(name)
-
-        return insert(name, TremoliteMatch(name, pattern))
+    show = true
 
 
     @export
@@ -74,7 +45,7 @@ def gem():
 
                         f.line('0,')
 
-                        for v in iterate_values_sorted_by_key(cache):
+                        for v in iterate_values_sorted_by_key(match_cache):
                             [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
 
                             f.blank()
@@ -140,7 +111,7 @@ def gem():
 
                 index = 1
 
-                for v in iterate_values_sorted_by_key(cache):
+                for v in iterate_values_sorted_by_key(match_cache):
                     [code, groups, flags] = parse_ascii_regular_expression(v.pattern.regular_expression)
 
                     f.blank()
@@ -170,18 +141,18 @@ def gem():
 
                 f.blank2()
 
-                total = maximum(length(v.name)    for v in iterate_values_sorted_by_key(cache))
+                total = maximum(length(v.name)    for v in iterate_values_sorted_by_key(match_cache))
                 total = (total + 8) &~ 3
 
                 with f.indent(
                     'export(',
                     ')',
                 ):
-                    for v in iterate_values_sorted_by_key(cache):
+                    for v in iterate_values_sorted_by_key(match_cache):
                         f.line('%*s%s,', -total, arrange('%r,', v.name), v.name)
 
             data = f.finish()
 
-        if 0:
+        if show:
             for s in data.splitlines():
                 line(s)
