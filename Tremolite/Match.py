@@ -61,7 +61,7 @@ def gem():
         from Tremolite import parse_ascii_regular_expression
 
 
-        def M(regular_expression, code, groups = none, flags = none):
+        def M(regular_expression, code, groups = 0, flags = 0):
             return compile_regular_expression(
                 regular_expression,
                 *parse_ascii_regular_expression(regular_expression)#,

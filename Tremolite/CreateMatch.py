@@ -131,7 +131,7 @@ def gem():
                     f.line('from Tremolite import parse_ascii_regular_expression')
                     f.blank2()
 
-                    with f.indent('def M(regular_expression, code, groups = none, flags = none):'):
+                    with f.indent('def M(regular_expression, code, groups = 0, flags = 0):'):
                         with f.indent('return compile_regular_expression(', ').match'):
                             f.line('regular_expression,')
                             f.line('*parse_ascii_regular_expression(regular_expression)#,')
@@ -182,5 +182,6 @@ def gem():
 
             data = f.finish()
 
-        for s in data.splitlines():
-            line(s)
+        if 0:
+            for s in data.splitlines():
+                line(s)

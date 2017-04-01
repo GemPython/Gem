@@ -6,7 +6,7 @@ def gem():
     require_gem('Tremolite.Core')
     require_gem('Tremolite.Compile')
     require_gem('Tremolite.Parse')
-    require_gem('Tremolite.ParsedMatch')
+    require_gem('Tremolite.Match')
 
 
     class TremoliteBase(Object):

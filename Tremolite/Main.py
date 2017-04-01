@@ -29,4 +29,4 @@ def gem():
     def main():
         #MATCH('test', 'test' + GROUP('number', '0' | ANY_OF('1-9') + REPEAT(ANY_OF('0-9'), 0, 100)) + END_OF_PATTERN)
         MATCH('group_name_match', ANY_OF('a-z') + ZERO_OR_MORE(ANY_OF('0-9', '_', 'a-z')) + END_OF_PATTERN)
-        create_match_code('../Tremolite/Match.py', '2017 Amit Green', 'Tremolite.Match')
+        create_match_code('../Tremolite/Match.gpy', '2017 Amit Green', 'Tremolite.Match')

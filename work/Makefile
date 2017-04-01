@@ -49,7 +49,6 @@ TREMOLITE_FILES = \
     #   Excludes:
     #       ../Tremolite/LICENSE
     #       ../Tremolite/Match.py
-    #       ../Tremolite/ParsedMatch.py
     #
 
 
@@ -90,7 +89,7 @@ clean:
 	rm -f pa.py pa2.py ps.py ps3.py
 	rm -f rm.py rx.py
 	rm -f so.py ssio.py sy.py
-	rm -f tcm.py tco.py tlp.txt tma.py tmc.py tp.py tpm.py tu.py tx.py
+	rm -f tcm.py tco.py tlp.txt tma.py tmc.py tp.py tu.py tx.py
 	rm -f zc.py zm.py zpa.py zps.py zpt.py zso.py
 
 
@@ -153,7 +152,6 @@ links:
 	ln -s ../Tremolite/Main.py                  tma.py
 	ln -s ../Tremolite/Match.py                 tmc.py
 	ln -s ../Tremolite/Parse.py                 tp.py
-	ln -s ../Tremolite/ParsedMatch.py           tpm.py
 	ln -s ../Tremolite/Build.py                 tu.py
 	ln -s ../Tremolite/Compile.py               tx.py
 	ln -s ../Topaz/Core.py                      zc.py
