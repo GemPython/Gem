@@ -502,6 +502,7 @@ def gem():
 
 
     export(
+        'DOT',              SPECIAL('.',   'DOT', repeatable = true, singular = true),
         'EMPTY',            SPECIAL('',    'EMPTY'),
         'END_OF_PATTERN',   SPECIAL(r'\Z', 'END_OF_PATTERN'),
     )

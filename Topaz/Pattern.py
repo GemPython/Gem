@@ -7,7 +7,7 @@ def gem():
     require_gem('Tremolite.Build')
 
 
-    from Tremolite import ANY_OF, END_OF_PATTERN, EMPTY, EXACT, GROUP
+    from Tremolite import ANY_OF, DOT, END_OF_PATTERN, EMPTY, EXACT, GROUP
     from Tremolite import MINIMUM_OF_ONE_OR_MORE, MINIMUM_OF_OPTIONAL, MINIMUM_OF_REPEAT_OR_MORE, MINIMUM_OF_ZERO_OR_MORE
     from Tremolite import ONE_OR_MORE, OPTIONAL, REPEAT, ZERO_OR_MORE
 
@@ -23,6 +23,7 @@ def gem():
                 [   'x' + MINIMUM_OF_OPTIONAL('y') + MINIMUM_OF_ONE_OR_MORE('z') + END_OF_PATTERN,  'xzz'       ],
                 [   MINIMUM_OF_ZERO_OR_MORE('x') + REPEAT('yz', 2, 3) + END_OF_PATTERN,             'yzyzyz'    ],
                 [   MINIMUM_OF_REPEAT_OR_MORE('x' | EXACT('z'), 0) + 'y' + END_OF_PATTERN,          'xzxy'      ],
+                [   'x' + ZERO_OR_MORE(DOT) + END_OF_PATTERN,                                       'xqq'       ],
         ]:
             #line('%s', pattern)
             #line('%r', pattern)
