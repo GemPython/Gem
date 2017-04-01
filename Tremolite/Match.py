@@ -70,21 +70,21 @@ def gem():
 
 
     #
-    #   python_identifier = ANY_OF('A-Z', '_', 'a-z') + ZERO_OR_MORE(ANY_OF('0-9', 'A-Z', '_', 'a-z'))
+    #   identifier = ANY_OF('A-Z', '_', 'a-z') + ZERO_OR_MORE(ANY_OF('0-9', 'A-Z', '_', 'a-z'))
     #
 
 
     #
-    #   group_name_match
+    #   name_match
     #
-    #       python_identifier + END_OF_PATTERN
+    #       identifier + END_OF_PATTERN
     #
-    group_name_match = M(
+    name_match = M(
         r'[A-Z_a-z][0-9A-Z_a-z]*\Z',
         1,
     )
 
 
     export(
-        'group_name_match',     group_name_match,
+        'name_match',   name_match,
     )

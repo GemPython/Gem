@@ -122,20 +122,20 @@ def gem():
 
     class TremoliteGroupBase(TremoliteBase):
         __slots__ = ((
-            'group_name',               #   String
-            'inside',                   #   String
+            'name',                     #   String
+            'pattern',                  #   String
         ))
 
 
-        def __init__(t, regular_expression, portray, group_name, inside):
+        def __init__(t, regular_expression, portray, name, pattern):
             t.regular_expression = regular_expression
             t.portray            = portray
-            t.group_name         = group_name
-            t.inside             = inside
+            t.name               = name
+            t.pattern            = pattern
 
 
         def __repr__(t):
-            return arrange('<%s %s %r>', t.__class__.__name__, t.group_name, t.inside)
+            return arrange('<%s %s %r>', t.__class__.__name__, t.name, t.pattern)
 
 
     class TremoliteGroup(TremoliteGroupBase):
@@ -152,6 +152,38 @@ def gem():
 
         repeatable = false
         singular   = false
+
+
+    class TremoliteName(TremoliteGroupBase):
+        __slots__ = (())
+
+        
+        def __init__(t, name, pattern):
+            t.regular_expression = pattern.regular_expression
+            t.portray            = t.name = name
+            t.pattern            = pattern
+
+
+        @property
+        def repeatable(t):
+            return t.pattern.repeatable
+
+
+        @property
+        def singular(t):
+            return t.pattern.singular
+
+
+    class TremoliteNamedGroup(TremoliteGroupBase):
+        __slots__ = (())
+
+
+        @property
+        def repeatable(t):
+            return t.pattern.repeatable
+
+
+        singular = repeatable
 
 
     class TremoliteMany(TremoliteBase):
@@ -202,7 +234,6 @@ def gem():
         is_tremolite_or = true
 
 
-
         def __add__(t, that):
             return wrap_parenthesis(t) + that
 
@@ -216,35 +247,6 @@ def gem():
                        t.portray + ' | ' + that.portray,
                        t.many + ((that,)),
                    )
-
-
-    class TremoliteName(TremoliteBase):
-        __slots__ = ((
-            'pattern',                  #   String
-        ))
-
-        
-        def __init__(t, name, pattern):
-            t.name               = name
-            t.regular_expression = pattern.regular_expression
-            t.pattern            = pattern
-
-
-        @property
-        def repeatable(t):
-            return t.pattern.repeatable
-
-
-        @property
-        def singular(t):
-            return t.pattern.singular
-
-
-        def __repr__(t):
-            return arrange('<TremoliteName %s %r>', t.name, t.inside)
-
-
-    TremoliteName.name = TremoliteName.portray
 
 
     class TremoliteParenthesis(TremoliteBase):
@@ -455,18 +457,18 @@ def gem():
 
 
     @export
-    def GROUP(group_name, inside):
-        if type(inside) is String:
-            inside = INVISIBLE_EXACT(inside)
+    def GROUP(name, pattern):
+        if name_match(name) is none:
+            raise_runtime_error('GROUP: invalid group name: %s (expected a python identifier)', name)
 
-        if group_name_match(group_name) is none:
-            raise_runtime_error('GROUP: invalid group name: %s (expected a python identifier)', group_name)
+        if type(pattern) is String:
+            pattern = INVISIBLE_EXACT(pattern)
 
         return TremoliteGroup(
-                   intern_arrange('(?P<%s>%s)', group_name, inside.regular_expression),
-                   arrange('GROUP(%s, %s)', portray_string(group_name), inside),
-                   group_name,
-                   inside,
+                   intern_arrange('(?P<%s>%s)', name, pattern.regular_expression),
+                   arrange('GROUP(%s, %s)', portray_string(name), pattern),
+                   name,
+                   pattern,
                )
 
 
@@ -506,7 +508,8 @@ def gem():
 
     @export
     def NAME(name, pattern):
-        assert (type(name) is String) and (length(name) > 0)
+        if name_match(name) is none:
+            raise_runtime_error('NAME: invalid name: %s (expected a python identifier)', name)
 
         if type(pattern) is String:
             pattern = INVISIBLE_EXACT(pattern)
@@ -514,6 +517,27 @@ def gem():
         name = intern_string(name)
 
         return name_insert(name, TremoliteName(name, pattern))
+
+
+    @export
+    def NAMED_GROUP(name, pattern):
+        if name_match(name) is none:
+            raise_runtime_error('NAMED_GROUP: invalid name: %s (expected a python identifier)', name)
+
+        if type(pattern) is String:
+            pattern = INVISIBLE_EXACT(pattern)
+
+        name = intern_string(name)
+
+        return name_insert(
+                   name,
+                   TremoliteNamedGroup(
+                       intern_arrange('(?P<%s>%s)', name, pattern.regular_expression),
+                       name,
+                       name,
+                       GROUP(name, pattern),
+                   ),
+               )
 
 
     @export
@@ -533,7 +557,7 @@ def gem():
         else:
             assert inside.repeatable
 
-        if group_name_match(group_name) is none:
+        if name_match(group_name) is none:
             raise_runtime_error('GROUP: invalid group name: %s (expected a python identifier)', group_name)
 
         return TremoliteOptionalGroup(
@@ -572,7 +596,7 @@ def gem():
 
 
     export(
-        'DOT',              SPECIAL('.',   'DOT', repeatable = true, singular = true),
-        'EMPTY',            SPECIAL('',    'EMPTY'),
-        'END_OF_PATTERN',   SPECIAL(r'\Z', 'END_OF_PATTERN'),
+        'DOT',              SPECIAL('.',            'DOT',      repeatable = true, singular = true),
+        'EMPTY',            SPECIAL('(?#empty)',    'EMPTY'),
+        'END_OF_PATTERN',   SPECIAL(r'\Z',          'END_OF_PATTERN'),
     )
