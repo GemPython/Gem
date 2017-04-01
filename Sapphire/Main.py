@@ -22,8 +22,9 @@ def boot():
 @gem('Sapphire.Main')
 def gem():
     require_gem('Sapphire.Core')
+    require_gem('Sapphire.Parse')
 
 
     @share
     def main():
-        raise_runtime_error('Sapphire: incomplete')
+        parse_python_from_path('../Sapphire/Main.py')

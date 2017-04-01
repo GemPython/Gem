@@ -3,16 +3,15 @@
 #
 @gem('Sapphire.Core')
 def gem():
-    require_gem('Gem.Exception')
-    require_gem('Gem.Map')
+    require_gem('Gem.Path')
 
 
-    from Gem import values_tuple_sorted_by_key
+    from Gem import read_text_from_path
 
 
     share(
         #
         #   Imported functions
         #
-        'values_tuple_sorted_by_key',   values_tuple_sorted_by_key,
+        'read_text_from_path',   read_text_from_path,
     )
