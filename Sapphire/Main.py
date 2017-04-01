@@ -23,6 +23,7 @@ def boot():
 def gem():
     require_gem('Sapphire.Core')
     require_gem('Sapphire.Parse')
+    require_gem('Sapphire.Pattern')
 
 
     @share
