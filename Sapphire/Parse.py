@@ -44,7 +44,6 @@ def gem():
 
     class DefineHeader(Token):
         __slots__ = ((
-            'indented',                     #   String
             'keyword_define',               #   String
             'name',                         #   String
             'left_parenthesis',             #   String
@@ -53,8 +52,7 @@ def gem():
         ))
 
 
-        def __init__(t, indented, keyword_define, name, left_parenthesis, argument_1, right_parenthesis__colon):
-            t.indented                 = indented
+        def __init__(t, keyword_define, name, left_parenthesis, argument_1, right_parenthesis__colon):
             t.keyword_define           = keyword_define
             t.name                     = name
             t.left_parenthesis         = left_parenthesis
@@ -63,8 +61,7 @@ def gem():
 
 
         def  __repr__(t):
-            return arrange('<DefineHeader %r %s %s %s %s %s>',
-                           t.indented,
+            return arrange('<DefineHeader %s %s %s %s %s>',
                            portray_string(t.keyword_define),
                            t.name,
                            portray_string(t.left_parenthesis),
@@ -98,6 +95,47 @@ def gem():
     empty_line = EmptyLine('')
 
 
+    class FunctionCall_0(Object):
+        __slot__ = ((
+            'left',                         #   Expression
+            'pair_of_parenthesis',          #   String
+        ))
+
+
+        def __init__(t, left, pair_of_parenthesis):
+            t.left                = left
+            t.pair_of_parenthesis = pair_of_parenthesis
+
+
+        def __repr__(t):
+            return arrange('<FunctionCall0 %r %r>', t.left, t.pair_of_parenthesis)
+            
+
+
+    class ReturnExpression(Token):
+        __slots__ = ((
+            'keyword_return',               #   String
+            'expression',                   #   String
+        ))
+
+
+        def __init__(t, keyword_return, expression):
+            t.keyword_return = keyword_return
+            t.expression     = expression
+
+
+        def  __repr__(t):
+            return arrange('<Return %r %s>', t.keyword_return, t.expression)
+
+
+    class Symbol(Token):
+        __slots__ = (())
+
+
+        def __repr__(t):
+            return arrange('<$%s>', t.s)
+
+
     class UnknownLine(Token):
         pass
 
@@ -126,17 +164,16 @@ def gem():
                     append_line(IndentedComment(indented, comment))
                     continue
 
-                keyword_define= m.group('keyword_define')
+                keyword_define = m.group('keyword_define')
 
                 if keyword_define is not none:
                     [
                         name_1, left_parenthesis, name_2, right_parenthesis__colon,
-                    ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
+                    ] = m.group('name_1', 'define__left_parenthesis', 'name_2', 'define__right_parenthesis__colon')
 
                     append_line(
                         DefineHeader(
-                            indented,
-                            keyword_define,
+                            indented + keyword_define,
                             name_1,
                             left_parenthesis,
                             name_2,
@@ -146,6 +183,18 @@ def gem():
 
                     continue
 
+                keyword_return = m.group('keyword_return')
+
+                if keyword_return is not none:
+                    [name_1, pair_of_parenthesis] = m.group('return__name_1', 'return__pair_of_parenthesis')
+
+                    expression = Symbol(name_1)
+
+                    if pair_of_parenthesis is not none:
+                        expression = FunctionCall_0(expression, pair_of_parenthesis)
+
+                    append_line(ReturnExpression(indented + keyword_return, expression))
+                    continue
 
                 if indented is '':
                     append_line(empty_line)
