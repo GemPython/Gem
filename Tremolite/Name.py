@@ -16,10 +16,22 @@ def gem():
 
 
         def __repr__(t):
-            return arrange('<TremoliteMatch %s %r>', t.name, t.pattern)
+            return arrange('<%s %s %r>', t.__class__.__name__, t.name, t.pattern)
 
 
-    [match_cache, match_insert] = produce_cache_and_insert_function('tremolite.match')
+    [match_cache, match_insert] = produce_cache_and_insert_function('Tremolite.match_cache')
+
+
+    @export
+    def FULL_MATCH(name, pattern):
+        assert (type(name) is String) and (length(name) > 0)
+
+        if type(pattern) is String:
+            pattern = INVISIBLE_EXACT(pattern)
+
+        name = intern_string(name)
+
+        return match_insert(name, TremoliteMatch(name, pattern + END_OF_PATTERN))
 
 
     @export

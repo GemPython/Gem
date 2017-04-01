@@ -29,6 +29,8 @@ def gem():
 
     @share
     def main():
-        #MATCH('test', 'test' + GROUP('number', '0' | ANY_OF('1-9') + REPEAT(ANY_OF('0-9'), 0, 100)) + END_OF_PATTERN)
-        MATCH('group_name_match', ANY_OF('a-z') + ZERO_OR_MORE(ANY_OF('0-9', '_', 'a-z')) + END_OF_PATTERN)
+        
+        python_identifier = NAME('python_identifier', ANY_OF('A-Z', '_', 'a-z') + ZERO_OR_MORE(ANY_OF('0-9', 'A-Z', '_', 'a-z')))
+
+        FULL_MATCH('group_name_match', python_identifier)
         create_match_code('../Tremolite/Match.gpy', '2017 Amit Green', 'Tremolite.Match')

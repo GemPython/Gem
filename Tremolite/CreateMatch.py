@@ -1,7 +1,7 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-@gem('Tremolite.Match')
+@gem('Tremolite.CreateMatch')
 def gem():
     require_gem('Tremolite.Name')
 
@@ -106,6 +106,15 @@ def gem():
                         with f.indent('return compile_regular_expression(', ').match'):
                             f.line('regular_expression,')
                             f.line('*parse_ascii_regular_expression(regular_expression)#,')
+
+                if name_cache:
+                    f.blank2()
+
+                    for v in iterate_values_sorted_by_key(name_cache):
+                        f.line('#')
+                        f.line('#   %s = %s', v.name, v.pattern)
+
+                    f.line('#')
 
                 f.blank2()
 

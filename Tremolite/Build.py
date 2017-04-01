@@ -218,6 +218,35 @@ def gem():
                    )
 
 
+    class TremoliteName(TremoliteBase):
+        __slots__ = ((
+            'pattern',                  #   String
+        ))
+
+        
+        def __init__(t, name, pattern):
+            t.name               = name
+            t.regular_expression = pattern.regular_expression
+            t.pattern            = pattern
+
+
+        @property
+        def repeatable(t):
+            return t.pattern.repeatable
+
+
+        @property
+        def singular(t):
+            return t.pattern.singular
+
+
+        def __repr__(t):
+            return arrange('<TremoliteName %s %r>', t.name, t.inside)
+
+
+    TremoliteName.name = TremoliteName.portray
+
+
     class TremoliteParenthesis(TremoliteBase):
         __slots__ = ((
             'inside',                   #   String
@@ -287,6 +316,9 @@ def gem():
                     suffix = ''
 
             return arrange('<TremoliteSpecial %s %s%s>', portray_string(t.regular_expression), t.portray, suffix)
+
+
+    [name_cache,  name_insert]  = produce_cache_and_insert_function('Tremolite.name_cache')
 
 
     def create_exact(s):
@@ -473,6 +505,18 @@ def gem():
 
 
     @export
+    def NAME(name, pattern):
+        assert (type(name) is String) and (length(name) > 0)
+
+        if type(pattern) is String:
+            pattern = INVISIBLE_EXACT(pattern)
+
+        name = intern_string(name)
+
+        return name_insert(name, TremoliteName(name, pattern))
+
+
+    @export
     def ONE_OR_MORE(inside):
         return create_simple_repeat('ONE_OR_MORE', inside, '+')
 
@@ -520,6 +564,11 @@ def gem():
     @export
     def ZERO_OR_MORE(inside):
         return create_simple_repeat('ZERO_OR_MORE', inside, '*')
+
+
+    share(
+        'name_cache',       name_cache,
+    )
 
 
     export(
