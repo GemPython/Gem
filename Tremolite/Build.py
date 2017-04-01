@@ -69,41 +69,6 @@ def gem():
                    )
 
 
-    class TremoliteAdd(TremoliteBase):
-        __slots__ = ((
-            'many',                     #   Tuple of TremoliteBase+
-        ))
-
-
-        repeatable = true
-        singular   = false
-
-
-        def __init__(t, regular_expression, portray, many):
-            t.regular_expression = regular_expression
-            t.portray            = portray
-            t.many               = many
-
-
-        def __repr__(t):
-            return arrange('<TremoliteAdd %s %s>',
-                           portray_string(t.regular_expression),
-                           ' '.join((portray_string(v)   if type(v) is String else   portray(v))  for v in t.many))
-
-
-        def __add__(t, that):
-            if type(that) is String:
-                that = INVISIBLE_EXACT(that)
-            elif that.is_tremolite_or:
-                that = wrap_parenthesis(that)
-
-            return TremoliteAdd(
-                       t.regular_expression + that.regular_expression,
-                       t.portray + ' + ' + that.portray,
-                       t.many + ((that,)),
-                   )
-
-
     class TremoliteAnyOf(TremoliteBase):
         __slots__ = ((
             'many',                     #   Tuple of String
@@ -189,15 +154,14 @@ def gem():
         singular   = false
 
 
-    class TremoliteOr(TremoliteBase):
+    class TremoliteMany(TremoliteBase):
         __slots__ = ((
             'many',                     #   Tuple of TremoliteBase+
         ))
 
 
-        is_tremolite_or = true
-        repeatable      = true
-        singular        = false
+        repeatable = true
+        singular   = false
 
 
         def __init__(t, regular_expression, portray, many):
@@ -207,9 +171,36 @@ def gem():
 
 
         def __repr__(t):
-            return arrange('<TremoliteOr %s %s>',
+            return arrange('<%s %s %s>',
+                           t.__class__.__name__,
                            portray_string(t.regular_expression),
                            ' '.join((portray_string(v)   if type(v) is String else   portray(v))  for v in t.many))
+
+
+
+    class TremoliteAdd(TremoliteMany):
+        __slots__ = (())
+
+
+        def __add__(t, that):
+            if type(that) is String:
+                that = INVISIBLE_EXACT(that)
+            elif that.is_tremolite_or:
+                that = wrap_parenthesis(that)
+
+            return TremoliteAdd(
+                       t.regular_expression + that.regular_expression,
+                       t.portray + ' + ' + that.portray,
+                       t.many + ((that,)),
+                   )
+
+
+    class TremoliteOr(TremoliteMany):
+        __slots__ = (())
+
+
+        is_tremolite_or = true
+
 
 
         def __add__(t, that):
