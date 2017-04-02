@@ -40,6 +40,14 @@ def gem():
             return arrange('<Return %r %s>', t.keyword_return, t.expression)
 
 
+    def parse_decorator(m0, s):
+        line(portray_raw_string(s[m0.end():]))
+
+        m = none#define_1_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
     def parse_define_header(m0, s):
         #line(portray_raw_string(s[m0.end():]))
 
@@ -78,8 +86,9 @@ def gem():
         return ReturnExpression(m0.group('indented') + m0.group('keyword__ow'), expression)
 
 
-    keyword_define.parse_line = parse_define_header
-    keyword_return.parse_line = parse_return
+    keyword_define  .parse_line = parse_define_header
+    keyword_return  .parse_line = parse_return
+    operator_at_sign.parse_line = parse_decorator
 
 
     @share

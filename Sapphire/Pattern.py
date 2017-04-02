@@ -36,8 +36,13 @@ def gem():
 
         keyword__ow = NAMED_GROUP(
                           'keyword__ow',
-                          GROUP('keyword', EXACT('def') | 'return')
-                              + (w | NOT_FOLLOWED_BY(alphanumeric_or_underscore))
+                          (
+                              GROUP(
+                                  'keyword',
+                                  '@' | (EXACT('def') | 'return') + NOT_FOLLOWED_BY(alphanumeric_or_underscore)
+                              )
+                                  + ow
+                          ),
                       )
 
         comment = NAME('comment', '#' + GROUP('comment', ZERO_OR_MORE(DOT)))

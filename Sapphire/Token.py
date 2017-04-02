@@ -93,6 +93,13 @@ def gem():
         keyword = 'return'
 
 
+    class OperatorAtSign(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = '@'
+
+
     @share
     class Symbol(Token):
         __slots__ = (())
@@ -113,11 +120,17 @@ def gem():
 
 
     share(
-        'empty_comment',    EmptyComment(''),
-        'empty_line',       EmptyLine(''),
-
-        'keyword_define',   conjure_symbol('def',    KeywordDefine),
-        'keyword_return',   conjure_symbol('return', KeywordReturn),
-
+        #
+        #   Functions
+        #
         'lookup_symbol',    lookup_symbol,
+
+        #
+        #   Values
+        #
+        'empty_comment',        EmptyComment(''),
+        'empty_line',           EmptyLine(''),
+        'keyword_define',       conjure_symbol('def',    KeywordDefine),
+        'keyword_return',       conjure_symbol('return', KeywordReturn),
+        'operator_at_sign',     conjure_symbol('@',      OperatorAtSign),
     )
