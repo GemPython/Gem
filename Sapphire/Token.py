@@ -75,6 +75,14 @@ def gem():
 
 
     @export
+    class OperatorComma(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = ','
+
+
+    @export
     class OperatorAtSign(KeywordBase):
         __slots__ = (())
 
@@ -83,44 +91,5 @@ def gem():
 
 
     @share
-    class SingleQuote(Token):
-        __slots__ = (())
-
-
-        def __repr__(t):
-            return arrange('<%s>', t.s)
-
-
-    @share
-    class Symbol(Token):
-        __slots__ = (())
-
-
-        def __repr__(t):
-            return arrange('<$%s>', t.s)
-
-
-    @share
     class UnknownLine(Token):
         pass
-
-
-    [
-            conjure_symbol, lookup_symbol,
-    ] = produce_cache_functions('Sapphire.symbol_cache', produce_conjure = true, produce_lookup = true)
-
-
-    share(
-        #
-        #   Functions
-        #
-        'lookup_symbol',    lookup_symbol,
-
-        #
-        #   Values
-        #
-        'keyword_define',       conjure_symbol('def',    KeywordDefine),
-        'keyword_from',         conjure_symbol('from',   KeywordFrom),
-        'keyword_return',       conjure_symbol('return', KeywordReturn),
-        'operator_at_sign',     conjure_symbol('@',      OperatorAtSign),
-    )

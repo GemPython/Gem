@@ -36,6 +36,7 @@ LICENSE_FILES = \
 
 SAPPHIRE_FILES = \
     ../Sapphire/Core.py \
+    ../Sapphire/Expression.py \
     ../Sapphire/Main.py \
     ../Sapphire/Parse.py \
     ../Sapphire/Pattern.py \
@@ -96,7 +97,7 @@ clean:
 	rm -f ef.py en.py ex.py
 	rm -f files fo.py fs.py
 	rm -f gd.py
-	rm -f hc.py hk.py hma.py hmc.py hpa.py hpt.py hs.py
+	rm -f hc.py he.py hk.py hma.py hmc.py hpa.py hpt.py hs.py
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
 	rm -f lr.txt
@@ -145,6 +146,7 @@ links:
 	ln -s ../Gem/FileStatus.py                  fs.py
 	ln -s ../Gem/Codec.py                       gd.py
 	ln -s ../Sapphire/Core.py                   hc.py
+	ln -s ../Sapphire/Expression.py             he.py
 	ln -s ../Sapphire/Token.py                  hk.py
 	ln -s ../Sapphire/Main.py                   hma.py
 	ln -s ../Sapphire/Match.py                  hmc.py

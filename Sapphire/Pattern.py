@@ -28,6 +28,7 @@ def gem():
         name_1     = NAMED_GROUP('name_1', identifier)
         name_2     = NAMED_GROUP('name_2', identifier)
         name_3     = NAMED_GROUP('name_3', identifier)
+        name_4     = NAMED_GROUP('name_4', identifier)
 
         single_quote = NAMED_GROUP(
                            'single_quote',
@@ -38,6 +39,7 @@ def gem():
                        )
 
         comma                    = NAMED_GROUP('comma',                    ow + ',' + ow)
+        dot                      = NAMED_GROUP('dot',                      ow + '.' + ow)
         left_parenthesis         = NAMED_GROUP('left_parenthesis',         ow + '(' + ow)
         right_parenthesis        = NAMED_GROUP('right_parenthesis',        ow + ')' + ow)
         right_parenthesis__colon = NAMED_GROUP('right_parenthesis__colon', ow + ')' + ow + ':')
@@ -76,7 +78,17 @@ def gem():
 
         MATCH(
             'from_1_match',
-            name_1 + keyword__import__w + name_2 + keyword__as__w + name_3 + (comma | LINEFEED + END_OF_PATTERN)
+            (
+                  name_1 + OPTIONAL(dot + name_2)
+                + keyword__import__w + name_3
+                + keyword__as__w + name_4
+                + (comma | LINEFEED + END_OF_PATTERN)
+            )
+        )
+
+        MATCH(
+            'from_2_match',
+            name_1 + keyword__as__w + name_2 + (comma | LINEFEED + END_OF_PATTERN)
         )
 
         FULL_MATCH(
