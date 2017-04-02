@@ -8,7 +8,7 @@ def gem():
     require_gem('Sapphire.Token')
 
 
-    show = false
+    show = true
 
 
     class FunctionCall_0(Object):
@@ -64,38 +64,6 @@ def gem():
             return arrange('<Return %r %s>', t.keyword_return, t.expression)
 
 
-    def parse_decorator(m0, s):
-        if show:
-            line(portray_raw_string(s[m0.end():]))
-
-        m = expression_match(s[m0.end():])
-
-        if m is none:
-            return UnknownLine(s)
-
-        return DecoratorHeader(m0.group('indented') + m0.group('keyword__ow'), parse_expression(m))
-
-
-    def parse_define_header(m0, s):
-        #line(portray_raw_string(s[m0.end():]))
-
-        m = define_1_match(s[m0.end():])
-
-        if m is none:
-            return UnknownLine(s)
-
-        [
-            name_1, left_parenthesis, name_2, right_parenthesis__colon,
-        ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
-
-        if name_2 is none:
-            parameters = ParameterColon_0(left_parenthesis + right_parenthesis__colon)
-        else:
-            parameters = ParameterColon_1(left_parenthesis, name_2, right_parenthesis__colon)
-
-        return DefineHeader(m0.group('indented') + m0.group('keyword__ow'), name_1, parameters)
-
-
     def parse_expression(m):
         [
                 name_1, left_parenthesis, single_quote, right_parenthesis,
@@ -112,20 +80,72 @@ def gem():
         return FunctionCall_1(expression, left_parenthesis, SingleQuote(single_quote), right_parenthesis)
 
 
-    def parse_return(m0, s):
-        #line(portray_raw_string(s[m0.end():]))
-
+    def parse_statement_decorator_header(m0, s):
         m = expression_match(s[m0.end():])
 
         if m is none:
             return UnknownLine(s)
 
-        return ReturnExpression(m0.group('indented') + m0.group('keyword__ow'), parse_expression(m))
+        return DecoratorHeader(OperatorAtSign(m0.group('indented') + m0.group('keyword__ow')), parse_expression(m))
 
 
-    keyword_define  .parse_line = parse_define_header
-    keyword_return  .parse_line = parse_return
-    operator_at_sign.parse_line = parse_decorator
+    def parse_statement_from(m0, s):
+        if show:
+            line(portray_raw_string(s[m0.end():]))
+
+        m = from_1_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
+        [
+                name_1, keyword__import__w, name_2, keyword__as__w, name_3, comma
+        ] = m.group('name_1', 'keyword__import__w', 'name_2', 'keyword__as__w', 'name_3', 'comma')
+
+        if comma is none:
+            return StatementFromImport(
+                       KeywordFrom(m0.group('indented') + m0.group('keyword__ow')),
+                       name_1,
+                       KeywordImport(keyword__import__w),
+                       AsFragment(name_2, KeywordAs(keyword__as__w), name_3),
+                   )
+
+        line('%r %r %r %r %r %r', name_1, keyword__import__w, name_2, keyword__as__w, name_3, comma)
+
+        raise_runtime_error('parse_statement_from: incomplete')
+
+
+    def parse_statement_define_header(m0, s):
+        m = define_1_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
+        [
+            name_1, left_parenthesis, name_2, right_parenthesis__colon,
+        ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
+
+        if name_2 is none:
+            parameters = ParameterColon_0(left_parenthesis + right_parenthesis__colon)
+        else:
+            parameters = ParameterColon_1(left_parenthesis, name_2, right_parenthesis__colon)
+
+        return DefineHeader(KeywordDefine(m0.group('indented') + m0.group('keyword__ow')), name_1, parameters)
+
+
+    def parse_statement_return(m0, s):
+        m = expression_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
+        return ReturnExpression(KeywordReturn(m0.group('indented') + m0.group('keyword__ow')), parse_expression(m))
+
+
+    keyword_define  .parse_line = parse_statement_define_header
+    keyword_from    .parse_line = parse_statement_from
+    keyword_return  .parse_line = parse_statement_return
+    operator_at_sign.parse_line = parse_statement_decorator_header
 
 
     @share

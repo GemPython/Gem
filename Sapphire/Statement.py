@@ -7,6 +7,25 @@ def gem():
 
 
     @share
+    class AsFragment(Object):
+        __slots__ = ((
+            'left_name',                    #   String+
+            'keyword_as',                   #   KeywordAs
+            'right_name',                   #   String+
+        ))
+
+
+        def __init__(t, left_name, keyword_as, right_name):
+            t.left_name  = left_name
+            t.keyword_as = keyword_as
+            t.right_name = right_name
+
+
+        def __repr__(t):
+            return arrange('<AsFragment %s %s %s>', t.left_name, t.keyword_as, t.right_name)
+
+
+    @share
     class Comment(Token):
         __slots__ = (())
 
@@ -44,7 +63,7 @@ def gem():
 
 
         def  __repr__(t):
-            return arrange('<DefineHeader %s %s %r>', portray_string(t.keyword_define), t.name, t.parameters_colon)
+            return arrange('<DefineHeader %s %s %r>', t.keyword_define, t.name, t.parameters_colon)
 
 
     class EmptyComment(Token):
@@ -112,6 +131,27 @@ def gem():
                            portray_string(t.left_parenthesis),
                            t.argument_1,
                            portray_string(t.right_parenthesis__colon))
+
+
+    @share
+    class StatementFromImport(Object):
+        __slots__ = ((
+            'keyword_from',                 #   KeywordFrom
+            'module',                       #   String+
+            'keyword_import',               #   KeywordImport
+            'imported',                     #   String+ | AsFragment
+        ))
+
+
+        def __init__(t, keyword_from, module, keyword_import, imported):
+            t.keyword_from   = keyword_from
+            t.module         = module
+            t.keyword_import = keyword_import
+            t.imported       = imported
+
+
+        def __repr__(t):
+            return arrange('<StatementFrom %r %s %r %r>', t.keyword_from, t.module, t.keyword_import, t.imported)
 
 
     share(

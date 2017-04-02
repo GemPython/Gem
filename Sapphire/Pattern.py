@@ -32,24 +32,29 @@ def gem():
         single_quote = NAMED_GROUP(
                            'single_quote',
                            (
-                                "'" + ONE_OR_MORE(BACKSLASH + PRINTABLE | PRINTABLE_MINUS("'", '\\')) + "'"
-                                    | ("''" + NOT_FOLLOWED_BY("'"))
+                                  "'" + ONE_OR_MORE(BACKSLASH + PRINTABLE | PRINTABLE_MINUS("'", '\\')) + "'"
+                                | ("''" + NOT_FOLLOWED_BY("'"))
                            )
                        )
 
+        comma                    = NAMED_GROUP('comma',                    ow + ',' + ow)
         left_parenthesis         = NAMED_GROUP('left_parenthesis',         ow + '(' + ow)
         right_parenthesis        = NAMED_GROUP('right_parenthesis',        ow + ')' + ow)
         right_parenthesis__colon = NAMED_GROUP('right_parenthesis__colon', ow + ')' + ow + ':')
         #pair_of_parenthesis      = NAMED_GROUP('pair_of_parenthesis',      ow + '(' + ow + ')' + ow)
 
+        keyword__as__w = NAMED_GROUP('keyword__as__w', w + 'as' + w)
+
+        keyword__import__w = NAMED_GROUP('keyword__import__w', w + 'import' + w)
+
         keyword__ow = NAMED_GROUP(
                           'keyword__ow',
                           (
-                              GROUP(
-                                  'keyword',
-                                  '@' | (EXACT('def') | 'return') + NOT_FOLLOWED_BY(alphanumeric_or_underscore)
-                              )
-                                  + ow
+                                GROUP(
+                                    'keyword',
+                                    '@' | (EXACT('def') | 'from' | 'return') + NOT_FOLLOWED_BY(alphanumeric_or_underscore)
+                                )
+                              + ow
                           ),
                       )
 
@@ -59,14 +64,19 @@ def gem():
             'line_match',
             NAMED_GROUP('indented', ow)
                 + (
-                      keyword__ow + OPTIONAL(GROUP('newline_1', LINEFEED) + END_OF_PATTERN)
-                    | (comment | EMPTY) + GROUP('newline_2', LINEFEED) + END_OF_PATTERN
+                        keyword__ow + OPTIONAL(GROUP('newline_1', LINEFEED) + END_OF_PATTERN)
+                      | (comment | EMPTY) + GROUP('newline_2', LINEFEED) + END_OF_PATTERN
                   )
         )
 
         FULL_MATCH(
             'define_1_match',
             name_1 + left_parenthesis + OPTIONAL(name_2) + right_parenthesis__colon + LINEFEED,
+        )
+
+        MATCH(
+            'from_1_match',
+            name_1 + keyword__import__w + name_2 + keyword__as__w + name_3 + (comma | LINEFEED + END_OF_PATTERN)
         )
 
         FULL_MATCH(

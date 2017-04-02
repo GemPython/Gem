@@ -31,9 +31,18 @@ def gem():
 
 
         def __repr__(t):
-            return t.keyword
+            return arrange('<%s>', t.s)
 
 
+    @export
+    class KeywordAs(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = 'as'
+
+
+    @export
     class KeywordDefine(KeywordBase):
         __slots__ = (())
 
@@ -41,6 +50,23 @@ def gem():
         keyword = 'def'
 
 
+    @export
+    class KeywordFrom(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = 'from'
+
+
+    @export
+    class KeywordImport(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = 'import'
+
+
+    @export
     class KeywordReturn(KeywordBase):
         __slots__ = (())
 
@@ -48,6 +74,7 @@ def gem():
         keyword = 'return'
 
 
+    @export
     class OperatorAtSign(KeywordBase):
         __slots__ = (())
 
@@ -93,6 +120,7 @@ def gem():
         #   Values
         #
         'keyword_define',       conjure_symbol('def',    KeywordDefine),
+        'keyword_from',         conjure_symbol('from',   KeywordFrom),
         'keyword_return',       conjure_symbol('return', KeywordReturn),
         'operator_at_sign',     conjure_symbol('@',      OperatorAtSign),
     )
