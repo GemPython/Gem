@@ -8,6 +8,7 @@ def gem():
             name,
             produce_cache   = false,
             produce_conjure = false,
+            produce_find    = false,
             produce_insert  = false,
             produce_lookup  = false,
     ):
@@ -22,6 +23,9 @@ def gem():
         if (produce_conjure) or (produce_lookup):
             lookup = cache.get
 
+        if (produce_find) or (produce_insert):
+            find = cache.__getitem__
+
         if produce_cache:
             append(cache)
 
@@ -32,9 +36,11 @@ def gem():
 
             append(conjure)
 
+        if produce_find:
+            append(find)
+
         if produce_insert:
             contains = cache.__contains__
-            find     = cache.__getitem__
 
 
             if __debug__:
