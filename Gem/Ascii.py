@@ -9,12 +9,14 @@ def gem():
     from Gem import execute
 
 
+    show      = false
     ascii_map = {}
 
 
     class Ascii(Object):
         __slots__ = ((
             'c',                        #   String
+            'ordinal',                  #   String
             'portray',                  #   String
             'pattern',                  #   String
             'is_apostrophe',            #   Boolean
@@ -26,7 +28,7 @@ def gem():
 
 
         def __init__(
-                t, c, portray, pattern,
+                t, c, ordinal, portray, pattern,
 
                 is_apostrophe     = false,
                 is_backslash      = false,
@@ -34,6 +36,7 @@ def gem():
                 is_quotation_mark = false,
         ):
             t.c       = c
+            t.ordinal = ordinal
             t.portray = portray
             t.pattern = pattern
 
@@ -61,13 +64,19 @@ def gem():
                 if t.is_printable:         other += ' is_printable'
                 if t.is_quotation_mark:    other += ' is_quotation_mark'
 
-                return arrange('<Ascii %r %r%s>', t.c, t.portray, other)
+                return arrange('<Ascii %r %d %r%s>', t.c, t.ordinal, t.portray, other)
 
+
+
+    store_ascii = ascii_map.__setitem__
+
+    def store_ascii_and_ordinal(ascii):
+        store_ascii(ascii.c, ascii)
+        store_ascii(ascii.ordinal, ascii)
 
 
     @execute
     def execute():
-        store_ascii        = ascii_map.__setitem__
         is_special_pattern = FrozenSet(r'$()*+.?[\]^{}').__contains__
 
         for i in iterate_range(0, 128):
@@ -76,27 +85,27 @@ def gem():
             if not (32 <= i <= 126):
                 c_portray = intern_string(portray(c)[1:-1])
 
-                store_ascii(c, Ascii(c, c_portray, c_portray))
+                store_ascii_and_ordinal(Ascii(c, i, c_portray, c_portray))
                 continue
 
             if c == '"':
-                store_ascii(c, Ascii(c, c, c, is_quotation_mark = true, is_printable = true))
+                store_ascii_and_ordinal(Ascii(c, i, c, c, is_quotation_mark = true, is_printable = true))
                 continue
 
             if c == '\\':
                 portay_backslash = intern_string(r'\\')
 
-                store_ascii(c, Ascii(c, portay_backslash, portay_backslash, is_backslash = true, is_printable = true))
+                store_ascii_and_ordinal(Ascii(c, i, portay_backslash, portay_backslash, is_backslash = true, is_printable = true))
                 continue
 
             if c == "'":
-                store_ascii(c, Ascii(c, c, c, is_printable = true, is_apostrophe = true))
+                store_ascii_and_ordinal(Ascii(c, i, c, c, is_printable = true, is_apostrophe = true))
                 continue
 
-            store_ascii(
-                c,
+            store_ascii_and_ordinal(
                 Ascii(
                     c,
+                    i,
                     c,
                     (intern_string('\\' + c)    if is_special_pattern(c) else    c),
                     is_printable = true,
@@ -104,18 +113,14 @@ def gem():
             )
 
 
-        if 0:
+        if show:
             for [i, k] in iterate_items_sorted_by_key(ascii_map):
                 line('%r: %r', i, k)
 
 
     export(
         'lookup_ascii',     ascii_map.get,
-    )
-
-
-    share(
-        'unknown_ascii',    Ascii(none, none, none),
+        'unknown_ascii',    Ascii(none, none, none, none),
     )
 
 
