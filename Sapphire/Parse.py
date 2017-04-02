@@ -5,6 +5,7 @@
 def gem():
     require_gem('Sapphire.Expression')
     require_gem('Sapphire.Match')
+    require_gem('Sapphire.ParseExpression')
     require_gem('Sapphire.Statement')
     require_gem('Sapphire.Token')
 
@@ -67,10 +68,10 @@ def gem():
 
     def parse_expression(m):
         [
-                name_1, left_parenthesis, single_quote, right_parenthesis,
-        ] = m.group('name_1', 'left_parenthesis', 'single_quote', 'right_parenthesis')
+                name, left_parenthesis, single_quote, right_parenthesis,
+        ] = m.group('name', 'left_parenthesis', 'single_quote', 'right_parenthesis')
 
-        expression = Symbol(name_1)
+        expression = Symbol(name)
 
         if left_parenthesis is none:
             return expression
@@ -181,34 +182,41 @@ def gem():
         return ReturnExpression(KeywordReturn(m0.group('indented') + m0.group('keyword__ow')), parse_expression(m))
 
 
-    keyword_define  .parse_line = parse_statement_define_header
-    keyword_from    .parse_line = parse_statement_from
-    keyword_import  .parse_line = parse_statement_import
-    keyword_return  .parse_line = parse_statement_return
-    operator_at_sign.parse_line = parse_statement_decorator_header
+
+    find_parse_line = {
+                          'def'    : parse_statement_define_header,
+                          'from'   : parse_statement_from,
+                          'import' : parse_statement_import,
+                          'return' : parse_statement_return,
+                          '@'      : parse_statement_decorator_header,
+                      }.__getitem__
 
 
     @share
     def parse_python_from_path(path):
-        data        = read_text_from_path('../Sapphire/Main.py')
-        many        = []
-        append_line = many.append
+        data   = read_text_from_path('../Sapphire/Main.py')
+        many   = []
+        append = many.append
 
         for s in data.splitlines(true):
             m = line_match(s)
 
             if m is none:
-                append_line(UnknownLine(s))
+                append(UnknownLine(s))
                 continue
 
             [
-                    indented, keyword, comment, newline_2,
-            ] = m.group('indented', 'keyword', 'comment', 'newline_2')
+                    indented, keyword, name, comment, newline_2,
+            ] = m.group('indented', 'keyword', 'name', 'comment', 'newline_2')
 
             if keyword is not none:
-                assert comment is newline_2 is none
+                assert name is comment is newline_2 is none
 
-                append_line(lookup_symbol(keyword).parse_line(m, s))
+                append(find_parse_line(keyword)(m, s))
+                continue
+
+            if name:
+                append(parse_expression__symbol(m, s, name))
                 continue
 
             assert newline_2 is not none
@@ -216,20 +224,20 @@ def gem():
             if comment is not none:
                 if indented is '':
                     if comment is '':
-                        append_line(empty_comment)
+                        append(empty_comment)
                         continue
 
-                    append_line(Comment(comment))
+                    append(Comment(comment))
                     continue
 
-                append_line(IndentedComment(indented, comment))
+                append(IndentedComment(indented, comment))
                 continue
 
             if indented is '':
-                append_line(empty_line)
+                append(empty_line)
                 continue
 
-            append_line(EmptyLine(indented))
+            append(EmptyLine(indented))
             continue
 
         for v in many:

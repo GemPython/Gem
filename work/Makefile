@@ -36,9 +36,9 @@ LICENSE_FILES = \
 
 SAPPHIRE_FILES = \
     ../Sapphire/Core.py \
-    ../Sapphire/Expression.py \
+    ../Sapphire/Elemental.py ../Sapphire/Expression.py \
     ../Sapphire/Main.py \
-    ../Sapphire/Parse.py \
+    ../Sapphire/Parse.py ../Sapphire/ParseExpression.py \
     ../Sapphire/Pattern.py \
     ../Sapphire/Statement.py \
     ../Sapphire/Token.py
@@ -97,7 +97,7 @@ clean:
 	rm -f ef.py en.py ex.py
 	rm -f files fo.py fs.py
 	rm -f gd.py
-	rm -f hc.py he.py hk.py hma.py hmc.py hpa.py hpt.py hs.py
+	rm -f hc.py hem.py hex.py hk.py hma.py hmc.py hpa.py hpe.py hpt.py hs.py
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
 	rm -f lr.txt
@@ -146,11 +146,13 @@ links:
 	ln -s ../Gem/FileStatus.py                  fs.py
 	ln -s ../Gem/Codec.py                       gd.py
 	ln -s ../Sapphire/Core.py                   hc.py
-	ln -s ../Sapphire/Expression.py             he.py
+	ln -s ../Sapphire/Elemental.py              hem.py
+	ln -s ../Sapphire/Expression.py             hex.py
 	ln -s ../Sapphire/Token.py                  hk.py
 	ln -s ../Sapphire/Main.py                   hma.py
 	ln -s ../Sapphire/Match.py                  hmc.py
 	ln -s ../Sapphire/Parse.py                  hpa.py
+	ln -s ../Sapphire/ParseExpression.py        hpe.py
 	ln -s ../Sapphire/Pattern.py                hpt.py
 	ln -s ../Sapphire/Statement.py              hs.py
 	ln -s ../Gem/__init__.py                    in.py

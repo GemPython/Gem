@@ -25,10 +25,13 @@ def gem():
         alphanumeric_or_underscore = NAME('alphanumeric_or_underscore', ANY_OF('0-9', 'A-Z', '_', 'a-z'))
 
         identifier = NAME('identifier', ANY_OF('A-Z', '_', 'a-z') + ZERO_OR_MORE(alphanumeric_or_underscore))
+        name       = NAMED_GROUP('name', identifier)
         name_1     = NAMED_GROUP('name_1', identifier)
         name_2     = NAMED_GROUP('name_2', identifier)
         name_3     = NAMED_GROUP('name_3', identifier)
         name_4     = NAMED_GROUP('name_4', identifier)
+
+        number = NAMED_GROUP('number', ANY_OF('1-9') + ZERO_OR_MORE('0-9'))
 
         single_quote = NAMED_GROUP(
                            'single_quote',
@@ -68,11 +71,28 @@ def gem():
 
         comment = NAME('comment', '#' + GROUP('comment', ZERO_OR_MORE(DOT)))
 
+        #
+        #   Expressions
+        #
+        MATCH(
+            'first_argument_match',
+            (
+                  (name | number)
+                + GROUP('operator__ow', ow + GROUP('operator', ANY_OF('(', ',')) + ow)
+            )
+        )
+
+        MATCH('postfix_match', dot + name + left_parenthesis)
+ 
+        #
+        #   Statements
+        #
         MATCH(
             'line_match',
             NAMED_GROUP('indented', ow)
                 + (
                         keyword__ow + OPTIONAL(GROUP('newline_1', LINEFEED) + END_OF_PATTERN)
+                      | name
                       | (comment | EMPTY) + GROUP('newline_2', LINEFEED) + END_OF_PATTERN
                   )
         )
@@ -101,7 +121,7 @@ def gem():
 
         FULL_MATCH(
             'expression_match',
-            name_1 + OPTIONAL(left_parenthesis + OPTIONAL(single_quote) + right_parenthesis) + LINEFEED,
+            name + OPTIONAL(left_parenthesis + OPTIONAL(single_quote) + right_parenthesis) + LINEFEED,
         )
- 
+
         create_match_code('../Sapphire/Match.py', '2017 Amit Green', 'Sapphire.Match')
