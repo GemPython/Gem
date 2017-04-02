@@ -151,7 +151,24 @@ def gem():
 
 
         def __repr__(t):
-            return arrange('<StatementFrom %r %s %r %r>', t.keyword_from, t.module, t.keyword_import, t.imported)
+            return arrange('<StatementFrom %r %r %r %r>', t.keyword_from, t.module, t.keyword_import, t.imported)
+
+
+    @share
+    class StatementImport(Object):
+        __slots__ = ((
+            'keyword_import',               #   KeywordImport
+            'module',                       #   String+
+        ))
+
+
+        def __init__(t, keyword_import, module):
+            t.keyword_import = keyword_import
+            t.module         = module
+
+
+        def __repr__(t):
+            return arrange('<StatementImport %r %r>', t.keyword_import, t.module)
 
 
     share(

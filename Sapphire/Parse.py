@@ -91,25 +91,26 @@ def gem():
 
 
     def parse_statement_from(m0, s):
-        if show:
-            line(portray_raw_string(s[m0.end():]))
-
         m = from_1_match(s, m0.end())
 
         if m is none:
-            line('unknown#1')
             return UnknownLine(s)
 
         [
-                name_1, keyword__import__w, name_3, keyword__as__w, name_4, comma
-        ] = m.group('name_1', 'keyword__import__w', 'name_3', 'keyword__as__w', 'name_4', 'comma')
+                name_1, dot, name_2, keyword__import__w, name_3, keyword__as__w, name_4, comma
+        ] = m.group('name_1', 'dot', 'name_2', 'keyword__import__w', 'name_3', 'keyword__as__w', 'name_4', 'comma')
+
+        if dot is none:
+            module = name_1
+        else:
+            module = ExpressionDot(name_1, dot, name_2)
 
         as_fragment = AsFragment(name_3, KeywordAs(keyword__as__w), name_4)
 
         if comma is none:
             return StatementFromImport(
                        KeywordFrom(m0.group('indented') + m0.group('keyword__ow')),
-                       name_1,
+                       module,
                        KeywordImport(keyword__import__w),
                        as_fragment,
                    )
@@ -128,7 +129,7 @@ def gem():
         if comma_2 is none:
             return StatementFromImport(
                        KeywordFrom(m0.group('indented') + m0.group('keyword__ow')),
-                       name_1,
+                       module,
                        KeywordImport(keyword__import__w),
                        ExpressionComma(as_fragment, OperatorComma(comma), as_fragment_2)
                    )
@@ -136,8 +137,25 @@ def gem():
         raise_runtime_error('parse_statement_from: incomplete')
 
 
+    def parse_statement_import(m0, s):
+        #if show:
+        #    line(portray_raw_string(s[m0.end():]))
+
+        m = import_match(s, m0.end())
+
+        if m is none:
+            return UnknownLine(s)
+
+        name_1 = m.group('name_1')
+
+        return StatementImport(
+                   KeywordImport(m0.group('indented') + m0.group('keyword__ow')),
+                   name_1,
+               )
+
+
     def parse_statement_define_header(m0, s):
-        m = define_1_match(s, m0.end())
+        m = define_match(s, m0.end())
 
         if m is none:
             return UnknownLine(s)
@@ -165,6 +183,7 @@ def gem():
 
     keyword_define  .parse_line = parse_statement_define_header
     keyword_from    .parse_line = parse_statement_from
+    keyword_import  .parse_line = parse_statement_import
     keyword_return  .parse_line = parse_statement_return
     operator_at_sign.parse_line = parse_statement_decorator_header
 

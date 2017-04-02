@@ -7,7 +7,7 @@ def gem():
 
 
     @share
-    class ExpressionComma(Object):
+    class ExpressionBinaryBase(Object):
         __slots__ = ((
             'left',                     #   Expression
             'operator',                 #   Operator*
@@ -23,6 +23,16 @@ def gem():
 
         def __repr__(t):
             return arrange('<%s %r %r %r>', t.__class__.__name__, t.left, t.operator, t.right)
+
+
+    @share
+    class ExpressionComma(ExpressionBinaryBase):
+        __slots__ = (())
+
+
+    @share
+    class ExpressionDot(ExpressionBinaryBase):
+        __slots__ = (())
 
 
     @share
@@ -60,6 +70,7 @@ def gem():
         #
         'keyword_define',       conjure_symbol('def',    KeywordDefine),
         'keyword_from',         conjure_symbol('from',   KeywordFrom),
+        'keyword_import',       conjure_symbol('import', KeywordImport),
         'keyword_return',       conjure_symbol('return', KeywordReturn),
         'operator_at_sign',     conjure_symbol('@',      OperatorAtSign),
     )

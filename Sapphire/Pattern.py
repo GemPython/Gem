@@ -54,7 +54,13 @@ def gem():
                           (
                                 GROUP(
                                     'keyword',
-                                    '@' | (EXACT('def') | 'from' | 'return') + NOT_FOLLOWED_BY(alphanumeric_or_underscore)
+                                    (
+                                          '@'
+                                        | (
+                                                (EXACT('def') | 'from' | 'import' | 'return')
+                                              + NOT_FOLLOWED_BY(alphanumeric_or_underscore)
+                                          )
+                                    )
                                 )
                               + ow
                           ),
@@ -72,7 +78,7 @@ def gem():
         )
 
         FULL_MATCH(
-            'define_1_match',
+            'define_match',
             name_1 + left_parenthesis + OPTIONAL(name_2) + right_parenthesis__colon + LINEFEED,
         )
 
@@ -90,6 +96,8 @@ def gem():
             'from_2_match',
             name_1 + keyword__as__w + name_2 + (comma | LINEFEED + END_OF_PATTERN)
         )
+
+        FULL_MATCH('import_match', name_1 + LINEFEED)
 
         FULL_MATCH(
             'expression_match',
