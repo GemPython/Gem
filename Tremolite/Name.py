@@ -19,7 +19,7 @@ def gem():
             return arrange('<%s %s %r>', t.__class__.__name__, t.name, t.pattern)
 
 
-    [match_cache, match_insert] = produce_cache_and_insert_function('Tremolite.match_cache')
+    [match_cache, match_insert] = produce_cache_functions('Tremolite.match_cache', produce_cache = true, produce_insert = true)
 
 
     @export

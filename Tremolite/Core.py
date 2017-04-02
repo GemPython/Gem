@@ -17,22 +17,22 @@ def gem():
 
     from Gem import create_DelayedFileOutput, encode_ascii, first_map_item
     from Gem import iterate_items_sorted_by_key, iterate_values_sorted_by_key
-    from Gem import lookup_ascii, produce_cache_and_insert_function, python_version, read_text_from_path, view_items
+    from Gem import lookup_ascii, produce_cache_functions, python_version, read_text_from_path, view_items
 
 
     share(
         #
         #   Imported functions
         #
-        'create_DelayedFileOutput',             create_DelayedFileOutput,
-        'encode_ascii',                         encode_ascii,
-        'first_map_item',                       first_map_item,
-        'iterate_items_sorted_by_key',          iterate_items_sorted_by_key,
-        'iterate_values_sorted_by_key',         iterate_values_sorted_by_key,
-        'lookup_ascii',                         lookup_ascii,
-        'produce_cache_and_insert_function',    produce_cache_and_insert_function,
-        'read_text_from_path',                  read_text_from_path,
-        'view_items',                           view_items,
+        'create_DelayedFileOutput',         create_DelayedFileOutput,
+        'encode_ascii',                     encode_ascii,
+        'first_map_item',                   first_map_item,
+        'iterate_items_sorted_by_key',      iterate_items_sorted_by_key,
+        'iterate_values_sorted_by_key',     iterate_values_sorted_by_key,
+        'lookup_ascii',                     lookup_ascii,
+        'produce_cache_functions',          produce_cache_functions,
+        'read_text_from_path',              read_text_from_path,
+        'view_items',                       view_items,
 
 
         #
