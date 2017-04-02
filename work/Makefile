@@ -38,7 +38,9 @@ SAPPHIRE_FILES = \
     ../Sapphire/Core.py \
     ../Sapphire/Main.py \
     ../Sapphire/Parse.py \
-    ../Sapphire/Pattern.py
+    ../Sapphire/Pattern.py \
+    ../Sapphire/Statement.py \
+    ../Sapphire/Token.py
     #
     #   Excludes:
     #       ../Sapphire/Match.py
@@ -94,7 +96,7 @@ clean:
 	rm -f ef.py en.py ex.py
 	rm -f files fo.py fs.py
 	rm -f gd.py
-	rm -f hc.py hma.py hmc.py hpa.py hpt.py
+	rm -f hc.py hk.py hma.py hmc.py hpa.py hpt.py hs.py
 	rm -f in.py im.py io.py iv.py
 	rm -f jb.py
 	rm -f lr.txt
@@ -143,10 +145,12 @@ links:
 	ln -s ../Gem/FileStatus.py                  fs.py
 	ln -s ../Gem/Codec.py                       gd.py
 	ln -s ../Sapphire/Core.py                   hc.py
+	ln -s ../Sapphire/Token.py                  hk.py
 	ln -s ../Sapphire/Main.py                   hma.py
 	ln -s ../Sapphire/Match.py                  hmc.py
 	ln -s ../Sapphire/Parse.py                  hpa.py
 	ln -s ../Sapphire/Pattern.py                hpt.py
+	ln -s ../Sapphire/Statement.py              hs.py
 	ln -s ../Gem/__init__.py                    in.py
 	ln -s ../Gem/Import.py                      im.py
 	ln -s ../Ivory/Main.py                      iv.py
