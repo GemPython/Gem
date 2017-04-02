@@ -1,12 +1,8 @@
 #
 #   Copyright (c) 2017 Amit Green.  All rights reserved.
 #
-@gem('Sapphire.Parse')
+@gem('Sapphire.Token')
 def gem():
-    require_gem('Sapphire.Match')
-    require_gem('Sapphire.Statement')
-
-
     @share
     class Token(Object):
         __slots__ = ((

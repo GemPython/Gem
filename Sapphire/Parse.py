@@ -52,11 +52,12 @@ def gem():
             name_1, left_parenthesis, name_2, right_parenthesis__colon,
         ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
 
-        return DefineHeader(
-                   m0.group('keyword__ow'),
-                   name_1,
-                   ParameterColon_1(left_parenthesis, name_2, right_parenthesis__colon),
-               )
+        if name_2 is none:
+            parameters = ParameterColon_0(left_parenthesis + right_parenthesis__colon)
+        else:
+            parameters = ParameterColon_1(left_parenthesis, name_2, right_parenthesis__colon)
+
+        return DefineHeader(m0.group('indented') + m0.group('keyword__ow'), name_1, parameters)
 
 
     def parse_return(m0, s):
@@ -74,7 +75,7 @@ def gem():
         if pair_of_parenthesis is not none:
             expression = FunctionCall_0(expression, pair_of_parenthesis)
 
-        return ReturnExpression(m0.group('keyword__ow'), expression)
+        return ReturnExpression(m0.group('indented') + m0.group('keyword__ow'), expression)
 
 
     keyword_define.parse_line = parse_define_header

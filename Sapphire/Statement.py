@@ -3,6 +3,14 @@
 #
 @gem('Sapphire.Statement')
 def gem():
+    require_gem('Sapphire.Token')
+
+
+    @share
+    class ParameterColon_0(Token):
+        pass
+
+
     @share
     class ParameterColon_1(Object):
         __slots__ = ((

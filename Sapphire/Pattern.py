@@ -51,7 +51,7 @@ def gem():
                   )
         )
 
-        FULL_MATCH('define_1_match',   name_1 + left_parenthesis + name_2 + right_parenthesis__colon + LINEFEED)
+        FULL_MATCH('define_1_match',   name_1 + left_parenthesis + OPTIONAL(name_2) + right_parenthesis__colon + LINEFEED)
         FULL_MATCH('expression_match', name_1 + OPTIONAL(pair_of_parenthesis) + LINEFEED)
  
         create_match_code('../Sapphire/Match.py', '2017 Amit Green', 'Sapphire.Match')
