@@ -8,6 +8,9 @@ def gem():
     require_gem('Sapphire.Token')
 
 
+    show = false
+
+
     class FunctionCall_0(Object):
         __slot__ = ((
             'left',                         #   Expression
@@ -21,7 +24,28 @@ def gem():
 
 
         def __repr__(t):
-            return arrange('<FunctionCall0 %r %r>', t.left, t.pair_of_parenthesis)
+            return arrange('<FunctionCall_0 %r %r>', t.left, t.pair_of_parenthesis)
+
+
+    class FunctionCall_1(Object):
+        __slot__ = ((
+            'left',                         #   Expression
+            'left_parenthesis',             #   String
+            'argument_1',                   #   Any
+            'right_parenthesis',            #   String
+        ))
+
+
+        def __init__(t, left, left_parenthesis, argument_1, right_parenthesis):
+            t.left              = left
+            t.left_parenthesis  = left_parenthesis
+            t.argument_1        = argument_1
+            t.right_parenthesis = right_parenthesis
+
+
+        def __repr__(t):
+            return arrange('<FunctionCall_1 %r %r %r %r>',
+                           t.left, t.left_parenthesis, t.argument_1, t.right_parenthesis)
 
 
     class ReturnExpression(Token):
@@ -41,12 +65,16 @@ def gem():
 
 
     def parse_decorator(m0, s):
-        line(portray_raw_string(s[m0.end():]))
+        if show:
+            line(portray_raw_string(s[m0.end():]))
 
-        m = none#define_1_match(s[m0.end():])
+        m = expression_match(s[m0.end():])
 
         if m is none:
             return UnknownLine(s)
+
+        return DecoratorHeader(m0.group('indented') + m0.group('keyword__ow'), parse_expression(m))
+
 
     def parse_define_header(m0, s):
         #line(portray_raw_string(s[m0.end():]))
@@ -68,6 +96,22 @@ def gem():
         return DefineHeader(m0.group('indented') + m0.group('keyword__ow'), name_1, parameters)
 
 
+    def parse_expression(m):
+        [
+                name_1, left_parenthesis, single_quote, right_parenthesis,
+        ] = m.group('name_1', 'left_parenthesis', 'single_quote', 'right_parenthesis')
+
+        expression = Symbol(name_1)
+
+        if left_parenthesis is none:
+            return expression
+
+        if single_quote is none:
+            return FunctionCall_0(expression, left_parenthesis + right_parenthesis)
+
+        return FunctionCall_1(expression, left_parenthesis, SingleQuote(single_quote), right_parenthesis)
+
+
     def parse_return(m0, s):
         #line(portray_raw_string(s[m0.end():]))
 
@@ -76,14 +120,7 @@ def gem():
         if m is none:
             return UnknownLine(s)
 
-        [name_1, pair_of_parenthesis] = m.group('name_1', 'pair_of_parenthesis')
-
-        expression = Symbol(name_1)
-
-        if pair_of_parenthesis is not none:
-            expression = FunctionCall_0(expression, pair_of_parenthesis)
-
-        return ReturnExpression(m0.group('indented') + m0.group('keyword__ow'), expression)
+        return ReturnExpression(m0.group('indented') + m0.group('keyword__ow'), parse_expression(m))
 
 
     keyword_define  .parse_line = parse_define_header

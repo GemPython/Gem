@@ -9,9 +9,9 @@ def gem():
     require_gem('Tremolite.Name')
 
 
-    from Tremolite import create_match_code, ANY_OF, DOT, EMPTY, END_OF_PATTERN, EXACT, FULL_MATCH, GROUP, LINEFEED
-    from Tremolite import MATCH, NAME, NAMED_GROUP, NOT_FOLLOWED_BY, ONE_OR_MORE, OPTIONAL, OPTIONAL_GROUP
-    from Tremolite import ZERO_OR_MORE
+    from Tremolite import create_match_code, ANY_OF, BACKSLASH, DOT, EMPTY, END_OF_PATTERN, EXACT, FULL_MATCH
+    from Tremolite import GROUP, LINEFEED, MATCH, NAME, NAMED_GROUP, NOT_FOLLOWED_BY
+    from Tremolite import ONE_OR_MORE, OPTIONAL, OPTIONAL_GROUP, PRINTABLE, PRINTABLE_MINUS, ZERO_OR_MORE
 
 
     @share
@@ -29,10 +29,18 @@ def gem():
         name_2     = NAMED_GROUP('name_2', identifier)
         name_3     = NAMED_GROUP('name_3', identifier)
 
+        single_quote = NAMED_GROUP(
+                           'single_quote',
+                           (
+                                "'" + ONE_OR_MORE(BACKSLASH + PRINTABLE | PRINTABLE_MINUS("'", '\\')) + "'"
+                                    | ("''" + NOT_FOLLOWED_BY("'"))
+                           )
+                       )
+
         left_parenthesis         = NAMED_GROUP('left_parenthesis',         ow + '(' + ow)
         right_parenthesis        = NAMED_GROUP('right_parenthesis',        ow + ')' + ow)
         right_parenthesis__colon = NAMED_GROUP('right_parenthesis__colon', ow + ')' + ow + ':')
-        pair_of_parenthesis      = NAMED_GROUP('pair_of_parenthesis',      ow + '(' + ow + ')' + ow)
+        #pair_of_parenthesis      = NAMED_GROUP('pair_of_parenthesis',      ow + '(' + ow + ')' + ow)
 
         keyword__ow = NAMED_GROUP(
                           'keyword__ow',
@@ -56,7 +64,14 @@ def gem():
                   )
         )
 
-        FULL_MATCH('define_1_match',   name_1 + left_parenthesis + OPTIONAL(name_2) + right_parenthesis__colon + LINEFEED)
-        FULL_MATCH('expression_match', name_1 + OPTIONAL(pair_of_parenthesis) + LINEFEED)
+        FULL_MATCH(
+            'define_1_match',
+            name_1 + left_parenthesis + OPTIONAL(name_2) + right_parenthesis__colon + LINEFEED,
+        )
+
+        FULL_MATCH(
+            'expression_match',
+            name_1 + OPTIONAL(left_parenthesis + OPTIONAL(single_quote) + right_parenthesis) + LINEFEED,
+        )
  
         create_match_code('../Sapphire/Match.py', '2017 Amit Green', 'Sapphire.Match')

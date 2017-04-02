@@ -7,6 +7,87 @@ def gem():
 
 
     @share
+    class Comment(Token):
+        __slots__ = (())
+
+
+    @share
+    class DecoratorHeader(Object):
+        __slots__ = ((
+            'operator_decorator',           #   OperatorAtSign
+            'expresssion',                  #   Any
+        ))
+
+
+        def __init__(t, operator_decorator, expresssion):
+            t.operator_decorator = operator_decorator
+            t.expresssion        = expresssion
+
+
+        def  __repr__(t):
+            return arrange('<DecoratorHeader %r %r>', t.operator_decorator, t.expresssion)
+
+
+    @share
+    class DefineHeader(Object):
+        __slots__ = ((
+            'keyword_define',               #   KeywordDefine
+            'name',                         #   String
+            'parameters_colon',             #   Parameter_0 | Parameter_1
+        ))
+
+
+        def __init__(t, keyword_define, name, parameters_colon):
+            t.keyword_define   = keyword_define
+            t.name             = name
+            t.parameters_colon = parameters_colon
+
+
+        def  __repr__(t):
+            return arrange('<DefineHeader %s %s %r>', portray_string(t.keyword_define), t.name, t.parameters_colon)
+
+
+    class EmptyComment(Token):
+        __slots__ = (())
+
+
+        @static_method
+        def __repr__():
+            return '<EmptyComment>'
+
+
+    @share
+    class EmptyLine(Token):
+        __slots__ = (())
+
+
+        def __repr__(t):
+            if t.s is '':
+                return '<EmptyLine>'
+
+            return arrange('<EmptyLine %r>', t.s)
+
+
+    @share
+    class IndentedComment(Token):
+        __slots__ = ((
+            'indented',                     #   String
+        ))
+
+
+        def __init__(t, indented, s):
+            t.indented = indented
+            t.s        = s
+
+
+        def __repr__(t):
+            if t.s is '':
+                return arrange('<+# %r #>', t.indented)
+
+            return arrange('<+# %r # %s>', t.indented, portray_string(t.s))
+
+
+    @share
     class ParameterColon_0(Token):
         pass
 
@@ -33,20 +114,7 @@ def gem():
                            portray_string(t.right_parenthesis__colon))
 
 
-    @share
-    class DefineHeader(Object):
-        __slots__ = ((
-            'keyword_define',               #   String
-            'name',                         #   String
-            'parameters_colon',             #   Parameter_0 | Parameter_1
-        ))
-
-
-        def __init__(t, keyword_define, name, parameters_colon):
-            t.keyword_define   = keyword_define
-            t.name             = name
-            t.parameters_colon = parameters_colon
-
-
-        def  __repr__(t):
-            return arrange('<DefineHeader %s %s %r>', portray_string(t.keyword_define), t.name, t.parameters_colon)
+    share(
+        'empty_comment',        EmptyComment(''),
+        'empty_line',           EmptyLine(''),
+    )
