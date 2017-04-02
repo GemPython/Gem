@@ -9,6 +9,9 @@ def gem():
     require_gem('Tremolite.Match')
 
 
+    show = false
+
+
     #
     #   TremoliteBase
     #       TremoliteExact
@@ -144,7 +147,7 @@ def gem():
     class TremoliteName(TremoliteGroupBase):
         __slots__ = (())
 
-        
+
         def __init__(t, name, pattern):
             t.regular_expression = pattern.regular_expression
             t.portray            = t.name = name
@@ -201,7 +204,6 @@ def gem():
                            t.__class__.__name__,
                            portray_string(t.regular_expression),
                            ' '.join((portray_string(v)   if type(v) is String else   portray(v))  for v in t.many))
-
 
 
     class TremoliteAdd(TremoliteMany):
@@ -500,7 +502,7 @@ def gem():
 
     @export
     def MINIMUM_OF_ONE_OR_MORE(pattern):
-        return create_simple_repeat('MINIMUM_OF_ONE_OR_MORE', pattern, '+?')
+        return create_simple_repeat('MINIMUM_OF_ONE_OR_MORE', pattern, '{1,7777777}?')
 
 
     @export
@@ -515,12 +517,12 @@ def gem():
 
     @export
     def MINIMUM_OF_REPEAT_OR_MORE(pattern, m):
-        return create_repeat('MINIMUM_OF_REPEAT_OR_MORE', pattern, m, -7, '?')
+        return create_repeat('MINIMUM_OF_REPEAT_OR_MORE', pattern, m, 7777777, '?')
 
 
     @export
     def MINIMUM_OF_ZERO_OR_MORE(pattern):
-        return create_simple_repeat('MINIMUM_OF_ZERO_OR_MORE', pattern, '*?')
+        return create_simple_repeat('MINIMUM_OF_ZERO_OR_MORE', pattern, '{,7777777}?')
 
 
     @export
@@ -571,7 +573,7 @@ def gem():
 
     @export
     def ONE_OR_MORE(pattern):
-        return create_simple_repeat('ONE_OR_MORE', pattern, '+')
+        return create_simple_repeat('ONE_OR_MORE', pattern, '{1,7777777}')
 
 
     @export
@@ -597,9 +599,116 @@ def gem():
                )
 
 
+    #
+    #<PRINTABLE_MINUS>
+    #
+    def raise_invalid_printable_minus_character(c, s):
+        raise_runtime_error('invalid character <%s> passed to PRINTABLE_MINUS(%s)',
+                            portray_string(c), portray_string(s))
+
+
+    def raise_already_not_allowed_printable_minus_character(c, s):
+        raise_runtime_error('character %r already not allowed in PRINTABLE_MINUS(%s)',
+                            portray_string(c), portray_string(s))
+
+
+    ordinal_space = ordinal(' ')
+    ordinal_minus = ordinal('-')
+    ordinal_tilde = ordinal('~')
+
+
+    @export
+    def PRINTABLE_MINUS(*arguments):
+        assert length(arguments) > 0
+
+        valid = [ordinal_space <= i <= ordinal_tilde   for i in iterate_range(0, 256)]
+
+        for s in arguments:
+            if length(s) is 1:
+                a = lookup_ascii(s, unknown_ascii)
+
+                if not a.is_printable:
+                    raise_invalid_printable_minus_character(s, s)
+
+                if not valid[a.ordinal]:
+                    raise_already_not_allowed_printable_minus_character(s, s)
+
+                valid[a.ordinal] = false
+                continue
+
+            assert (length(s) is 3) and (s[1] is '-')
+
+            a0 = lookup_ascii(s[0], unknown_ascii)
+            a2 = lookup_ascii(s[2], unknown_ascii)
+
+            if not a0.is_printable:
+                raise_invalid_printable_minus_character(s[0], s)
+
+            if not a2.is_printable:
+                raise_invalid_printable_minus_character(s[2], s)
+
+            if a0.ordinal > a2.ordinal:
+                raise_runtime_error('invalid backwards range PRINTABLE_MINUS(%s)', portray_string(s))
+
+            for i in iterate_range(a0.ordinal, a2.ordinal):
+                if not valid[i]:
+                    raise_already_not_allowed_printable_minus_character(character(i), s)
+
+                valid[i] = false
+
+        many   = ['[']
+        append = many.append
+        lowest = none
+
+
+        def add_range(lowest, highest):
+            if show:
+                line('add_range(%d, %d)', lowest, highest)
+
+            if lowest == ordinal_minus:
+                many.insert(0, '-')
+                lowest += 1
+
+            if highest == ordinal_minus:
+                many.insert(0, '-')
+                highest -= 1
+
+            if lowest == highest:
+                many.append(lookup_ascii(lowest).pattern)
+                return
+
+            if lowest > highest:
+                return
+
+            many.append(arrange('%s-%s', lookup_ascii(lowest).pattern, lookup_ascii(highest).pattern))
+
+
+        for i in iterate_range(0, 256):
+            if valid[i]:
+                if lowest is none:
+                    lowest = i
+                    continue
+            else:
+                if lowest is not none:
+                    add_range(lowest, i - 1)
+                    lowest = none
+        else:
+            if lowest is not none:
+                add_range(lowest, 255)
+
+        many.append(']')
+
+        return TremoliteAnyOf(
+                   intern_string(''.join(many)),
+                   intern_arrange('PRINTABLE_MINUS(%s)', ', '.join(portray_string(s)   for s in arguments)),
+                   Tuple(intern_string(s)   for s in arguments)
+               )
+    #</PRINTABLE_MINUS>
+
+
     @export
     def REPEAT_OR_MORE(pattern, m):
-        return create_repeat('REPEAT_OR_MORE', pattern, m, -7)
+        return create_repeat('REPEAT_OR_MORE', pattern, m, 7777777)
 
 
     @export
@@ -616,7 +725,7 @@ def gem():
 
     @export
     def ZERO_OR_MORE(pattern):
-        return create_simple_repeat('ZERO_OR_MORE', pattern, '*')
+        return create_simple_repeat('ZERO_OR_MORE', pattern, '{,7777777}')
 
 
     share(
@@ -625,8 +734,10 @@ def gem():
 
 
     export(
-        'DOT',              SPECIAL('.',            'DOT',      repeatable = true, singular = true),
+        'BACKSLASH',        SPECIAL(r'\\',          'BACKSLASH',    repeatable = true, singular = true),
+        'DOT',              SPECIAL('.',            'DOT',          repeatable = true, singular = true),
         'EMPTY',            SPECIAL('(?#empty)',    'EMPTY'),
-        'LINEFEED',         SPECIAL(r'\n',          'LINEFEED', repeatable = true, singular = true),
         'END_OF_PATTERN',   SPECIAL(r'\Z',          'END_OF_PATTERN'),
+        'LINEFEED',         SPECIAL(r'\n',          'LINEFEED',     repeatable = true, singular = true),
+        'PRINTABLE',        SPECIAL('[ -~]',        'PRINTABLE',    repeatable = true, singular = true),
     )
