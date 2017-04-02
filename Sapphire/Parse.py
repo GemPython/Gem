@@ -12,6 +12,9 @@ def gem():
         ))
 
 
+        is_keyword = false
+
+
         def __init__(t, s):
             t.s = s
 
@@ -78,9 +81,6 @@ def gem():
             return '<EmptyComment>'
 
 
-    empty_comment = EmptyComment('')
-
-
     class EmptyLine(Token):
         __slots__ = (())
 
@@ -90,9 +90,6 @@ def gem():
                 return '<EmptyLine>'
 
             return arrange('<EmptyLine %r>', t.s)
-
-
-    empty_line = EmptyLine('')
 
 
     class FunctionCall_0(Object):
@@ -109,7 +106,33 @@ def gem():
 
         def __repr__(t):
             return arrange('<FunctionCall0 %r %r>', t.left, t.pair_of_parenthesis)
-            
+
+
+    class KeywordBase(Token):
+        __slots__ = ((
+            'parse_line',                   #   Function
+        ))
+
+
+        is_keyword = true
+
+
+        def __repr__(t):
+            return t.keyword
+
+
+    class KeywordDefine(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = 'def'
+
+
+    class KeywordReturn(KeywordBase):
+        __slots__ = (())
+
+
+        keyword = 'return'
 
 
     class ReturnExpression(Token):
@@ -140,17 +163,78 @@ def gem():
         pass
 
 
+    empty_comment = EmptyComment('')
+    empty_line    = EmptyLine('')
+
+    [
+            conjure_symbol, lookup_symbol,
+    ] = produce_cache_functions('Sapphire.symbol_cache', produce_conjure = true, produce_lookup = true)
+
+
+    def parse_define_header(m0, s):
+        #line(portray_raw_string(s[m0.end():]))
+
+        m = define_1_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
+        [
+            name_1, left_parenthesis, name_2, right_parenthesis__colon,
+        ] = m.group('name_1', 'left_parenthesis', 'name_2', 'right_parenthesis__colon')
+
+        return DefineHeader(
+                   m0.group('keyword__ow'),
+                   name_1,
+                   left_parenthesis,
+                   name_2,
+                   right_parenthesis__colon,
+               )
+
+
+    def parse_return(m0, s):
+        #line(portray_raw_string(s[m0.end():]))
+
+        m = expression_match(s[m0.end():])
+
+        if m is none:
+            return UnknownLine(s)
+
+        [name_1, pair_of_parenthesis] = m.group('name_1', 'pair_of_parenthesis')
+
+        expression = Symbol(name_1)
+
+        if pair_of_parenthesis is not none:
+            expression = FunctionCall_0(expression, pair_of_parenthesis)
+
+        return ReturnExpression(m0.group('keyword__ow'), expression)
+
+
+    conjure_symbol('def',    KeywordDefine).parse_line = parse_define_header
+    conjure_symbol('return', KeywordReturn).parse_line = parse_return
+
+
     @share
     def parse_python_from_path(path):
         data        = read_text_from_path('../Sapphire/Main.py')
         many        = []
         append_line = many.append
 
-        for s in data.splitlines():
+        for s in data.splitlines(true):
             m = line_match(s)
 
             if m is not none:
-                [indented, comment] = m.group('ow1', 'comment')
+                [
+                        indented, keyword, comment, newline_2,
+                ] = m.group('indented', 'keyword', 'comment', 'newline_2')
+
+                if keyword is not none:
+                    assert comment is newline_2 is none
+
+                    append_line(lookup_symbol(keyword).parse_line(m, s))
+                    continue
+
+                assert newline_2 is not none
 
                 if comment is not none:
                     if indented is '':
@@ -162,38 +246,6 @@ def gem():
                         continue
 
                     append_line(IndentedComment(indented, comment))
-                    continue
-
-                keyword_define = m.group('keyword_define')
-
-                if keyword_define is not none:
-                    [
-                        name_1, left_parenthesis, name_2, right_parenthesis__colon,
-                    ] = m.group('name_1', 'define__left_parenthesis', 'name_2', 'define__right_parenthesis__colon')
-
-                    append_line(
-                        DefineHeader(
-                            indented + keyword_define,
-                            name_1,
-                            left_parenthesis,
-                            name_2,
-                            right_parenthesis__colon,
-                        ),
-                    )
-
-                    continue
-
-                keyword_return = m.group('keyword_return')
-
-                if keyword_return is not none:
-                    [name_1, pair_of_parenthesis] = m.group('return__name_1', 'return__pair_of_parenthesis')
-
-                    expression = Symbol(name_1)
-
-                    if pair_of_parenthesis is not none:
-                        expression = FunctionCall_0(expression, pair_of_parenthesis)
-
-                    append_line(ReturnExpression(indented + keyword_return, expression))
                     continue
 
                 if indented is '':

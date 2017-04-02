@@ -22,11 +22,13 @@ def boot():
 @gem('Sapphire.Main')
 def gem():
     require_gem('Sapphire.Core')
-    require_gem('Sapphire.Parse')
     require_gem('Sapphire.Pattern')
 
 
     @share
     def main():
         create_sapphire_match()
+
+        require_gem('Sapphire.Parse')               #   Must be after 'create_sapphire_match'
+
         parse_python_from_path('../Sapphire/Main.py')
