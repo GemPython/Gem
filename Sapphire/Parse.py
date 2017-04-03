@@ -13,59 +13,6 @@ def gem():
     show = true
 
 
-    class FunctionCall_0(Object):
-        __slot__ = ((
-            'left',                         #   Expression
-            'pair_of_parenthesis',          #   String
-        ))
-
-
-        def __init__(t, left, pair_of_parenthesis):
-            t.left                = left
-            t.pair_of_parenthesis = pair_of_parenthesis
-
-
-        def __repr__(t):
-            return arrange('<FunctionCall_0 %r %r>', t.left, t.pair_of_parenthesis)
-
-
-    class FunctionCall_1(Object):
-        __slot__ = ((
-            'left',                         #   Expression
-            'left_parenthesis',             #   String
-            'argument_1',                   #   Any
-            'right_parenthesis',            #   String
-        ))
-
-
-        def __init__(t, left, left_parenthesis, argument_1, right_parenthesis):
-            t.left              = left
-            t.left_parenthesis  = left_parenthesis
-            t.argument_1        = argument_1
-            t.right_parenthesis = right_parenthesis
-
-
-        def __repr__(t):
-            return arrange('<FunctionCall_1 %r %r %r %r>',
-                           t.left, t.left_parenthesis, t.argument_1, t.right_parenthesis)
-
-
-    class ReturnExpression(Token):
-        __slots__ = ((
-            'keyword_return',               #   String
-            'expression',                   #   String
-        ))
-
-
-        def __init__(t, keyword_return, expression):
-            t.keyword_return = keyword_return
-            t.expression     = expression
-
-
-        def  __repr__(t):
-            return arrange('<Return %r %s>', t.keyword_return, t.expression)
-
-
     def parse_expression(m):
         [
                 name, left_parenthesis, single_quote, right_parenthesis,
@@ -77,9 +24,9 @@ def gem():
             return expression
 
         if single_quote is none:
-            return FunctionCall_0(expression, left_parenthesis + right_parenthesis)
+            return ExpressionCall(expression, left_parenthesis + right_parenthesis)
 
-        return FunctionCall_1(expression, left_parenthesis, SingleQuote(single_quote), right_parenthesis)
+        return ExpressionCall(expression, Arguments_1(left_parenthesis, SingleQuote(single_quote), right_parenthesis))
 
 
     def parse_statement_decorator_header(m0, s):
@@ -179,8 +126,10 @@ def gem():
         if m is none:
             return UnknownLine(s)
 
-        return ReturnExpression(KeywordReturn(m0.group('indented') + m0.group('keyword__ow')), parse_expression(m))
-
+        return StatementReturnExpression(
+                   KeywordReturn(m0.group('indented') + m0.group('keyword__ow')),
+                   parse_expression(m),
+               )
 
 
     find_parse_line = {
@@ -216,7 +165,7 @@ def gem():
                 continue
 
             if name:
-                append(parse_expression__symbol(m, s, name))
+                append(parse_statement_expression__symbol(m, s, name))
                 continue
 
             assert newline_2 is not none

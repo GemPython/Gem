@@ -74,6 +74,23 @@ def gem():
 
 
     @share
+    class ExpressionCall(Object):
+        __slot__ = ((
+            'left',                         #   Expression
+            'arguments',                    #   Arguments*
+        ))
+
+
+        def __init__(t, left, arguments):
+            t.left      = left
+            t.arguments = arguments
+
+
+        def __repr__(t):
+            return arrange('<ExpressionCall %r %r>', t.left, t.arguments)
+
+
+    @share
     class ExpressionComma(ExpressionBinaryBase):
         __slots__ = (())
 
@@ -103,6 +120,29 @@ def gem():
         def __repr__(t):
             return arrange('<%s %r %r %r %r>',
                            t.__class__.__name__, t.array, t.left_square_bracket, t.index, t.right_square_bracket)
+
+
+    @share
+    class ExpressionMethodCall(Object):
+        __slot__ = ((
+            'left',                         #   Expression
+            'dot',                          #   OperatorDot
+            'right',                        #   Symbol
+            'arguments',                    #   Arguments*
+        ))
+
+
+        def __init__(t, left, dot, right, arguments):
+            t.left      = left
+            t.dot       = dot
+            t.right     = right
+            t.arguments = arguments
+
+
+        def __repr__(t):
+            return arrange('<ExpressionCall %r %r %r %r>', t.left, t.dot, t.right, t.arguments)
+
+
     @share
     class Number(Token):
         __slots__ = (())

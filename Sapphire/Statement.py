@@ -171,6 +171,23 @@ def gem():
             return arrange('<StatementImport %r %r>', t.keyword_import, t.module)
 
 
+    @share
+    class StatementReturnExpression(Token):
+        __slots__ = ((
+            'keyword_return',               #   String
+            'expression',                   #   String
+        ))
+
+
+        def __init__(t, keyword_return, expression):
+            t.keyword_return = keyword_return
+            t.expression     = expression
+
+
+        def  __repr__(t):
+            return arrange('<Return %r %s>', t.keyword_return, t.expression)
+
+
     share(
         'empty_comment',        EmptyComment(''),
         'empty_line',           EmptyLine(''),

@@ -104,7 +104,8 @@ def gem():
             )
         )
 
-        MATCH('postfix_match', dot + name + left_parenthesis)
+        MATCH('statement_expression_match', OPTIONAL(dot + GROUP('right', identifier)) + left_parenthesis)
+        FULL_MATCH('statement_postfix_match', LINEFEED)
  
         #
         #   Statements
