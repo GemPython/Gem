@@ -7,7 +7,8 @@ def gem():
 
 
     class KeywordAndOperatorBase(Token):
-        is_keyword = true
+        is_comma             = false
+        is_right_parenthesis = false
 
 
         def __repr__(t):
@@ -45,8 +46,15 @@ def gem():
 
 
     @export
+    class OperatorAtSign(KeywordAndOperatorBase):
+        __slots__ = (())
+        keyword   = '@'
+
+
+    @export
     class OperatorComma(KeywordAndOperatorBase):
         __slots__ = (())
+        is_comma  = true
         keyword   = ','
 
 
@@ -57,9 +65,30 @@ def gem():
 
 
     @export
-    class OperatorAtSign(KeywordAndOperatorBase):
+    class OperatorLeftParenthesis(KeywordAndOperatorBase):
         __slots__ = (())
-        keyword   = '@'
+        keyword   = '('             #   )
+
+
+    @export
+    class OperatorLeftSquareBracket(KeywordAndOperatorBase):
+        __slots__ = (())
+        keyword   = '['             #   ]
+
+
+    @export
+    class OperatorRightParenthesis(KeywordAndOperatorBase):
+        __slots__            = (())
+        is_right_parenthesis = true
+        #  ([
+        keyword              = ')'
+
+
+    @export
+    class OperatorRightSquareBracket(KeywordAndOperatorBase):
+        __slots__ = (())
+        #   [
+        keyword   = ']'
 
 
     @share

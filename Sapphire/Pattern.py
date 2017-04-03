@@ -31,7 +31,7 @@ def gem():
         name_3     = NAMED_GROUP('name_3', identifier)
         name_4     = NAMED_GROUP('name_4', identifier)
 
-        number = NAMED_GROUP('number', ANY_OF('1-9') + ZERO_OR_MORE('0-9'))
+        number = NAMED_GROUP('number', '0' | ANY_OF('1-9') + ZERO_OR_MORE('0-9'))
 
         single_quote = NAMED_GROUP(
                            'single_quote',
@@ -75,10 +75,32 @@ def gem():
         #   Expressions
         #
         MATCH(
-            'first_argument_match',
+            'argument_1_match',
             (
                   (name | number)
-                + GROUP('operator__ow', ow + GROUP('operator', ANY_OF('(', ',')) + ow)
+                + GROUP('operator__ow', ow + GROUP('operator', ANY_OF('(', ',', '[')) + ow)     #   ]
+            )
+        )
+
+        MATCH(
+            'argument_2_match',
+            (
+                  (name | number | single_quote)
+                + GROUP('operator__ow', ow + GROUP('operator', ANY_OF('(', ')', ',')) + ow)
+            )
+        )
+
+        MATCH(
+            'argument_postfix_match',
+            #   (
+            GROUP('operator__ow', ow + GROUP('operator', ANY_OF(')', ',')) + ow)
+        )
+
+        MATCH(
+            'index_1_match',
+            (
+                  (name | number)
+                + GROUP('operator__ow', ow + GROUP('operator', ANY_OF(']')) + ow)
             )
         )
 
